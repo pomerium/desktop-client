@@ -8,12 +8,13 @@
  * When running `yarn build` or `yarn build-main`, this file is compiled to
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
+import * as child_process from 'child_process';
 import 'core-js/stable';
-import 'regenerator-runtime/runtime';
-import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
-import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import 'regenerator-runtime/runtime';
+import { getAssetPath, pomeriumCli } from './binaries';
 import MenuBuilder from './menu';
 
 export default class AppUpdater {
@@ -59,14 +60,6 @@ const createWindow = async () => {
     await installExtensions();
   }
 
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'resources')
-    : path.join(__dirname, '../resources');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
@@ -80,7 +73,7 @@ const createWindow = async () => {
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
   // @TODO: Use 'ready-to-show' event
-  //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
+  //        https://gitpomerium-tcp-connector/src/main.dev.ts:83hub.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
@@ -129,4 +122,12 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
+});
+
+// poc to make sure it works
+const command = `${pomeriumCli} -h`;
+child_process.exec(command, (error, standard_out, standard_error) => {
+  console.log(error);
+  console.log(standard_out);
+  console.log(standard_error);
 });

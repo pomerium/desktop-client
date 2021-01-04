@@ -1,7 +1,7 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Fast Refresh for rapid application development",
+  "name": "pomerium-tcp-connector",
+  "productName": "PomeriumTcpConnector",
+  "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
     "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.babel.js",
@@ -30,8 +30,8 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "PomeriumTcpConnector",
+    "appId": "io.pomerium.PomeriumTcpConnector",
     "files": [
       "dist/",
       "node_modules/",
@@ -74,7 +74,7 @@
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Zero-Trust"
     },
     "directories": {
       "app": "src",
@@ -86,47 +86,37 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "pomerium-tcp-connector",
+      "repo": "pomerium-tcp-connector"
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/pomerium/pomerium-tcp-connector.git"
   },
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Pomerium Inc",
+    "email": "info@pomerium.com",
+    "url": "https://pomerium.io/"
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    },
-    {
-      "name": "John Tran",
-      "email": "jptran318@gmail.com",
-      "url": "https://github.com/jooohhn"
+      "name": "Nathan Hayfield",
+      "email": "nhayfield@pomerium.com",
+      "url": "https://github.com/nhayfield"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/pomerium/pomerium-tcp-connector/issues"
   },
   "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "zero trust",
+    "network",
+    "internal",
+    "security"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/pomerium/pomerium-tcp-connector#readme",
   "jest": {
     "testURL": "http://localhost/",
     "moduleNameMapper": {
@@ -248,10 +238,14 @@
     "yarn-deduplicate": "^3.1.0"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.2",
     "electron-debug": "^3.1.0",
+    "electron-is-packaged": "^1.0.2",
     "electron-log": "^4.2.4",
+    "electron-root-path": "^1.0.16",
     "electron-updater": "^4.3.4",
     "history": "^5.0.0",
+    "menubar": "^9.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
