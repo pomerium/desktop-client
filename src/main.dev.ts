@@ -13,9 +13,8 @@ import 'core-js/stable';
 import { app, BrowserWindow, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import path from 'path';
 import 'regenerator-runtime/runtime';
-import { pomeriumCli } from './binaries';
+import { getAssetPath, pomeriumCli } from './binaries';
 import MenuBuilder from './menu';
 
 export default class AppUpdater {
@@ -60,14 +59,6 @@ const createWindow = async () => {
   ) {
     await installExtensions();
   }
-
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'resources')
-    : path.join(__dirname, '../resources');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
 
   mainWindow = new BrowserWindow({
     show: false,
@@ -134,7 +125,7 @@ app.on('activate', () => {
 });
 
 // poc to make sure it works
-const command = `${pomeriumCli} version`;
+const command = `${pomeriumCli} -h`;
 child_process.exec(command, (error, standard_out, standard_error) => {
   console.log(error);
   console.log(standard_out);
