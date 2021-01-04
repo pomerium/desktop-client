@@ -13,5 +13,3 @@ To package apps for the local platform:
 ```bash
 yarn package
 ```
-
-## License
