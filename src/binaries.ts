@@ -5,8 +5,8 @@ import path from 'path';
 import getPlatform from './platform';
 
 const IS_PROD = process.env.NODE_ENV === 'production';
-// const prodPath = getPlatform() === 'mac' ? './Contents/Resources' : 'resources';
 
+// todo: is there a better way? (i haven't found one)
 function getAppRoot(): string {
   if (process.platform === 'win32') {
     return path.join(app.getAppPath(), '/../../../');

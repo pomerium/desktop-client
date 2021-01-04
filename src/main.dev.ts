@@ -134,7 +134,7 @@ app.on('activate', () => {
 });
 
 // poc to make sure it works
-const command = `${pomeriumCli} -h`;
+const command = `${pomeriumCli} version`;
 child_process.exec(command, (error, standard_out, standard_error) => {
   console.log(error);
   console.log(standard_out);
