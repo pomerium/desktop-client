@@ -130,8 +130,6 @@ app.on('ready', async () => {
         mainWindow?.show();
       },
     },
-    { label: 'Item2', type: 'radio' },
-    { label: 'Item3', type: 'radio', checked: true },
     {
       label: 'Quit',
       click() {
