@@ -76,13 +76,6 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
-
-    if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
-    } else {
-      mainWindow.show();
-      mainWindow.focus();
-    }
   });
 
   mainWindow.on('minimize', (event: Event) => {
@@ -143,7 +136,9 @@ app.on('ready', async () => {
     tray,
   });
 
-  mb.on('ready', async () => {});
+  mb.on('ready', async () => {
+    mainWindow?.loadURL(`file://${__dirname}/index.html`);
+  });
 });
 
 // poc to make sure it works
