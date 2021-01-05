@@ -10,12 +10,12 @@
  */
 import * as child_process from 'child_process';
 import 'core-js/stable';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, Tray, Menu, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import 'regenerator-runtime/runtime';
+import { menubar } from 'menubar';
 import { getAssetPath, pomeriumCli } from './binaries';
-import MenuBuilder from './menu';
 
 export default class AppUpdater {
   constructor() {
@@ -70,14 +70,13 @@ const createWindow = async () => {
     },
   });
 
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
-
   // @TODO: Use 'ready-to-show' event
   //        https://gitpomerium-tcp-connector/src/main.dev.ts:83hub.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -86,42 +85,67 @@ const createWindow = async () => {
     }
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-
-  // Open urls in the user's browser
-  mainWindow.webContents.on('new-window', (event, url) => {
+  mainWindow.on('minimize', (event: Event) => {
     event.preventDefault();
-    shell.openExternal(url);
+    mainWindow?.hide();
   });
 
+  mainWindow.on('close', (event) => {
+    event.preventDefault();
+    mainWindow?.hide();
+    return false;
+  });
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
 };
 
-/**
- * Add event listeners...
- */
-
-app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.whenReady().then(createWindow).catch(console.log);
-
-app.on('activate', () => {
+app.on('activate', async () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) createWindow();
+  if (mainWindow === null) await createWindow();
+});
+
+app.on('before-quit', () => {
+  mainWindow?.removeAllListeners('close');
+  mainWindow?.close();
+});
+
+app.on('ready', async () => {
+  await createWindow();
+  const tray = new Tray(getAssetPath('icons', '24x24.png'));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Docs',
+      click() {
+        shell.openExternal(
+          'https://github.com/pomerium/pomerium-tcp-connector#readme'
+        );
+      },
+    },
+    {
+      label: 'Connect',
+      click() {
+        mainWindow?.loadURL(`file://${__dirname}/index.html`);
+        mainWindow?.show();
+      },
+    },
+    { label: 'Item2', type: 'radio' },
+    { label: 'Item3', type: 'radio', checked: true },
+    {
+      label: 'Quit',
+      click() {
+        app.quit();
+      },
+    },
+  ]);
+  tray.setContextMenu(contextMenu);
+
+  const mb = menubar({
+    tray,
+  });
+
+  mb.on('ready', async () => {});
 });
 
 // poc to make sure it works
