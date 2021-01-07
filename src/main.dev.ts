@@ -10,13 +10,24 @@
  */
 import * as child_process from 'child_process';
 import 'core-js/stable';
-import { app, Tray, Menu, shell, BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { menubar } from 'menubar';
 import 'regenerator-runtime/runtime';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
-import { getAssetPath, pomeriumCli } from './utils/binaries';
+import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import { pomeriumCli } from './utils/binaries';
 import { isDev, isProd, prodDebug } from './utils/constants';
-import { createWindow } from './utils/MainWindow';
+import createWindow from './utils/mainWindow';
+import createTray from './utils/trayMenu';
+
+class AppUpdater {
+  constructor() {
+    log.transports.file.level = 'info';
+    autoUpdater.logger = log;
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+}
 
 if (isProd) {
   const sourceMapSupport = require('source-map-support');
@@ -40,43 +51,15 @@ app.on('before-quit', () => {
 });
 
 app.on('ready', async () => {
+  // Remove this if your app does not use auto updates
+  // eslint-disable-next-line
+  new AppUpdater();
   installExtension(REDUX_DEVTOOLS)
     .then((name: string) => console.log(`Added Extension:  ${name}`))
     .catch((err: Error) => console.log('An error occurred: ', err));
   mainWindow = createWindow();
-  const tray = new Tray(getAssetPath('icons', '24x24.png'));
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Connect',
-      click() {
-        mainWindow?.webContents.send('redirectTo', '/hello');
-        mainWindow?.show();
-      },
-    },
-    {
-      label: 'Settings',
-      click() {
-        mainWindow?.webContents.send('redirectTo', '/hello2');
-        mainWindow?.show();
-      },
-    },
-    {
-      label: 'Help',
-      click() {
-        shell.openExternal(
-          'https://github.com/pomerium/pomerium-tcp-connector#readme'
-        );
-      },
-    },
-    {
-      label: 'Quit',
-      click() {
-        app.quit();
-      },
-    },
-  ]);
-  tray.setContextMenu(contextMenu);
-
+  mainWindow?.loadURL(`file://${__dirname}/index.html`);
+  const tray = createTray(mainWindow);
   const mb = menubar({
     tray,
   });

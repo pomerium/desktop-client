@@ -1,18 +1,8 @@
 import { BrowserWindow } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 import { getAssetPath } from './binaries';
 import MenuBuilder from './windowMenu';
 
-export class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
-
-export const createWindow = () => {
+const createWindow = () => {
   const mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
@@ -22,8 +12,6 @@ export const createWindow = () => {
       nodeIntegration: true,
     },
   });
-
-  mainWindow.loadURL(`file://${__dirname}/../index.html`);
 
   mainWindow.webContents.on('did-finish-load', () => {
     if (!mainWindow) {
@@ -45,9 +33,7 @@ export const createWindow = () => {
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
-
   return mainWindow;
 };
+
+export default createWindow;
