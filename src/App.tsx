@@ -9,11 +9,6 @@ import {
 } from 'react-router-dom';
 
 const Hello: FC = () => {
-  const history = useHistory();
-  ipcRenderer.on('redirectTo', (_, arg) => {
-    history.replace(arg);
-  });
-
   return (
     <div>
       <h3>Hello1</h3>
@@ -22,10 +17,6 @@ const Hello: FC = () => {
 };
 
 const Hello2: FC = () => {
-  const history = useHistory();
-  ipcRenderer.on('redirectTo', (_, arg) => {
-    history.replace(arg);
-  });
   return (
     <div>
       <h3>HELLO 2</h3>
@@ -33,15 +24,25 @@ const Hello2: FC = () => {
   );
 };
 
+const RouteListener: FC = (x) => {
+  const history = useHistory();
+  ipcRenderer.on('redirectTo', (_, arg) => {
+    history.replace(arg);
+  });
+  return <>{x.children}</>;
+};
+
 export default function App() {
   return (
     <HashRouter>
       <Switch>
-        <Route exact path="/">
-          <Redirect to="/hello" />
-        </Route>
-        <Route exact path="/hello" component={Hello} />
-        <Route exact path="/hello2" component={Hello2} />
+        <RouteListener>
+          <Route exact path="/">
+            <Redirect to="/hello" />
+          </Route>
+          <Route exact path="/hello" component={Hello} />
+          <Route exact path="/hello2" component={Hello2} />
+        </RouteListener>
       </Switch>
     </HashRouter>
   );
