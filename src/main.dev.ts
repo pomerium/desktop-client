@@ -10,24 +10,13 @@
  */
 import * as child_process from 'child_process';
 import 'core-js/stable';
-import { app, BrowserWindow, Tray, Menu, shell } from 'electron';
-import log from 'electron-log';
-import { autoUpdater } from 'electron-updater';
+import { app, Tray, Menu, shell, BrowserWindow } from 'electron';
 import { menubar } from 'menubar';
 import 'regenerator-runtime/runtime';
-import { getAssetPath, pomeriumCli } from './binaries';
-import { isDev, isProd, prodDebug } from './constants';
-import MenuBuilder from './menu';
-
-export default class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
-
-let mainWindow: BrowserWindow | null = null;
+import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
+import { getAssetPath, pomeriumCli } from './utils/binaries';
+import { isDev, isProd, prodDebug } from './utils/constants';
+import { createWindow } from './utils/MainWindow';
 
 if (isProd) {
   const sourceMapSupport = require('source-map-support');
@@ -37,68 +26,12 @@ if (isProd) {
 if (isDev || prodDebug) {
   require('electron-debug')();
 }
-
-const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS'];
-
-  return installer
-    .default(
-      extensions.map((name) => installer[name]),
-      forceDownload
-    )
-    .catch(console.log);
-};
-
-const createWindow = async () => {
-  if (isDev || prodDebug) {
-    await installExtensions();
-  }
-
-  mainWindow = new BrowserWindow({
-    show: false,
-    width: 1024,
-    height: 728,
-    icon: getAssetPath('icon.png'),
-    webPreferences: {
-      nodeIntegration: true,
-    },
-  });
-
-  await mainWindow.loadURL(`file://${__dirname}/index.html`);
-
-  // @TODO: Use 'ready-to-show' event
-  //        https://gitpomerium-tcp-connector/src/main.dev.ts:83hub.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-  mainWindow.webContents.on('did-finish-load', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
-    }
-  });
-
-  mainWindow.on('minimize', (event: Event) => {
-    event.preventDefault();
-    mainWindow?.hide();
-  });
-
-  mainWindow.on('close', (event) => {
-    event.preventDefault();
-    mainWindow?.hide();
-    return false;
-  });
-
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
-};
+let mainWindow: BrowserWindow | null;
 
 app.on('activate', async () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) await createWindow();
+  if (mainWindow === null) mainWindow = createWindow();
 });
 
 app.on('before-quit', () => {
@@ -107,7 +40,10 @@ app.on('before-quit', () => {
 });
 
 app.on('ready', async () => {
-  await createWindow();
+  installExtension(REDUX_DEVTOOLS)
+    .then((name: string) => console.log(`Added Extension:  ${name}`))
+    .catch((err: Error) => console.log('An error occurred: ', err));
+  mainWindow = createWindow();
   const tray = new Tray(getAssetPath('icons', '24x24.png'));
   const contextMenu = Menu.buildFromTemplate([
     {
