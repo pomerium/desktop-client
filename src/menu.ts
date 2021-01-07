@@ -5,6 +5,7 @@ import {
   BrowserWindow,
   MenuItemConstructorOptions,
 } from 'electron';
+import { isDev, prodDebug } from './constants';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -19,10 +20,7 @@ export default class MenuBuilder {
   }
 
   buildMenu(): Menu {
-    if (
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-    ) {
+    if (isDev || prodDebug) {
       this.setupDevelopmentEnvironment();
     }
 
@@ -64,16 +62,10 @@ export default class MenuBuilder {
         { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
-          label: 'Hide ElectronReact',
+          label: 'Hide',
           accelerator: 'Command+H',
           selector: 'hide:',
         },
-        {
-          label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
-          selector: 'hideOtherApplications:',
-        },
-        { label: 'Show All', selector: 'unhideAllApplications:' },
         { type: 'separator' },
         {
           label: 'Quit',
@@ -81,22 +73,6 @@ export default class MenuBuilder {
           click: () => {
             app.quit();
           },
-        },
-      ],
-    };
-    const subMenuEdit: DarwinMenuItemConstructorOptions = {
-      label: 'Edit',
-      submenu: [
-        { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
-        { label: 'Redo', accelerator: 'Shift+Command+Z', selector: 'redo:' },
-        { type: 'separator' },
-        { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
-        { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
-        { label: 'Paste', accelerator: 'Command+V', selector: 'paste:' },
-        {
-          label: 'Select All',
-          accelerator: 'Command+A',
-          selector: 'selectAll:',
         },
       ],
     };
@@ -157,39 +133,23 @@ export default class MenuBuilder {
         {
           label: 'Learn More',
           click() {
-            shell.openExternal('https://electronjs.org');
+            shell.openExternal('https://pomerium.io');
           },
         },
         {
           label: 'Documentation',
           click() {
             shell.openExternal(
-              'https://github.com/electron/electron/tree/master/docs#readme'
+              'https://github.com/pomerium/pomerium-tcp-connector'
             );
-          },
-        },
-        {
-          label: 'Community Discussions',
-          click() {
-            shell.openExternal('https://www.electronjs.org/community');
-          },
-        },
-        {
-          label: 'Search Issues',
-          click() {
-            shell.openExternal('https://github.com/electron/electron/issues');
           },
         },
       ],
     };
 
-    const subMenuView =
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-        ? subMenuViewDev
-        : subMenuViewProd;
+    const subMenuView = isDev || prodDebug ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout, subMenuView, subMenuWindow, subMenuHelp];
   }
 
   buildDefaultTemplate() {
@@ -198,14 +158,10 @@ export default class MenuBuilder {
         label: '&File',
         submenu: [
           {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
-          },
-          {
             label: '&Close',
             accelerator: 'Ctrl+W',
             click: () => {
-              this.mainWindow.close();
+              this.mainWindow.hide();
             },
           },
         ],
@@ -213,8 +169,7 @@ export default class MenuBuilder {
       {
         label: '&View',
         submenu:
-          process.env.NODE_ENV === 'development' ||
-          process.env.DEBUG_PROD === 'true'
+          isDev || prodDebug
             ? [
                 {
                   label: '&Reload',
@@ -258,27 +213,15 @@ export default class MenuBuilder {
           {
             label: 'Learn More',
             click() {
-              shell.openExternal('https://electronjs.org');
+              shell.openExternal('https://pomerium.io');
             },
           },
           {
             label: 'Documentation',
             click() {
               shell.openExternal(
-                'https://github.com/electron/electron/tree/master/docs#readme'
+                'https://github.com/pomerium/pomerium-tcp-connector'
               );
-            },
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
             },
           },
         ],

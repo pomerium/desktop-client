@@ -13,9 +13,11 @@ import 'core-js/stable';
 import { app, BrowserWindow, Tray, Menu, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import 'regenerator-runtime/runtime';
 import { menubar } from 'menubar';
+import 'regenerator-runtime/runtime';
 import { getAssetPath, pomeriumCli } from './binaries';
+import { isDev, isProd, prodDebug } from './constants';
+import MenuBuilder from './menu';
 
 export default class AppUpdater {
   constructor() {
@@ -27,15 +29,12 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-if (process.env.NODE_ENV === 'production') {
+if (isProd) {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
 
-if (
-  process.env.NODE_ENV === 'development' ||
-  process.env.DEBUG_PROD === 'true'
-) {
+if (isDev || prodDebug) {
   require('electron-debug')();
 }
 
@@ -53,10 +52,7 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
+  if (isDev || prodDebug) {
     await installExtensions();
   }
 
@@ -69,6 +65,8 @@ const createWindow = async () => {
       nodeIntegration: true,
     },
   });
+
+  await mainWindow.loadURL(`file://${__dirname}/index.html`);
 
   // @TODO: Use 'ready-to-show' event
   //        https://gitpomerium-tcp-connector/src/main.dev.ts:83hub.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -88,6 +86,10 @@ const createWindow = async () => {
     mainWindow?.hide();
     return false;
   });
+
+  const menuBuilder = new MenuBuilder(mainWindow);
+  menuBuilder.buildMenu();
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -109,18 +111,25 @@ app.on('ready', async () => {
   const tray = new Tray(getAssetPath('icons', '24x24.png'));
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Docs',
+      label: 'Connect',
+      click() {
+        mainWindow?.webContents.send('redirectTo', '/hello');
+        mainWindow?.show();
+      },
+    },
+    {
+      label: 'Settings',
+      click() {
+        mainWindow?.webContents.send('redirectTo', '/hello2');
+        mainWindow?.show();
+      },
+    },
+    {
+      label: 'Help',
       click() {
         shell.openExternal(
           'https://github.com/pomerium/pomerium-tcp-connector#readme'
         );
-      },
-    },
-    {
-      label: 'Connect',
-      click() {
-        mainWindow?.loadURL(`file://${__dirname}/index.html`);
-        mainWindow?.show();
       },
     },
     {
@@ -136,9 +145,7 @@ app.on('ready', async () => {
     tray,
   });
 
-  mb.on('ready', async () => {
-    mainWindow?.loadURL(`file://${__dirname}/index.html`);
-  });
+  mb.on('ready', async () => {});
 });
 
 // poc to make sure it works
