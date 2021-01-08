@@ -7,6 +7,7 @@ import {
   Switch,
   Route,
 } from 'react-router-dom';
+import ConnectForm from './pages/ConnectForm';
 
 const Hello: FC = () => {
   return (
@@ -42,6 +43,7 @@ export default function App() {
           </Route>
           <Route exact path="/hello" component={Hello} />
           <Route exact path="/hello2" component={Hello2} />
+          <Route exact path="/connect" component={ConnectForm} />
         </RouteListener>
       </Switch>
     </HashRouter>

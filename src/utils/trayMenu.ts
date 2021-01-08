@@ -7,7 +7,7 @@ const createTray = (mainWindow: BrowserWindow): Tray => {
     {
       label: 'Connect',
       click() {
-        mainWindow?.webContents.send('redirectTo', '/hello');
+        mainWindow?.webContents.send('redirectTo', '/connect');
         mainWindow?.show();
       },
     },
