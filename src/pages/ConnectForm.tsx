@@ -9,6 +9,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@material-ui/core';
+import { ipcRenderer } from 'electron';
 import React, { FC, useState } from 'react';
 import { isUrl, isIp } from '../utils/validators';
 
@@ -52,7 +53,22 @@ const ConnectForm: FC<Props> = () => {
 
   const connect = (): void => {
     if (!localError && !destinationError && !pomeriumUrlError) {
-      alert('here');
+      const args = {
+        destinationUrl,
+        localAddress,
+        pomeriumUrl,
+        disableTLS,
+      };
+      ipcRenderer.once('connect-reply', (_, result) => {
+        // eslint-disable-next-line no-alert,no-console
+        alert(result);
+      });
+      ipcRenderer.once('connect-close', (_, result) => {
+        // eslint-disable-next-line no-alert,no-console
+        alert(result);
+      });
+
+      ipcRenderer.send('connect', args);
     }
   };
 
@@ -72,6 +88,7 @@ const ConnectForm: FC<Props> = () => {
               value={destinationUrl}
               onChange={(evt): void => saveDestination(evt.target.value)}
               variant="outlined"
+              autoFocus
             />
           </Grid>
           <Grid item xs={12}>
@@ -110,7 +127,12 @@ const ConnectForm: FC<Props> = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Button type="button" variant="outlined" onClick={connect}>
+            <Button
+              type="button"
+              variant="outlined"
+              disabled={localError || destinationError || pomeriumUrlError}
+              onClick={connect}
+            >
               Connect
             </Button>
           </Grid>

@@ -9,14 +9,6 @@ import {
 } from 'react-router-dom';
 import ConnectForm from './pages/ConnectForm';
 
-const Hello: FC = () => {
-  return (
-    <div>
-      <h3>Hello1</h3>
-    </div>
-  );
-};
-
 const Hello2: FC = () => {
   return (
     <div>
@@ -39,9 +31,8 @@ export default function App() {
       <Switch>
         <RouteListener>
           <Route exact path="/">
-            <Redirect to="/hello" />
+            <Redirect to="/connect" />
           </Route>
-          <Route exact path="/hello" component={Hello} />
           <Route exact path="/hello2" component={Hello2} />
           <Route exact path="/connect" component={ConnectForm} />
         </RouteListener>

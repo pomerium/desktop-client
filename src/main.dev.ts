@@ -8,17 +8,16 @@
  * When running `yarn build` or `yarn build-main`, this file is compiled to
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
-import * as child_process from 'child_process';
 import 'core-js/stable';
-import { app, BrowserWindow } from 'electron';
-import { menubar } from 'menubar';
-import 'regenerator-runtime/runtime';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import { pomeriumCli } from './utils/binaries';
-import { isDev, isProd, prodDebug } from './utils/constants';
+import { menubar } from 'menubar';
 import createWindow from './utils/mainWindow';
+import 'regenerator-runtime/runtime';
+import { spawnTcpConnect, TcpConnectArgs } from './utils/binaries';
+import { isDev, isProd, prodDebug } from './utils/constants';
 import createTray from './utils/trayMenu';
 
 class AppUpdater {
@@ -65,12 +64,16 @@ app.on('ready', async () => {
   });
 
   mb.on('ready', async () => {});
-});
 
-// poc to make sure it works
-const command = `${pomeriumCli} -h`;
-child_process.exec(command, (error, standard_out, standard_error) => {
-  console.log(error);
-  console.log(standard_out);
-  console.log(standard_error);
+  ipcMain.on('connect', (event, args: TcpConnectArgs) => {
+    const child = spawnTcpConnect(args);
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', (data) => {
+      event.sender.send('connect-reply', data.toString());
+    });
+    child.on('close', (code) => {
+      event.sender.send('connect-close', code);
+    });
+    // todo: add disconnect to menu
+  });
 });
