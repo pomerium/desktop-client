@@ -31,7 +31,8 @@ const buildSpawnArgs = (args: TcpConnectArgs) => {
     spawnArgs.push(args.localAddress);
   }
   if (args.pomeriumUrl) {
-    spawnArgs.push(`--pomerium-url ${args.pomeriumUrl}`);
+    spawnArgs.push(`--pomerium-url`);
+    spawnArgs.push(args.pomeriumUrl);
   }
   if (args.disableTLS) {
     spawnArgs.push('--disable-tls-verification');

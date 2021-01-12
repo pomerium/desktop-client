@@ -8,6 +8,8 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  ListItem,
+  List,
 } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
 import React, { FC, useState } from 'react';
@@ -16,6 +18,12 @@ import { isUrl, isIp } from '../utils/validators';
 const useStyles = makeStyles(() => ({
   container: {
     padding: 3,
+  },
+  red: {
+    color: 'red',
+  },
+  green: {
+    color: 'green',
   },
 }));
 
@@ -32,6 +40,9 @@ const ConnectForm: FC<Props> = () => {
   const [destinationError, setDestinationError] = useState(true);
   const [pomeriumUrl, setPomeriumUrl] = useState('');
   const [pomeriumUrlError, setPomeriumUrlError] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const [output, setOutput] = useState<string[]>([]);
+  const [disconnectChannel, setDisconnectChannel] = useState('');
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
   };
@@ -51,94 +62,152 @@ const ConnectForm: FC<Props> = () => {
     setPomeriumUrlError(!isUrl(value));
   };
 
+  const disconnect = (): void => {
+    if (disconnectChannel) {
+      ipcRenderer.send(disconnectChannel, null);
+    }
+  };
+
   const connect = (): void => {
     if (!localError && !destinationError && !pomeriumUrlError) {
+      setOutput([]);
+      setConnected(true);
       const args = {
         destinationUrl,
         localAddress,
         pomeriumUrl,
         disableTLS,
       };
-      ipcRenderer.once('connect-reply', (_, result) => {
-        // eslint-disable-next-line no-alert,no-console
-        alert(result);
+      ipcRenderer.on('connect-reply', (_, result) => {
+        setOutput(result.output);
+        setDisconnectChannel(result.disconnectChannel);
       });
-      ipcRenderer.once('connect-close', (_, result) => {
-        // eslint-disable-next-line no-alert,no-console
-        alert(result);
+      ipcRenderer.on('connect-close', () => {
+        // eslint-disable-next-line no-console
+        console.log('connection_closed');
+        setConnected(false);
       });
 
       ipcRenderer.send('connect', args);
+      // ssh.localhost.pomerium.io:22
     }
   };
 
+  const clear = (): void => {
+    setDisableTLS(false);
+    setLocalAddress('');
+    setLocalError(false);
+    setDestinationUrl('');
+    setDestinationError(true);
+    setPomeriumUrl('');
+    setPomeriumUrlError(false);
+    setConnected(false);
+    setOutput([]);
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <Container className={classes.container}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12}>
-            <Typography variant="h4">Pomerium TCP Connector</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              required
-              error={destinationError}
-              label="Destination Url"
-              value={destinationUrl}
-              onChange={(evt): void => saveDestination(evt.target.value)}
-              variant="outlined"
-              autoFocus
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormGroup>
-              <FormControlLabel
-                label="Disable TLS Verification"
-                control={
-                  <Checkbox
-                    checked={disableTLS}
-                    name="disable-tls-verification"
-                    color="primary"
-                    onChange={(): void => setDisableTLS(!disableTLS)}
-                  />
-                }
+    <>
+      <form onSubmit={handleSubmit}>
+        <Grid className={classes.container}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12}>
+              <Typography variant="h4">Pomerium TCP Connector</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                required
+                error={destinationError}
+                label="Destination Url"
+                value={destinationUrl}
+                onChange={(evt): void => saveDestination(evt.target.value)}
+                variant="outlined"
+                autoFocus
               />
-            </FormGroup>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Local Address"
-              error={localError}
-              value={localAddress}
-              onChange={(evt): void => saveLocal(evt.target.value)}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Alternate Pomerium Url"
-              error={pomeriumUrlError}
-              value={pomeriumUrl}
-              onChange={(evt): void => savePomeriumUrl(evt.target.value)}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button
-              type="button"
-              variant="outlined"
-              disabled={localError || destinationError || pomeriumUrlError}
-              onClick={connect}
-            >
-              Connect
-            </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <FormGroup>
+                <FormControlLabel
+                  label="Disable TLS Verification"
+                  control={
+                    <Checkbox
+                      checked={disableTLS}
+                      name="disable-tls-verification"
+                      color="primary"
+                      onChange={(): void => setDisableTLS(!disableTLS)}
+                    />
+                  }
+                />
+              </FormGroup>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Local Address"
+                error={localError}
+                value={localAddress}
+                onChange={(evt): void => saveLocal(evt.target.value)}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Alternate Pomerium Url"
+                error={pomeriumUrlError}
+                value={pomeriumUrl}
+                onChange={(evt): void => savePomeriumUrl(evt.target.value)}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid container spacing={2} alignItems="center">
+              {connected && (
+                <Grid item xs={4}>
+                  <Button type="button" variant="outlined" onClick={disconnect}>
+                    Disconnect
+                  </Button>
+                </Grid>
+              )}
+              <Grid item xs={4}>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  disabled={
+                    localError ||
+                    destinationError ||
+                    pomeriumUrlError ||
+                    connected
+                  }
+                  onClick={connect}
+                >
+                  Connect
+                </Button>
+              </Grid>
+              <Grid item xs={4}>
+                <Button type="button" variant="outlined" onClick={clear}>
+                  New Connection
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
-      </Container>
-    </form>
+      </form>
+      {!!output.length && (
+        <Container className={classes.container}>
+          <List>
+            {output.map((item, i) => (
+              <ListItem
+                className={connected ? classes.green : classes.red}
+                // eslint-disable-next-line react/no-array-index-key
+                key={`output_${i}`}
+              >
+                {item}
+              </ListItem>
+            ))}
+          </List>
+        </Container>
+      )}
+    </>
   );
 };
 

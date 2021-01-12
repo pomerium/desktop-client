@@ -14,6 +14,7 @@ import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
+import { v4 as uuid } from 'uuid';
 import createWindow from './utils/mainWindow';
 import 'regenerator-runtime/runtime';
 import { spawnTcpConnect, TcpConnectArgs } from './utils/binaries';
@@ -68,11 +69,19 @@ app.on('ready', async () => {
   ipcMain.on('connect', (event, args: TcpConnectArgs) => {
     const child = spawnTcpConnect(args);
     child.stderr.setEncoding('utf8');
+    const output: string[] = [];
+    const disconnectChannel = `disconnect${uuid()}`;
     child.stderr.on('data', (data) => {
-      event.sender.send('connect-reply', data.toString());
+      output.push(data.toString());
+      event.sender.send('connect-reply', { output, disconnectChannel });
     });
-    child.on('close', (code) => {
+    child.on('exit', (code) => {
       event.sender.send('connect-close', code);
+      ipcMain.removeHandler(disconnectChannel);
+      child.removeAllListeners();
+    });
+    ipcMain.on(disconnectChannel, () => {
+      child.kill();
     });
     // todo: add disconnect to menu
   });
