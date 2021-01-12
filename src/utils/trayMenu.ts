@@ -1,9 +1,35 @@
 import { app, BrowserWindow, Menu, shell, Tray } from 'electron';
+import child_process from 'child_process';
 import { getAssetPath } from './binaries';
 
-const createTray = (mainWindow: BrowserWindow): Tray => {
-  const tray = new Tray(getAssetPath('icons', '24x24.png'));
-  const contextMenu = Menu.buildFromTemplate([
+export interface Connection {
+  url: string;
+  port: string;
+  child: child_process.ChildProcessWithoutNullStreams;
+  disconnectChannel: string;
+}
+
+const buildConnections = (connections: Connection[]) => {
+  return connections.map((connection) => {
+    return {
+      label: `${connection.url} -> ${connection.port}`,
+      submenu: [
+        {
+          label: 'Disconnect',
+          click: () => {
+            connection.child.kill();
+          },
+        },
+      ],
+    };
+  });
+};
+
+export const createContextMenu = (
+  mainWindow: BrowserWindow | null,
+  connections: Connection[]
+): Menu => {
+  return Menu.buildFromTemplate([
     {
       label: 'Connect',
       click() {
@@ -17,6 +43,10 @@ const createTray = (mainWindow: BrowserWindow): Tray => {
         mainWindow?.webContents.send('redirectTo', '/hello2');
         mainWindow?.show();
       },
+    },
+    {
+      label: 'Connections',
+      submenu: buildConnections(connections),
     },
     {
       label: 'Help',
@@ -33,8 +63,10 @@ const createTray = (mainWindow: BrowserWindow): Tray => {
       },
     },
   ]);
-  tray.setContextMenu(contextMenu);
-  return tray;
 };
 
-export default createTray;
+export const createTray = (mainWindow: BrowserWindow): Tray => {
+  const tray = new Tray(getAssetPath('icons', '24x24.png'));
+  tray.setContextMenu(createContextMenu(mainWindow, []));
+  return tray;
+};

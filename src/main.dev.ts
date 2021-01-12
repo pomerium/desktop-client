@@ -15,14 +15,13 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
 import { v4 as uuid } from 'uuid';
-import child_process from 'child_process';
 import createWindow from './utils/mainWindow';
 import 'regenerator-runtime/runtime';
 import { spawnTcpConnect, TcpConnectArgs } from './utils/binaries';
 import { isDev, isProd, prodDebug } from './utils/constants';
-import createTray from './utils/trayMenu';
+import { createTray, createContextMenu, Connection } from './utils/trayMenu';
 
-const children: child_process.ChildProcessWithoutNullStreams[] = [];
+let connections: Connection[] = [];
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -30,6 +29,11 @@ class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
+
+const getPort = (text: string) => {
+  const parts = text.split(':');
+  return parseInt(parts[parts.length - 1], 10);
+};
 
 if (isProd) {
   const sourceMapSupport = require('source-map-support');
@@ -48,7 +52,7 @@ app.on('activate', async () => {
 });
 
 app.on('before-quit', () => {
-  children.forEach((child) => child.kill());
+  connections.forEach((connection) => connection.child.kill());
   mainWindow?.removeAllListeners('close');
   mainWindow?.close();
 });
@@ -70,23 +74,38 @@ app.on('ready', async () => {
   mb.on('ready', async () => {
     ipcMain.on('connect', (event, args: TcpConnectArgs) => {
       const child = spawnTcpConnect(args);
-      children.push(child);
       child.stderr.setEncoding('utf8');
       const output: string[] = [];
       const disconnectChannel = `disconnect${uuid()}`;
       child.stderr.on('data', (data) => {
         output.push(data.toString());
         event.sender.send('connect-reply', { output, disconnectChannel });
+        const port = `:${getPort(data.toString())}`;
+        const found = connections.some(
+          (connection) => connection.port === port
+        );
+        if (!found) {
+          connections.push({
+            url: args.destinationUrl,
+            port,
+            child,
+            disconnectChannel,
+          });
+          mb.tray.setContextMenu(createContextMenu(mainWindow, connections));
+        }
       });
       child.on('exit', (code) => {
         event.sender.send('connect-close', code);
         ipcMain.removeHandler(disconnectChannel);
         child.removeAllListeners();
+        connections = connections.filter((connection) => {
+          return connection.disconnectChannel !== disconnectChannel;
+        });
+        mb.tray.setContextMenu(createContextMenu(mainWindow, connections));
       });
       ipcMain.on(disconnectChannel, () => {
         child.kill();
       });
-      // todo: add disconnect to menu
     });
   });
 });
