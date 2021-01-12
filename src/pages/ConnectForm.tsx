@@ -83,13 +83,10 @@ const ConnectForm: FC<Props> = () => {
         setDisconnectChannel(result.disconnectChannel);
       });
       ipcRenderer.on('connect-close', () => {
-        // eslint-disable-next-line no-console
-        console.log('connection_closed');
         setConnected(false);
       });
 
       ipcRenderer.send('connect', args);
-      // ssh.localhost.pomerium.io:22
     }
   };
 
