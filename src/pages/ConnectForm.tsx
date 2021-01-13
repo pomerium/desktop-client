@@ -25,6 +25,12 @@ const useStyles = makeStyles(() => ({
   green: {
     color: 'green',
   },
+  button: {
+    padding: 1,
+  },
+  buttonWrapper: {
+    marginTop: 20,
+  },
 }));
 
 interface Props {
@@ -157,16 +163,29 @@ const ConnectForm: FC<Props> = () => {
                 variant="outlined"
               />
             </Grid>
-            <Grid container spacing={2} alignItems="center">
-              {connected && (
-                <Grid item xs={4}>
-                  <Button type="button" variant="outlined" onClick={disconnect}>
-                    Disconnect
-                  </Button>
-                </Grid>
-              )}
-              <Grid item xs={4}>
+            <Grid
+              container
+              spacing={8}
+              alignItems="center"
+              justify="center"
+              className={classes.buttonWrapper}
+            >
+              <Grid item xs={3}>
                 <Button
+                  fullWidth
+                  type="button"
+                  variant="outlined"
+                  onClick={disconnect}
+                  disabled={!connected}
+                  color="primary"
+                  className={classes.button}
+                >
+                  Disconnect
+                </Button>
+              </Grid>
+              <Grid item xs={3}>
+                <Button
+                  fullWidth
                   type="button"
                   variant="outlined"
                   disabled={
@@ -175,13 +194,23 @@ const ConnectForm: FC<Props> = () => {
                     pomeriumUrlError ||
                     connected
                   }
+                  color="primary"
+                  className={classes.button}
                   onClick={connect}
                 >
                   Connect
                 </Button>
               </Grid>
-              <Grid item xs={4}>
-                <Button type="button" variant="outlined" onClick={clear}>
+              <Grid item xs={3}>
+                <Button
+                  fullWidth
+                  type="button"
+                  variant="outlined"
+                  onClick={clear}
+                  color="primary"
+                  className={classes.button}
+                  disabled={!connected}
+                >
                   New Connection
                 </Button>
               </Grid>

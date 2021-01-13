@@ -22,6 +22,8 @@ import { isDev, isProd, prodDebug } from './utils/constants';
 import { createTray, createContextMenu, Connection } from './utils/trayMenu';
 
 let connections: Connection[] = [];
+let mainWindow: BrowserWindow | null;
+
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -43,7 +45,6 @@ if (isProd) {
 if (isDev || prodDebug) {
   require('electron-debug')();
 }
-let mainWindow: BrowserWindow | null;
 
 app.on('activate', async () => {
   // On macOS it's common to re-create a window in the app when the
@@ -81,10 +82,10 @@ app.on('ready', async () => {
         output.push(data.toString());
         event.sender.send('connect-reply', { output, disconnectChannel });
         const port = `:${getPort(data.toString())}`;
-        const found = connections.some(
-          (connection) => connection.port === port
+        const connectionInMenu = connections.some(
+          (connection) => connection.disconnectChannel === disconnectChannel
         );
-        if (!found) {
+        if (!connectionInMenu) {
           connections.push({
             url: args.destinationUrl,
             port,
@@ -94,6 +95,9 @@ app.on('ready', async () => {
           mb.tray.setContextMenu(createContextMenu(mainWindow, connections));
         }
       });
+      ipcMain.on(disconnectChannel, () => {
+        child.kill();
+      });
       child.on('exit', (code) => {
         event.sender.send('connect-close', code);
         ipcMain.removeHandler(disconnectChannel);
@@ -102,9 +106,6 @@ app.on('ready', async () => {
           return connection.disconnectChannel !== disconnectChannel;
         });
         mb.tray.setContextMenu(createContextMenu(mainWindow, connections));
-      });
-      ipcMain.on(disconnectChannel, () => {
-        child.kill();
       });
     });
   });
