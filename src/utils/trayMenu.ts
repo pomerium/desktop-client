@@ -6,7 +6,7 @@ export interface Connection {
   url: string;
   port: string;
   child: child_process.ChildProcessWithoutNullStreams;
-  disconnectChannel: string;
+  channelID: string;
 }
 
 const buildConnections = (connections: Connection[]) => {

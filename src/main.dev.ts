@@ -14,11 +14,17 @@ import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
-import { v4 as uuid } from 'uuid';
 import createWindow from './utils/mainWindow';
 import 'regenerator-runtime/runtime';
 import { spawnTcpConnect, TcpConnectArgs } from './utils/binaries';
-import { isDev, isProd, prodDebug } from './utils/constants';
+import {
+  CONNECTION_CLOSED,
+  CONNECTION_RESPONSE,
+  DISCONNECT,
+  isDev,
+  isProd,
+  prodDebug,
+} from './utils/constants';
 import { createTray, createContextMenu, Connection } from './utils/trayMenu';
 
 let connections: Connection[] = [];
@@ -77,33 +83,39 @@ app.on('ready', async () => {
       const child = spawnTcpConnect(args);
       child.stderr.setEncoding('utf8');
       const output: string[] = [];
-      const disconnectChannel = `disconnect${uuid()}`;
       child.stderr.on('data', (data) => {
         output.push(data.toString());
-        event.sender.send('connect-reply', { output, disconnectChannel });
+        event.sender.send(CONNECTION_RESPONSE, {
+          output,
+          channelID: args.channelID,
+        });
         const port = `:${getPort(data.toString())}`;
         const connectionInMenu = connections.some(
-          (connection) => connection.disconnectChannel === disconnectChannel
+          (connection) => connection.channelID === args.channelID
         );
         if (!connectionInMenu) {
           connections.push({
             url: args.destinationUrl,
             port,
             child,
-            disconnectChannel,
+            channelID: args.channelID,
           });
           mb.tray.setContextMenu(createContextMenu(mainWindow, connections));
         }
       });
-      ipcMain.on(disconnectChannel, () => {
-        child.kill();
+      ipcMain.on(DISCONNECT, (_, msg) => {
+        if (msg.channelID === args.channelID) {
+          child.kill();
+        }
       });
       child.on('exit', (code) => {
-        event.sender.send('connect-close', code);
-        ipcMain.removeHandler(disconnectChannel);
+        event.sender.send(CONNECTION_CLOSED, {
+          code,
+          channelID: args.channelID,
+        });
         child.removeAllListeners();
         connections = connections.filter((connection) => {
-          return connection.disconnectChannel !== disconnectChannel;
+          return connection.channelID !== args.channelID;
         });
         mb.tray.setContextMenu(createContextMenu(mainWindow, connections));
       });

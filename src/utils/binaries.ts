@@ -19,6 +19,7 @@ export const pomeriumCli: string = getAssetPath(
 
 export interface TcpConnectArgs {
   destinationUrl: string;
+  channelID: string;
   localAddress?: string;
   pomeriumUrl?: string;
   disableTLS?: boolean;

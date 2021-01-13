@@ -12,8 +12,15 @@ import {
   List,
 } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { isUrl, isIp } from '../utils/validators';
+import {
+  CONNECTION_CLOSED,
+  CONNECTION_RESPONSE,
+  DISCONNECT,
+} from '../utils/constants';
+import { TcpConnectArgs } from '../utils/binaries';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -48,7 +55,7 @@ const ConnectForm: FC<Props> = () => {
   const [pomeriumUrlError, setPomeriumUrlError] = useState(false);
   const [connected, setConnected] = useState(false);
   const [output, setOutput] = useState<string[]>([]);
-  const [disconnectChannel, setDisconnectChannel] = useState('');
+  const [channelID, setChannelID] = useState(''); // keeps communication per connection
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
   };
@@ -68,29 +75,38 @@ const ConnectForm: FC<Props> = () => {
     setPomeriumUrlError(!isUrl(value));
   };
 
-  const disconnect = (): void => {
-    if (disconnectChannel) {
-      ipcRenderer.send(disconnectChannel, null);
-    }
+  const disconnect = (channel_id: string): void => {
+    ipcRenderer.send(DISCONNECT, { channelID: channel_id });
   };
+
+  useEffect(() => {
+    ipcRenderer.on(CONNECTION_RESPONSE, (_, msg) => {
+      if (msg.channelID === channelID) {
+        setOutput(msg.output);
+      }
+    });
+    ipcRenderer.on(CONNECTION_CLOSED, (_, msg) => {
+      if (msg.channelID === channelID) {
+        setConnected(false);
+      }
+    });
+  }, [channelID]);
 
   const connect = (): void => {
     if (!localError && !destinationError && !pomeriumUrlError) {
+      const uuid = uuidv4();
+      setChannelID(uuid);
+      ipcRenderer.removeAllListeners(CONNECTION_RESPONSE);
+      ipcRenderer.removeAllListeners(CONNECTION_CLOSED);
       setOutput([]);
       setConnected(true);
-      const args = {
+      const args: TcpConnectArgs = {
         destinationUrl,
         localAddress,
         pomeriumUrl,
         disableTLS,
+        channelID: uuid,
       };
-      ipcRenderer.on('connect-reply', (_, result) => {
-        setOutput(result.output);
-        setDisconnectChannel(result.disconnectChannel);
-      });
-      ipcRenderer.on('connect-close', () => {
-        setConnected(false);
-      });
 
       ipcRenderer.send('connect', args);
     }
@@ -175,7 +191,7 @@ const ConnectForm: FC<Props> = () => {
                   fullWidth
                   type="button"
                   variant="outlined"
-                  onClick={disconnect}
+                  onClick={() => disconnect(channelID)}
                   disabled={!connected}
                   color="primary"
                   className={classes.button}
