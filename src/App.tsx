@@ -19,7 +19,7 @@ const Hello2: FC = () => {
 
 const RouteListener: FC = (x) => {
   const history = useHistory();
-  ipcRenderer.on('redirectTo', (_, arg) => {
+  ipcRenderer?.on('redirectTo', (_, arg) => {
     history.replace(arg);
   });
   return <>{x.children}</>;
