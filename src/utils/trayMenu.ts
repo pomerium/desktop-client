@@ -1,4 +1,12 @@
-import { app, BrowserWindow, Menu, shell, Tray } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  Menu,
+  MenuItem,
+  MenuItemConstructorOptions,
+  shell,
+  Tray,
+} from 'electron';
 import child_process from 'child_process';
 import { getAssetPath } from './binaries';
 
@@ -25,11 +33,11 @@ const buildConnections = (connections: Connection[]) => {
   });
 };
 
-export const createContextMenu = (
+const buildMenuTemplate = (
   mainWindow: BrowserWindow | null,
   connections: Connection[]
-): Menu => {
-  return Menu.buildFromTemplate([
+) => {
+  const template: (MenuItemConstructorOptions | MenuItem)[] = [
     {
       label: 'Connect',
       click() {
@@ -44,25 +52,38 @@ export const createContextMenu = (
         mainWindow?.show();
       },
     },
-    {
+  ];
+  if (connections.length) {
+    template.push({
       label: 'Connections',
       submenu: buildConnections(connections),
+    });
+  }
+
+  template.push({
+    label: 'Help',
+    click() {
+      shell.openExternal(
+        'https://github.com/pomerium/pomerium-tcp-connector#readme'
+      );
     },
-    {
-      label: 'Help',
-      click() {
-        shell.openExternal(
-          'https://github.com/pomerium/pomerium-tcp-connector#readme'
-        );
-      },
+  });
+
+  template.push({
+    label: 'Quit',
+    click() {
+      app.quit();
     },
-    {
-      label: 'Quit',
-      click() {
-        app.quit();
-      },
-    },
-  ]);
+  });
+
+  return template;
+};
+
+export const createContextMenu = (
+  mainWindow: BrowserWindow | null,
+  connections: Connection[]
+): Menu => {
+  return Menu.buildFromTemplate(buildMenuTemplate(mainWindow, connections));
 };
 
 export const createTray = (mainWindow: BrowserWindow): Tray => {

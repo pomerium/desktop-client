@@ -1,6 +1,5 @@
 import {
   makeStyles,
-  Container,
   Button,
   Grid,
   TextField,
@@ -235,7 +234,7 @@ const ConnectForm: FC<Props> = () => {
         </Grid>
       </form>
       {!!output.length && (
-        <Container className={classes.container}>
+        <Grid container alignItems="center" justify="center">
           <List>
             {output.map((item, i) => (
               <ListItem
@@ -247,7 +246,7 @@ const ConnectForm: FC<Props> = () => {
               </ListItem>
             ))}
           </List>
-        </Container>
+        </Grid>
       )}
     </>
   );
