@@ -19,7 +19,7 @@ import {
   CONNECTION_RESPONSE,
   DISCONNECT,
 } from '../utils/constants';
-import { TcpConnectArgs } from '../utils/binaries';
+import { ConnectionData } from '../utils/binaries';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -43,35 +43,82 @@ interface Props {
   onComplete?: () => void;
 }
 
+const noErrors = {
+  localAddress: false,
+  destinationUrl: false,
+  pomeriumUrl: false,
+  caFilePath: false,
+  caFileText: false,
+};
+
+const initialConnectionData: ConnectionData = {
+  destinationUrl: '',
+  localAddress: '',
+  pomeriumUrl: '',
+  disableTLS: false,
+  caFileText: '',
+  caFilePath: '',
+  channelID: '',
+};
+
 const ConnectForm: FC<Props> = () => {
   const classes = useStyles();
-  const [disableTLS, setDisableTLS] = useState(false);
-  const [localAddress, setLocalAddress] = useState('');
-  const [localError, setLocalError] = useState(false);
-  const [destinationUrl, setDestinationUrl] = useState('');
-  const [destinationError, setDestinationError] = useState(true);
-  const [pomeriumUrl, setPomeriumUrl] = useState('');
-  const [pomeriumUrlError, setPomeriumUrlError] = useState(false);
   const [connected, setConnected] = useState(false);
   const [output, setOutput] = useState<string[]>([]);
-  const [channelID, setChannelID] = useState(''); // keeps communication per connection
+  const [errors, setErrors] = useState(noErrors);
+  const [connectionData, setConnectionData] = useState(initialConnectionData);
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
   };
 
   const saveDestination = (value: string): void => {
-    setDestinationUrl(value);
-    setDestinationError(!isUrl(value) || !value.trim());
+    setConnectionData({
+      ...connectionData,
+      ...{ destinationUrl: value.trim() },
+    });
+    setErrors({
+      ...errors,
+      ...{ destinationUrl: !isUrl(value) || !value.trim() },
+    });
   };
 
   const saveLocal = (value: string): void => {
-    setLocalAddress(value);
-    setLocalError(!isIp(value));
+    setConnectionData({ ...connectionData, ...{ localAddress: value.trim() } });
+    setErrors({
+      ...errors,
+      ...{ localAddress: !isIp(value) },
+    });
   };
 
   const savePomeriumUrl = (value: string): void => {
-    setPomeriumUrl(value);
-    setPomeriumUrlError(!isUrl(value));
+    setConnectionData({ ...connectionData, ...{ pomeriumUrl: value.trim() } });
+    setErrors({
+      ...errors,
+      ...{ pomeriumUrl: !isUrl(value) },
+    });
+  };
+
+  const saveDisableTLS = (): void => {
+    setConnectionData({
+      ...connectionData,
+      ...{ disableTLS: !connectionData.disableTLS },
+    });
+  };
+
+  const saveCaFilePath = (value: string): void => {
+    setConnectionData({ ...connectionData, ...{ caFilePath: value.trim() } });
+    setErrors({
+      ...errors,
+      ...{ caFilePath: !!connectionData.caFileText },
+    });
+  };
+
+  const saveCaFileText = (value: string): void => {
+    setConnectionData({ ...connectionData, ...{ caFileText: value.trim() } });
+    setErrors({
+      ...errors,
+      ...{ caFileText: !!connectionData.caFilePath },
+    });
   };
 
   const disconnect = (channel_id: string): void => {
@@ -80,47 +127,36 @@ const ConnectForm: FC<Props> = () => {
 
   useEffect(() => {
     ipcRenderer.on(CONNECTION_RESPONSE, (_, msg) => {
-      if (msg.channelID === channelID) {
+      if (msg.channelID === connectionData.channelID) {
         setOutput(msg.output);
       }
     });
     ipcRenderer.on(CONNECTION_CLOSED, (_, msg) => {
-      if (msg.channelID === channelID) {
+      if (msg.channelID === connectionData.channelID) {
         setConnected(false);
       }
     });
-  }, [channelID]);
+  }, [connectionData.channelID]);
 
   const connect = (): void => {
-    if (!localError && !destinationError && !pomeriumUrlError) {
+    if (Object.values(errors).every((error) => !error)) {
       const uuid = uuidv4();
-      setChannelID(uuid);
       ipcRenderer.removeAllListeners(CONNECTION_RESPONSE);
       ipcRenderer.removeAllListeners(CONNECTION_CLOSED);
       setOutput([]);
       setConnected(true);
-      const args: TcpConnectArgs = {
-        destinationUrl,
-        localAddress,
-        pomeriumUrl,
-        disableTLS,
-        channelID: uuid,
-      };
-
+      const args: ConnectionData = { ...connectionData };
+      args.channelID = uuid;
+      setConnectionData(args);
       ipcRenderer.send('connect', args);
     }
   };
 
   const clear = (): void => {
-    setDisableTLS(false);
-    setLocalAddress('');
-    setLocalError(false);
-    setDestinationUrl('');
-    setDestinationError(true);
-    setPomeriumUrl('');
-    setPomeriumUrlError(false);
+    setConnectionData(initialConnectionData);
     setConnected(false);
     setOutput([]);
+    setErrors(noErrors);
   };
 
   return (
@@ -135,9 +171,9 @@ const ConnectForm: FC<Props> = () => {
               <TextField
                 fullWidth
                 required
-                error={destinationError}
+                error={errors.destinationUrl}
                 label="Destination Url"
-                value={destinationUrl}
+                value={connectionData.destinationUrl}
                 onChange={(evt): void => saveDestination(evt.target.value)}
                 variant="outlined"
                 autoFocus
@@ -149,10 +185,10 @@ const ConnectForm: FC<Props> = () => {
                   label="Disable TLS Verification"
                   control={
                     <Checkbox
-                      checked={disableTLS}
+                      checked={connectionData.disableTLS}
                       name="disable-tls-verification"
                       color="primary"
-                      onChange={(): void => setDisableTLS(!disableTLS)}
+                      onChange={saveDisableTLS}
                     />
                   }
                 />
@@ -162,8 +198,8 @@ const ConnectForm: FC<Props> = () => {
               <TextField
                 fullWidth
                 label="Local Address"
-                error={localError}
-                value={localAddress}
+                error={errors.localAddress}
+                value={connectionData.localAddress}
                 onChange={(evt): void => saveLocal(evt.target.value)}
                 variant="outlined"
               />
@@ -172,10 +208,32 @@ const ConnectForm: FC<Props> = () => {
               <TextField
                 fullWidth
                 label="Alternate Pomerium Url"
-                error={pomeriumUrlError}
-                value={pomeriumUrl}
+                error={errors.pomeriumUrl}
+                value={connectionData.pomeriumUrl}
                 onChange={(evt): void => savePomeriumUrl(evt.target.value)}
                 variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="CA File Path"
+                error={errors.caFilePath}
+                value={connectionData.caFilePath}
+                onChange={(evt): void => saveCaFilePath(evt.target.value)}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="CA File Text"
+                error={errors.caFileText}
+                value={connectionData.caFileText}
+                onChange={(evt): void => saveCaFileText(evt.target.value)}
+                variant="outlined"
+                multiline
+                rows={4}
               />
             </Grid>
             <Grid
@@ -190,7 +248,7 @@ const ConnectForm: FC<Props> = () => {
                   fullWidth
                   type="button"
                   variant="outlined"
-                  onClick={() => disconnect(channelID)}
+                  onClick={() => disconnect(connectionData.channelID)}
                   disabled={!connected}
                   color="primary"
                   className={classes.button}
@@ -203,12 +261,7 @@ const ConnectForm: FC<Props> = () => {
                   fullWidth
                   type="button"
                   variant="outlined"
-                  disabled={
-                    localError ||
-                    destinationError ||
-                    pomeriumUrlError ||
-                    connected
-                  }
+                  disabled={Object.values(errors).some(Boolean) || connected}
                   color="primary"
                   className={classes.button}
                   onClick={connect}

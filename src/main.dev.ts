@@ -14,9 +14,10 @@ import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
+import Store from 'electron-store';
 import createWindow from './utils/mainWindow';
 import 'regenerator-runtime/runtime';
-import { spawnTcpConnect, TcpConnectArgs } from './utils/binaries';
+import { spawnTcpConnect, ConnectionData } from './utils/binaries';
 import {
   CONNECTION_CLOSED,
   CONNECTION_RESPONSE,
@@ -79,7 +80,11 @@ app.on('ready', async () => {
   });
 
   mb.on('ready', async () => {
-    ipcMain.on('connect', (event, args: TcpConnectArgs) => {
+    const store = new Store();
+    store.onDidChange('connections', (conns) => {
+      console.log(conns);
+    });
+    ipcMain.on('connect', (event, args: ConnectionData) => {
       const child = spawnTcpConnect(args);
       child.stderr.setEncoding('utf8');
       const output: string[] = [];
@@ -90,10 +95,10 @@ app.on('ready', async () => {
           channelID: args.channelID,
         });
         const port = `:${getPort(data.toString())}`;
-        const connectionInMenu = connections.some(
+        const connectionExists = connections.some(
           (connection) => connection.channelID === args.channelID
         );
-        if (!connectionInMenu) {
+        if (!connectionExists) {
           connections.push({
             url: args.destinationUrl,
             port,
