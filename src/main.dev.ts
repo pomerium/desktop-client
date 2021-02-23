@@ -64,9 +64,7 @@ app.on('ready', async () => {
   const connections = new Connections();
   const trayMenuHelper = new TrayMenuHelper(connections, mainWindow, null);
   const tray = trayMenuHelper.createTray();
-  const options = { height: 2000, width: 2 };
   const menu = menubar({
-    browserWindow: options,
     tray,
   });
   trayMenuHelper.setMenu(menu);
