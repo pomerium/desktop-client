@@ -16,18 +16,17 @@ import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
 import createWindow from './utils/mainWindow';
 import 'regenerator-runtime/runtime';
-import { spawnTcpConnect, TcpConnectArgs } from './utils/binaries';
 import {
-  CONNECTION_CLOSED,
-  CONNECTION_RESPONSE,
   DISCONNECT,
   isDev,
   isProd,
   prodDebug,
+  ConnectionData,
+  CONNECT,
 } from './utils/constants';
-import { createTray, createContextMenu, Connection } from './utils/trayMenu';
+import Connections from './utils/connections';
+import TrayMenuHelper from './utils/trayMenuHelper';
 
-let connections: Connection[] = [];
 let mainWindow: BrowserWindow | null;
 
 class AppUpdater {
@@ -37,11 +36,6 @@ class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-
-const getPort = (text: string) => {
-  const parts = text.split(':');
-  return parseInt(parts[parts.length - 1], 10);
-};
 
 if (isProd) {
   const sourceMapSupport = require('source-map-support');
@@ -58,12 +52,6 @@ app.on('activate', async () => {
   if (mainWindow === null) mainWindow = createWindow();
 });
 
-app.on('before-quit', () => {
-  connections.forEach((connection) => connection.child.kill());
-  mainWindow?.removeAllListeners('close');
-  mainWindow?.close();
-});
-
 app.on('ready', async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
@@ -73,52 +61,32 @@ app.on('ready', async () => {
     .catch((err: Error) => console.log('An error occurred: ', err));
   mainWindow = createWindow();
   mainWindow?.loadURL(`file://${__dirname}/index.html`);
-  const tray = createTray(mainWindow);
-  const mb = menubar({
+  const connections = new Connections();
+  const trayMenuHelper = new TrayMenuHelper(connections, mainWindow, null);
+  const tray = trayMenuHelper.createTray();
+  const menu = menubar({
     tray,
   });
+  trayMenuHelper.setMenu(menu);
 
-  mb.on('ready', async () => {
-    ipcMain.on('connect', (event, args: TcpConnectArgs) => {
-      const child = spawnTcpConnect(args);
-      child.stderr.setEncoding('utf8');
-      const output: string[] = [];
-      child.stderr.on('data', (data) => {
-        output.push(data.toString());
-        event.sender.send(CONNECTION_RESPONSE, {
-          output,
-          channelID: args.channelID,
-        });
-        const port = `:${getPort(data.toString())}`;
-        const connectionInMenu = connections.some(
-          (connection) => connection.channelID === args.channelID
-        );
-        if (!connectionInMenu) {
-          connections.push({
-            url: args.destinationUrl,
-            port,
-            child,
-            channelID: args.channelID,
-          });
-          mb.tray.setContextMenu(createContextMenu(mainWindow, connections));
-        }
+  menu.on('ready', async () => {
+    menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    ipcMain.on(CONNECT, (evt, args: ConnectionData) => {
+      connections.saveConnection(args);
+      connections.createMenuConnectionFromData(args);
+      connections.connect(args.channelID, evt);
+      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    });
+    ipcMain.on(DISCONNECT, (_evt, msg) => {
+      connections.disconnect(msg.channelID);
+      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    });
+    app.on('before-quit', () => {
+      Object.values(connections.getMenuConnections()).forEach((conn) => {
+        connections.disconnect(conn.channelID);
       });
-      ipcMain.on(DISCONNECT, (_, msg) => {
-        if (msg.channelID === args.channelID) {
-          child.kill();
-        }
-      });
-      child.on('exit', (code) => {
-        event.sender.send(CONNECTION_CLOSED, {
-          code,
-          channelID: args.channelID,
-        });
-        child.removeAllListeners();
-        connections = connections.filter((connection) => {
-          return connection.channelID !== args.channelID;
-        });
-        mb.tray.setContextMenu(createContextMenu(mainWindow, connections));
-      });
+      mainWindow?.removeAllListeners('close');
+      mainWindow?.close();
     });
   });
 });

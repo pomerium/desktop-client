@@ -2,6 +2,7 @@ import { app } from 'electron';
 import path from 'path';
 import * as child_process from 'child_process';
 import getPlatform from '../platform';
+import { ConnectionData } from './constants';
 
 export const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')
@@ -17,15 +18,7 @@ export const pomeriumCli: string = getAssetPath(
   'pomerium-cli'
 );
 
-export interface TcpConnectArgs {
-  destinationUrl: string;
-  channelID: string;
-  localAddress?: string;
-  pomeriumUrl?: string;
-  disableTLS?: boolean;
-}
-
-const buildSpawnArgs = (args: TcpConnectArgs) => {
+const buildSpawnArgs = (args: ConnectionData) => {
   const spawnArgs = ['tcp', args.destinationUrl];
   if (args.localAddress) {
     spawnArgs.push(`--listen`);
@@ -38,11 +31,22 @@ const buildSpawnArgs = (args: TcpConnectArgs) => {
   if (args.disableTLS) {
     spawnArgs.push('--disable-tls-verification');
   }
+
+  if (args.caFilePath) {
+    spawnArgs.push(`--alternate-ca-path`);
+    spawnArgs.push(args.caFilePath);
+  }
+
+  if (args.caFileText) {
+    spawnArgs.push(`--ca-cert`);
+    spawnArgs.push(btoa(args.caFileText));
+  }
+
   return spawnArgs;
 };
 
 export const spawnTcpConnect = (
-  args: TcpConnectArgs
+  args: ConnectionData
 ): child_process.ChildProcessWithoutNullStreams => {
   return child_process.spawn(pomeriumCli, buildSpawnArgs(args));
 };
