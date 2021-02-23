@@ -18,8 +18,8 @@ import {
   CONNECTION_CLOSED,
   CONNECTION_RESPONSE,
   DISCONNECT,
+  ConnectionData,
 } from '../utils/constants';
-import { ConnectionData } from '../utils/binaries';
 
 const useStyles = makeStyles(() => ({
   container: {
