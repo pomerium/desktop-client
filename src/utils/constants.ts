@@ -26,3 +26,8 @@ export interface MenuConnection {
   channelID: string;
   output: string[];
 }
+
+export const THEMES = {
+  LIGHT: 'LIGHT',
+  DARK: 'DARK',
+};
