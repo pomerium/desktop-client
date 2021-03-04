@@ -55,19 +55,19 @@ export default class Connections {
   }
 
   connect(channelID: MenuConnection['channelID'], evt: IpcMainEvent | null) {
-    if (this.menuConnections[channelID].channelID) {
+    const conn = this.menuConnections[channelID];
+    if (conn.channelID) {
+      this.disconnect(conn.channelID);
       const child = spawnTcpConnect(this.connectionsData[channelID]);
       child.stderr.setEncoding('utf8');
-      this.menuConnections[channelID].child = child;
+      conn.child = child;
       child.stderr.on('data', (data) => {
-        this.menuConnections[channelID].output.push(data.toString());
+        conn.output.push(data.toString());
         evt?.sender.send(CONNECTION_RESPONSE, {
-          output: this.menuConnections[channelID].output,
+          output: conn.output,
           channelID,
         });
-        this.menuConnections[channelID].port = `:${this.getPort(
-          data.toString()
-        )}`;
+        conn.port = `:${this.getPort(data.toString())}`;
       });
       child.on('exit', (code) => {
         evt?.sender.send(CONNECTION_CLOSED, {
