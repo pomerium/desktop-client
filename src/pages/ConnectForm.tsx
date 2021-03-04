@@ -13,6 +13,8 @@ import {
 import { ipcRenderer } from 'electron';
 import React, { FC, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useParams } from 'react-router-dom';
+import Store from 'electron-store';
 import { isUrl, isIp } from '../utils/validators';
 import {
   CONNECTION_CLOSED,
@@ -61,6 +63,11 @@ const initialConnectionData: ConnectionData = {
   channelID: '',
 };
 
+interface QueryParams {
+  channelId: string;
+  editingConnected: string;
+}
+
 const ConnectForm: FC<Props> = () => {
   const classes = useStyles();
   const [connected, setConnected] = useState(false);
@@ -70,6 +77,21 @@ const ConnectForm: FC<Props> = () => {
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
   };
+
+  const { channelId, editingConnected }: QueryParams = useParams();
+  useEffect(() => {
+    if (channelId) {
+      const store = new Store({ name: 'connections' });
+      const data = store.get('connections') as Record<
+        ConnectionData['channelID'],
+        ConnectionData
+      >;
+      if (data[channelId]) {
+        setConnectionData(data[channelId]);
+      }
+      setConnected(editingConnected === 'true');
+    }
+  }, [channelId]);
 
   const saveDestination = (value: string): void => {
     setConnectionData({
@@ -126,6 +148,8 @@ const ConnectForm: FC<Props> = () => {
   };
 
   useEffect(() => {
+    ipcRenderer.removeAllListeners(CONNECTION_RESPONSE);
+    ipcRenderer.removeAllListeners(CONNECTION_CLOSED);
     ipcRenderer.on(CONNECTION_RESPONSE, (_, msg) => {
       if (msg.channelID === connectionData.channelID) {
         setOutput(msg.output);
@@ -140,13 +164,13 @@ const ConnectForm: FC<Props> = () => {
 
   const connect = (): void => {
     if (Object.values(errors).every((error) => !error)) {
-      const uuid = uuidv4();
-      ipcRenderer.removeAllListeners(CONNECTION_RESPONSE);
-      ipcRenderer.removeAllListeners(CONNECTION_CLOSED);
       setOutput([]);
       setConnected(true);
       const args: ConnectionData = { ...connectionData };
-      args.channelID = uuid;
+      if (!args.channelID) {
+        const uuid = uuidv4();
+        args.channelID = uuid;
+      }
       setConnectionData(args);
       ipcRenderer.send('connect', args);
     }
@@ -261,12 +285,12 @@ const ConnectForm: FC<Props> = () => {
                   fullWidth
                   type="button"
                   variant="outlined"
-                  disabled={Object.values(errors).some(Boolean) || connected}
+                  disabled={Object.values(errors).some(Boolean)}
                   color="primary"
                   className={classes.button}
                   onClick={connect}
                 >
-                  Connect
+                  Save/Connect
                 </Button>
               </Grid>
               <Grid item xs={3}>

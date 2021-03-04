@@ -35,6 +35,10 @@ export default function App() {
           </Route>
           <Route exact path="/hello2" component={Hello2} />
           <Route exact path="/connect" component={ConnectForm} />
+          <Route
+            path="/edit_connect/:channelId/:editingConnected"
+            component={ConnectForm}
+          />
         </RouteListener>
       </Switch>
     </HashRouter>

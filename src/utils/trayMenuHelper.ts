@@ -44,6 +44,7 @@ export default class TrayMenuHelper {
     return Object.values(this.connections.getMenuConnections()).map(
       (connection) => {
         const connectionOptions = [];
+
         if (connection.child) {
           connectionOptions.push({
             label: 'Disconnect',
@@ -65,6 +66,20 @@ export default class TrayMenuHelper {
             },
           });
         }
+
+        connectionOptions.push({
+          label: 'Edit',
+          click: () => {
+            this.mainWindow?.webContents.send(
+              'redirectTo',
+              `/edit_connect/${connection.channelID}/${
+                connection.child ? 'true' : 'false'
+              }`
+            );
+            this.mainWindow?.show();
+          },
+        });
+
         connectionOptions.push({
           label: 'Delete',
           click: () => {
@@ -86,7 +101,7 @@ export default class TrayMenuHelper {
     const { mainWindow, connections, buildConnections } = this;
     const template: (MenuItemConstructorOptions | MenuItem)[] = [
       {
-        label: 'Connect',
+        label: 'New Connection',
         click() {
           mainWindow?.webContents.send('redirectTo', '/connect');
           mainWindow?.show();
