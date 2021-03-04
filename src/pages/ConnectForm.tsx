@@ -2,11 +2,10 @@ import {
   makeStyles,
   Button,
   Grid,
-  TextField,
   Typography,
   FormGroup,
   FormControlLabel,
-  Checkbox,
+  Switch,
   ListItem,
   List,
 } from '@material-ui/core';
@@ -22,19 +21,18 @@ import {
   DISCONNECT,
   ConnectionData,
 } from '../utils/constants';
+import TextField from '../components/TextField';
+import { Theme } from '../utils/theme';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   container: {
-    padding: 3,
+    padding: theme.spacing(3),
   },
   red: {
     color: 'red',
   },
   green: {
     color: 'green',
-  },
-  button: {
-    padding: 1,
   },
   buttonWrapper: {
     marginTop: 20,
@@ -189,7 +187,9 @@ const ConnectForm: FC<Props> = () => {
         <Grid className={classes.container}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12}>
-              <Typography variant="h4">Pomerium TCP Connector</Typography>
+              <Typography variant="h3" color="textPrimary">
+                Pomerium TCP Connector
+              </Typography>
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -208,7 +208,7 @@ const ConnectForm: FC<Props> = () => {
                 <FormControlLabel
                   label="Disable TLS Verification"
                   control={
-                    <Checkbox
+                    <Switch
                       checked={connectionData.disableTLS}
                       name="disable-tls-verification"
                       color="primary"
@@ -271,11 +271,10 @@ const ConnectForm: FC<Props> = () => {
                 <Button
                   fullWidth
                   type="button"
-                  variant="outlined"
+                  variant="contained"
                   onClick={() => disconnect(connectionData.channelID)}
                   disabled={!connected}
                   color="primary"
-                  className={classes.button}
                 >
                   Disconnect
                 </Button>
@@ -284,10 +283,9 @@ const ConnectForm: FC<Props> = () => {
                 <Button
                   fullWidth
                   type="button"
-                  variant="outlined"
+                  variant="contained"
                   disabled={Object.values(errors).some(Boolean)}
                   color="primary"
-                  className={classes.button}
                   onClick={connect}
                 >
                   Save/Connect
@@ -296,11 +294,10 @@ const ConnectForm: FC<Props> = () => {
               <Grid item xs={3}>
                 <Button
                   fullWidth
-                  type="button"
-                  variant="outlined"
-                  onClick={clear}
+                  variant="contained"
                   color="primary"
-                  className={classes.button}
+                  type="button"
+                  onClick={clear}
                   disabled={!connected}
                 >
                   New Connection

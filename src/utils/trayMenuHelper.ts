@@ -107,13 +107,6 @@ export default class TrayMenuHelper {
           mainWindow?.show();
         },
       },
-      {
-        label: 'Settings',
-        click() {
-          mainWindow?.webContents.send('redirectTo', '/hello2');
-          mainWindow?.show();
-        },
-      },
     ];
     if (Object.values(connections.getMenuConnections()).length) {
       template.push({
