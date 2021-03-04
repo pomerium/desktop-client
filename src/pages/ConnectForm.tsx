@@ -34,14 +34,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   green: {
     color: 'green',
   },
-  button: {
-    background: theme.palette.primary.light,
-    marginRight: theme.spacing(1),
-    '&:hover': {
-      background: theme.palette.primary.light,
-      opacity: `0.6`,
-    },
-  },
   buttonWrapper: {
     marginTop: 20,
   },
@@ -283,7 +275,6 @@ const ConnectForm: FC<Props> = () => {
                   onClick={() => disconnect(connectionData.channelID)}
                   disabled={!connected}
                   color="primary"
-                  className={classes.button}
                 >
                   Disconnect
                 </Button>
@@ -295,7 +286,6 @@ const ConnectForm: FC<Props> = () => {
                   variant="contained"
                   disabled={Object.values(errors).some(Boolean)}
                   color="primary"
-                  className={classes.button}
                   onClick={connect}
                 >
                   Save/Connect
@@ -308,7 +298,6 @@ const ConnectForm: FC<Props> = () => {
                   color="primary"
                   type="button"
                   onClick={clear}
-                  className={classes.button}
                   disabled={!connected}
                 >
                   New Connection
