@@ -262,12 +262,12 @@ const ConnectForm: FC<Props> = () => {
             </Grid>
             <Grid
               container
-              spacing={8}
+              spacing={4}
               alignItems="center"
               justify="center"
               className={classes.buttonWrapper}
             >
-              <Grid item xs={3}>
+              <Grid item xs={12} sm={4}>
                 <Button
                   fullWidth
                   type="button"
@@ -279,7 +279,7 @@ const ConnectForm: FC<Props> = () => {
                   Disconnect
                 </Button>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={12} sm={4}>
                 <Button
                   fullWidth
                   type="button"
@@ -291,7 +291,7 @@ const ConnectForm: FC<Props> = () => {
                   Save/Connect
                 </Button>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={12} sm={4}>
                 <Button
                   fullWidth
                   variant="contained"
