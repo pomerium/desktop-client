@@ -12,6 +12,8 @@ export const getAssetPath = (...paths: string[]): string => {
   return path.join(RESOURCES_PATH, ...paths);
 };
 
+export const menuIconPath: string = getAssetPath('icons');
+
 export const pomeriumCli: string = getAssetPath(
   getPlatform(),
   'bin',
