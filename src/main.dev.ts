@@ -66,6 +66,8 @@ app.on('ready', async () => {
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
     tray,
+    preloadWindow: true,
+    browserWindow: { width: 0, height: 0 },
   });
   trayMenuHelper.setMenu(menu);
 
