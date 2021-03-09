@@ -1,6 +1,7 @@
 import {
   app,
   BrowserWindow,
+  clipboard,
   Menu,
   MenuItem,
   MenuItemConstructorOptions,
@@ -86,6 +87,16 @@ export default class TrayMenuHelper {
               }`
             );
             this.mainWindow?.show();
+          },
+        });
+
+        connectionOptions.push({
+          label: 'Copy Port',
+          icon: nativeImage.createFromPath(
+            path.join(menuIconPath, 'clipboard.png')
+          ),
+          click: () => {
+            clipboard.writeText(connection.port);
           },
         });
 

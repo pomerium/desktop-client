@@ -30,8 +30,6 @@ const createWindow = () => {
     return false;
   });
 
-  mainWindow?.loadURL(`file://${__dirname}/index.html`);
-
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
