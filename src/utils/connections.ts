@@ -87,7 +87,7 @@ export default class Connections {
   createMenuConnectionFromData(conn: ConnectionData) {
     this.menuConnections[conn.channelID] = {
       channelID: conn.channelID,
-      child: null,
+      child: this.menuConnections[conn.channelID]?.child || null,
       output: [],
       port: conn.localAddress || '',
       url: conn.destinationUrl,
