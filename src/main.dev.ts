@@ -60,6 +60,7 @@ app.on('ready', async () => {
     .then((name: string) => console.log(`Added Extension:  ${name}`))
     .catch((err: Error) => console.log('An error occurred: ', err));
   mainWindow = createWindow();
+  mainWindow?.loadURL(`file://${__dirname}/index.html`);
   const connections = new Connections();
   const trayMenuHelper = new TrayMenuHelper(connections, mainWindow, null);
   const tray = trayMenuHelper.createTray();
