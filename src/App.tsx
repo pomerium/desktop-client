@@ -16,7 +16,7 @@ import {
   ThemeProvider,
 } from '@material-ui/core';
 import { create } from 'jss';
-import { createTheme } from './utils/theme';
+import { createMuiTheme } from './utils/theme';
 import ConnectForm from './pages/ConnectForm';
 import { THEMES } from './utils/constants';
 
@@ -25,6 +25,7 @@ const RouteListener: FC = (x) => {
   ipcRenderer?.on('redirectTo', (_, arg) => {
     history.replace(arg);
   });
+  // eslint-disable-next-line react/destructuring-assignment
   return <>{x.children}</>;
 };
 
@@ -72,7 +73,7 @@ const defaultSettings: Settings = {
 const App: FC = () => {
   useStyles();
   return (
-    <ThemeProvider theme={createTheme(defaultSettings)}>
+    <ThemeProvider theme={createMuiTheme(defaultSettings)}>
       <StylesProvider jss={jss}>
         <HashRouter>
           <Switch>
