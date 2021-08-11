@@ -264,7 +264,7 @@ const ConnectForm: FC<Props> = () => {
               container
               spacing={4}
               alignItems="center"
-              justify="center"
+              justifyContent="center"
               className={classes.buttonWrapper}
             >
               <Grid item xs={12} sm={4}>
@@ -308,7 +308,7 @@ const ConnectForm: FC<Props> = () => {
         </Grid>
       </form>
       {!!output.length && (
-        <Grid container alignItems="center" justify="center">
+        <Grid container alignItems="center" justifyContent="center">
           <List>
             {output.map((item, i) => (
               <ListItem

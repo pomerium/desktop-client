@@ -12,7 +12,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
     '& .Mui-focused': {},
     '& .MuiInputBase-input': {
-      padding: theme.spacing(1),
       backgroundColor: theme.palette.background.dark,
     },
     '& .Mui-error .MuiInputBase-input': {
@@ -26,6 +25,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     boxShadow: theme.shadows[1],
     borderRadius: '2px',
+    '& .Mui-disabled': {
+      background: '#cfcfcf',
+    },
+    '& div.MuiOutlinedInput-root': {
+      background: theme.palette.background.dark,
+    },
+    '& div.MuiOutlinedInput-underline:before': {
+      borderBottom: `0px`,
+    },
+    '& div.MuiOutlinedInput-underline:after': {
+      border: `0px`,
+    },
   },
 }));
 

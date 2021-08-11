@@ -14,6 +14,8 @@ import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
+import * as url from 'url';
+import path from 'path';
 import createWindow from './utils/mainWindow';
 import 'regenerator-runtime/runtime';
 import {
@@ -60,7 +62,13 @@ app.on('ready', async () => {
     .then((name: string) => console.log(`Added Extension:  ${name}`))
     .catch((err: Error) => console.log('An error occurred: ', err));
   mainWindow = createWindow();
-  mainWindow?.loadURL(`file://${__dirname}/index.html`);
+  mainWindow?.loadURL(
+    url.format({
+      pathname: path.join(__dirname, 'index.html'),
+      protocol: 'file:',
+      slashes: true,
+    })
+  );
   const connections = new Connections();
   const trayMenuHelper = new TrayMenuHelper(connections, mainWindow, null);
   const tray = trayMenuHelper.createTray();
