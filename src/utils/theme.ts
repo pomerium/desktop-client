@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { colors, createMuiTheme, responsiveFontSizes } from '@material-ui/core';
-import type { Theme as MuiTheme } from '@material-ui/core/styles/createMuiTheme';
+import { colors, createTheme, responsiveFontSizes } from '@material-ui/core';
+import type { Theme as MuiTheme } from '@material-ui/core/styles/createTheme';
 import type {
   Palette as MuiPalette,
   TypeBackground as MuiTypeBackground,
@@ -120,7 +120,7 @@ const themesOptions: ThemeOptions[] = [
   },
 ];
 
-export const createTheme = (config: ThemeConfig = {}): Theme => {
+export const createMuiTheme = (config: ThemeConfig = {}): Theme => {
   let themeOptions = themesOptions.find((t) => t.name === config.theme);
 
   if (!themeOptions) {
@@ -128,7 +128,7 @@ export const createTheme = (config: ThemeConfig = {}): Theme => {
     [themeOptions] = themesOptions;
   }
 
-  let theme = createMuiTheme(_.merge({}, baseOptions, themeOptions));
+  let theme = createTheme(_.merge({}, baseOptions, themeOptions));
 
   if (config.responsiveFontSizes) {
     theme = responsiveFontSizes(theme);
