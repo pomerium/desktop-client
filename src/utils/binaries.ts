@@ -14,8 +14,7 @@ export const getAssetPath = (...paths: string[]): string => {
 export const menuIconPath: string = getAssetPath('icons');
 
 export const pomeriumCli: string = getAssetPath(
-  'bin',
-  'pomerium-cli'
+  'bin','pomerium-cli'
 );
 
 const buildSpawnArgs = (args: ConnectionData) => {
