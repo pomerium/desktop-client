@@ -82,7 +82,18 @@
       "output": "release"
     },
     "extraResources": [
-      "./assets/**"
+      {
+        "from": "assets/common/",
+        "to": "assets/"
+      },
+      {
+        "from": "assets/${platform}/common",
+        "to": "assets/"
+      },
+      {
+        "from": "assets/${platform}/${arch}",
+        "to": "assets/"
+      }
     ],
     "publish": {
       "provider": "github",
