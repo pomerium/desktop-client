@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { colors, createTheme, responsiveFontSizes } from '@material-ui/core';
 import type { Theme as MuiTheme } from '@material-ui/core/styles/createTheme';
 import type {

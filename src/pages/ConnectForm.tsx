@@ -89,7 +89,7 @@ const ConnectForm: FC<Props> = () => {
       }
       setConnected(editingConnected === 'true');
     }
-  }, [channelId]);
+  }, [channelId, editingConnected]);
 
   const saveDestination = (value: string): void => {
     setConnectionData({

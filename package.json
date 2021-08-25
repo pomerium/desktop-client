@@ -82,6 +82,14 @@
       "output": "release"
     },
     "extraResources": [
+      {
+        "from": "system_files/${platform}/common",
+        "to": "assets/"
+      },
+      {
+        "from": "system_files/${platform}/${arch}",
+        "to": "assets/"
+      },
       "./assets/**"
     ],
     "publish": {
