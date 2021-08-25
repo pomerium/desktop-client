@@ -1,7 +1,6 @@
 import { app } from 'electron';
 import path from 'path';
 import * as child_process from 'child_process';
-import getPlatform from '../platform';
 import { ConnectionData } from './constants';
 
 export const RESOURCES_PATH = app.isPackaged
@@ -14,11 +13,7 @@ export const getAssetPath = (...paths: string[]): string => {
 
 export const menuIconPath: string = getAssetPath('icons');
 
-export const pomeriumCli: string = getAssetPath(
-  getPlatform(),
-  'bin',
-  'pomerium-cli'
-);
+export const pomeriumCli: string = getAssetPath('bin', 'pomerium-cli');
 
 const buildSpawnArgs = (args: ConnectionData) => {
   const spawnArgs = ['tcp', args.destinationUrl];
