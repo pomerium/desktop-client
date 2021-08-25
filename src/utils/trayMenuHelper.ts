@@ -14,6 +14,12 @@ import path from 'path';
 import { getAssetPath, menuIconPath } from './binaries';
 import Connections from './connections';
 
+type ConnectionOption = {
+  label: string;
+  click(): void;
+  icon: nativeImage;
+};
+
 export default class TrayMenuHelper {
   connections: Connections;
 
@@ -46,7 +52,7 @@ export default class TrayMenuHelper {
   buildConnections = () => {
     return Object.values(this.connections.getMenuConnections()).map(
       (connection) => {
-        const connectionOptions = [];
+        const connectionOptions: ConnectionOption[] = [];
 
         if (connection.child) {
           connectionOptions.push({
