@@ -51,4 +51,5 @@ npm-debug.log.*
 *.scss.d.ts
 
 #different cli's are placed here for different OS
-assets/bin
+/system_files/**/pomerium-cli
+/system_files/**/pomerium-cli.exe
