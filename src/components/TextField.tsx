@@ -18,12 +18,12 @@ const useStyles = makeStyles((theme: Theme) => ({
       backgroundColor: theme.palette.error.main,
     },
     '& .MuiOutlinedInput-notchedOutline': {
-      borderWidth: '0px',
+      borderWidth: '1px',
+      borderColor: theme.palette.divider,
     },
     '& .MuiInputLabel-outlined:not(.MuiInputLabel-shrink)': {
       transform: 'translate(8px, 10px) scale(1)',
     },
-    boxShadow: theme.shadows[1],
     borderRadius: '2px',
     '& .Mui-disabled': {
       background: '#cfcfcf',
