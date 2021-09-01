@@ -149,9 +149,7 @@ export default class TrayMenuHelper {
       label: 'Help',
       icon: nativeImage.createFromPath(path.join(menuIconPath, 'help.png')),
       click() {
-        shell.openExternal(
-          'https://github.com/pomerium/pomerium-tcp-connector#readme'
-        );
+        shell.openExternal('https://github.com/pomerium/desktop-client#readme');
       },
     });
 

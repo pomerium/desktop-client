@@ -139,9 +139,7 @@ export default class MenuBuilder {
         {
           label: 'Documentation',
           click() {
-            shell.openExternal(
-              'https://github.com/pomerium/pomerium-tcp-connector'
-            );
+            shell.openExternal('https://github.com/pomerium/desktop-client');
           },
         },
       ],
@@ -219,9 +217,7 @@ export default class MenuBuilder {
           {
             label: 'Documentation',
             click() {
-              shell.openExternal(
-                'https://github.com/pomerium/pomerium-tcp-connector'
-              );
+              shell.openExternal('https://github.com/pomerium/desktop-client');
             },
           },
         ],

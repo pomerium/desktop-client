@@ -1,13 +1,13 @@
 {
-  "name": "pomerium-tcp-connector",
-  "productName": "pomerium-tcp-connector",
-  "version": "0.0.1",
+  "name": "pomerium-desktop",
+  "productName": "pomerium-desktop",
+  "version": "0.1.0",
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
   "main": "./main.prod.js",
   "author": {
     "name": "Pomerium Inc",
     "email": "info@pomerium.com",
-    "url": "https://github.com/pomerium/tcp-connector"
+    "url": "https://github.com/pomerium/desktop-client"
   },
   "scripts": {
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",
