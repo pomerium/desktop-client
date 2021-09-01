@@ -12,15 +12,6 @@
       content="pomerium,identity-proxy,context-proxy,proxy,dashboard"
     />
     <meta name="author" content="Pomerium, Inc" />
-    <script>
-      (() => {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = './dist/style.css';
-        // HACK: Writing the script path should be done with webpack
-        document.getElementsByTagName('head')[0].appendChild(link);
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>
