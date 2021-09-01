@@ -1,25 +1,25 @@
 import {
-  makeStyles,
   Button,
-  Grid,
-  Typography,
-  FormGroup,
   FormControlLabel,
-  Switch,
-  ListItem,
+  FormGroup,
+  Grid,
   List,
+  ListItem,
+  makeStyles,
+  Switch,
+  Typography,
 } from '@material-ui/core';
 import { ipcRenderer } from 'electron';
 import React, { FC, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
 import Store from 'electron-store';
-import { isUrl, isIp } from '../utils/validators';
+import { isIp } from '../utils/validators';
 import {
   CONNECTION_CLOSED,
   CONNECTION_RESPONSE,
-  DISCONNECT,
   ConnectionData,
+  DISCONNECT,
 } from '../utils/constants';
 import TextField from '../components/TextField';
 import { Theme } from '../utils/theme';
@@ -98,7 +98,7 @@ const ConnectForm: FC<Props> = () => {
     });
     setErrors({
       ...errors,
-      ...{ destinationUrl: !isUrl(value) || !value.trim() },
+      ...{ destinationUrl: !value.trim() },
     });
   };
 
@@ -106,16 +106,12 @@ const ConnectForm: FC<Props> = () => {
     setConnectionData({ ...connectionData, ...{ localAddress: value.trim() } });
     setErrors({
       ...errors,
-      ...{ localAddress: !isIp(value) },
+      ...{ localAddress: !isIp(value) && !!value },
     });
   };
 
   const savePomeriumUrl = (value: string): void => {
     setConnectionData({ ...connectionData, ...{ pomeriumUrl: value.trim() } });
-    setErrors({
-      ...errors,
-      ...{ pomeriumUrl: !isUrl(value) },
-    });
   };
 
   const saveDisableTLS = (): void => {
@@ -127,18 +123,10 @@ const ConnectForm: FC<Props> = () => {
 
   const saveCaFilePath = (value: string): void => {
     setConnectionData({ ...connectionData, ...{ caFilePath: value.trim() } });
-    setErrors({
-      ...errors,
-      ...{ caFilePath: !!connectionData.caFileText },
-    });
   };
 
   const saveCaFileText = (value: string): void => {
     setConnectionData({ ...connectionData, ...{ caFileText: value.trim() } });
-    setErrors({
-      ...errors,
-      ...{ caFileText: !!connectionData.caFilePath },
-    });
   };
 
   const disconnect = (channel_id: string): void => {
@@ -166,8 +154,7 @@ const ConnectForm: FC<Props> = () => {
       setConnected(true);
       const args: ConnectionData = { ...connectionData };
       if (!args.channelID) {
-        const uuid = uuidv4();
-        args.channelID = uuid;
+        args.channelID = uuidv4();
       }
       setConnectionData(args);
       ipcRenderer.send('connect', args);
@@ -195,7 +182,6 @@ const ConnectForm: FC<Props> = () => {
               <TextField
                 fullWidth
                 required
-                error={errors.destinationUrl}
                 label="Destination Url"
                 value={connectionData.destinationUrl}
                 onChange={(evt): void => saveDestination(evt.target.value)}
