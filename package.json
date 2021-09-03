@@ -4,7 +4,7 @@
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
   "scripts": {
     "download": "npx ts-node .erb/scripts/DownloadBinaries.ts",
-    "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
+    "build": "yarn download && concurrently \"yarn build:main\" \"yarn build:renderer\"",
     "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.babel.js",
     "build:renderer": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.renderer.prod.babel.js",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
@@ -48,11 +48,12 @@
       ],
       "type": "distribution",
       "hardenedRuntime": true,
-      "entitlements": "assets/entitlements.mac.plist",
-      "entitlementsInherit": "assets/entitlements.mac.plist",
+      "entitlements": "system_files/darwin/common/entitlements.mac.plist",
+      "entitlementsInherit": "system_files/darwin/common/entitlements.mac.plist",
       "gatekeeperAssess": false
     },
     "dmg": {
+      "sign": false,
       "contents": [
         {
           "x": 130,
@@ -95,8 +96,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "pomerium-desktop",
-      "repo": "https://github.com/pomerium/desktop-client"
+      "owner": "pomerium",
+      "repo": "desktop-client"
     }
   },
   "repository": {
