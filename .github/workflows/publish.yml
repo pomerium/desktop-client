@@ -1,9 +1,9 @@
 name: Publish
 
-on:
-  push:
-    branches:
-      - master
+on:   
+  release:
+    types:
+      - created
 
 jobs:
   publish:
@@ -25,3 +25,28 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
+
+      - name: Download pomerium-cli artifacts
+        run: |
+          yarn download
+
+      - name: Import Apple CSC
+        uses: apple-actions/import-codesign-certs@v1
+        with: 
+          p12-file-base64: ${{ secrets.APPLE_APP_CSC }}
+          p12-password: ${{ secrets.APPLE_APP_CSC_PASSWORD }}
+
+      - name: Set up Apple ID Credentials
+        run: |
+          mkdir ~/private_keys
+          echo "${{ secrets.APPLE_ID_KEY }}" > ~/private_keys/AuthKey_${{ secrets.APPLE_ID }}.p8
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_KEY_ISSUER: ${{ secrets.APPLE_ID_KEY_ISSUER }}
+        run: |
+          yarn package -ml --arm64 --x64 --publish always
+          yarn package -w --publish always
+
