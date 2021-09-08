@@ -1,12 +1,13 @@
 import {
-  Button, Container,
+  Button,
+  Container,
   Grid,
   List,
   ListItem,
   makeStyles,
   Switch,
-  Typography
-} from "@material-ui/core";
+  Typography,
+} from '@material-ui/core';
 import { ipcRenderer } from 'electron';
 import React, { FC, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
