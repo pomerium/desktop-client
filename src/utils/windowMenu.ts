@@ -52,10 +52,10 @@ export default class MenuBuilder {
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Pomerium TCP Connector',
+      label: 'Pomerium Desktop',
       submenu: [
         {
-          label: 'About Pomerium TCP Connector',
+          label: 'About Pomerium Desktop',
           selector: 'orderFrontStandardAboutPanel:',
         },
         { type: 'separator' },

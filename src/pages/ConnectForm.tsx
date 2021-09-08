@@ -1,7 +1,6 @@
 import {
   Button,
-  FormControlLabel,
-  FormGroup,
+  Container,
   Grid,
   List,
   ListItem,
@@ -22,11 +21,12 @@ import {
   DISCONNECT,
 } from '../utils/constants';
 import TextField from '../components/TextField';
+import FieldWrapper from '../components/FieldWrapper';
 import { Theme } from '../utils/theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
   },
   red: {
     color: 'red',
@@ -169,127 +169,141 @@ const ConnectForm: FC<Props> = () => {
   };
 
   return (
-    <>
+    <Container>
       <form onSubmit={handleSubmit}>
         <Grid className={classes.container}>
-          <Grid container spacing={2} alignItems="center">
+          <Grid container alignItems="flex-start">
             <Grid item xs={12}>
               <Typography variant="h3" color="textPrimary">
-                Pomerium TCP Connector
+                {connectionData.channelID ? 'Edit' : 'Add'} TCP Connection
               </Typography>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                required
-                label="Destination Url"
-                value={connectionData.destinationUrl}
-                onChange={(evt): void => saveDestination(evt.target.value)}
-                variant="outlined"
-                autoFocus
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormGroup>
-                <FormControlLabel
-                  label="Disable TLS Verification"
-                  control={
-                    <Switch
-                      checked={connectionData.disableTLS}
-                      name="disable-tls-verification"
-                      color="primary"
-                      onChange={saveDisableTLS}
-                    />
-                  }
-                />
-              </FormGroup>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Local Address"
-                error={errors.localAddress}
-                value={connectionData.localAddress}
-                onChange={(evt): void => saveLocal(evt.target.value)}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Alternate Pomerium Url"
-                error={errors.pomeriumUrl}
-                value={connectionData.pomeriumUrl}
-                onChange={(evt): void => savePomeriumUrl(evt.target.value)}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="CA File Path"
-                error={errors.caFilePath}
-                value={connectionData.caFilePath}
-                onChange={(evt): void => saveCaFilePath(evt.target.value)}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="CA File Text"
-                error={errors.caFileText}
-                value={connectionData.caFileText}
-                onChange={(evt): void => saveCaFileText(evt.target.value)}
-                variant="outlined"
-                multiline
-                rows={4}
-              />
-            </Grid>
-            <Grid
-              container
-              spacing={4}
-              alignItems="center"
-              justifyContent="center"
-              className={classes.buttonWrapper}
+          </Grid>
+        </Grid>
+
+        <FieldWrapper
+          description="REQUIRED. The url to connect to. The FROM field in a pomerium route."
+          label="Destination Url"
+        >
+          <TextField
+            fullWidth
+            required
+            value={connectionData.destinationUrl}
+            onChange={(evt): void => saveDestination(evt.target.value)}
+            variant="outlined"
+            autoFocus
+          />
+        </FieldWrapper>
+
+        <FieldWrapper
+          description="Skips TLS verification. No Cert Authority Needed."
+          label="Disable TLS Verification"
+        >
+          <Switch
+            checked={connectionData.disableTLS}
+            name="disable-tls-verification"
+            color="primary"
+            onChange={saveDisableTLS}
+          />
+        </FieldWrapper>
+
+        <FieldWrapper
+          description="OPTIONAL. The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
+          label="Local Address"
+        >
+          <TextField
+            fullWidth
+            error={errors.localAddress}
+            value={connectionData.localAddress}
+            onChange={(evt): void => saveLocal(evt.target.value)}
+            variant="outlined"
+          />
+        </FieldWrapper>
+
+        <FieldWrapper
+          description={
+            "OPTIONAL. Pomerium Proxy Url. Useful if the Destination URL isn't publicly resolvable"
+          }
+          label="Alternate Pomerium Url"
+        >
+          <TextField
+            fullWidth
+            error={errors.pomeriumUrl}
+            value={connectionData.pomeriumUrl}
+            onChange={(evt): void => savePomeriumUrl(evt.target.value)}
+            variant="outlined"
+          />
+        </FieldWrapper>
+
+        <FieldWrapper
+          label="CA File Path"
+          description="OPTIONAL. If Pomerium is using a CA in your system's trusted keychain you can provide the path to it here."
+        >
+          <TextField
+            fullWidth
+            error={errors.caFilePath}
+            value={connectionData.caFilePath}
+            onChange={(evt): void => saveCaFilePath(evt.target.value)}
+            variant="outlined"
+          />
+        </FieldWrapper>
+
+        <FieldWrapper
+          label="CA File Text"
+          description="OPTIONAL. If Pomerium is using a CA in your system's trusted keychain you can copy/paste it here."
+        >
+          <TextField
+            fullWidth
+            error={errors.caFileText}
+            value={connectionData.caFileText}
+            onChange={(evt): void => saveCaFileText(evt.target.value)}
+            variant="outlined"
+            multiline
+            rows={4}
+          />
+        </FieldWrapper>
+        <Grid
+          container
+          spacing={4}
+          alignItems="center"
+          justifyContent="center"
+          className={classes.buttonWrapper}
+        >
+          <Grid item xs={12} sm={4}>
+            <Button
+              fullWidth
+              type="button"
+              variant="contained"
+              onClick={() => disconnect(connectionData.channelID)}
+              disabled={!connected}
+              color="primary"
             >
-              <Grid item xs={12} sm={4}>
-                <Button
-                  fullWidth
-                  type="button"
-                  variant="contained"
-                  onClick={() => disconnect(connectionData.channelID)}
-                  disabled={!connected}
-                  color="primary"
-                >
-                  Disconnect
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Button
-                  fullWidth
-                  type="button"
-                  variant="contained"
-                  disabled={Object.values(errors).some(Boolean)}
-                  color="primary"
-                  onClick={connect}
-                >
-                  Save/Connect
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  type="button"
-                  onClick={clear}
-                  disabled={!connected}
-                >
-                  New Connection
-                </Button>
-              </Grid>
-            </Grid>
+              Disconnect
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Button
+              fullWidth
+              type="button"
+              variant="contained"
+              disabled={Object.values(errors).some(Boolean)}
+              color="primary"
+              onClick={connect}
+            >
+              Save/Connect
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              type="button"
+              onClick={clear}
+              disabled={!connected}
+            >
+              New Connection
+            </Button>
           </Grid>
         </Grid>
       </form>
@@ -308,7 +322,7 @@ const ConnectForm: FC<Props> = () => {
           </List>
         </Grid>
       )}
-    </>
+    </Container>
   );
 };
 
