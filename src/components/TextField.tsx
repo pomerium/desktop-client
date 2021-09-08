@@ -44,7 +44,7 @@ const TextField = (props: TextFieldProps): JSX.Element => {
   const classes = useStyles();
   return (
     <MuiTextField
-      {...props} //
+      {...props}
       variant="outlined"
       size="small"
       color="primary"
