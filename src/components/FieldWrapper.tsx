@@ -45,12 +45,7 @@ const FieldWrapper: FC<FieldWrapperProps> = ({
   return (
     <Container maxWidth={false} disableGutters className={classes.container}>
       <Grid container className={classes.innerContainer}>
-        <Grid
-          item
-          xs={4}
-          className={classes.labelGridItem}
-          alignItems="flex-start"
-        >
+        <Grid item xs={4} className={classes.labelGridItem}>
           <Typography variant="body1">{label}</Typography>
           <sub className={classes.questionMark}>
             <Tooltip title={description}>
@@ -60,7 +55,7 @@ const FieldWrapper: FC<FieldWrapperProps> = ({
             </Tooltip>
           </sub>
         </Grid>
-        <Grid item xs alignItems="flex-start">
+        <Grid item xs>
           {children}
         </Grid>
       </Grid>
