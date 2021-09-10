@@ -9,7 +9,7 @@
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
 import 'core-js/stable';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
@@ -47,6 +47,23 @@ if (isProd) {
 if (isDev || prodDebug) {
   require('electron-debug')();
 }
+
+process.on('uncaughtException', (err) => {
+  const msg = {
+    type: 'error',
+    title: 'Error in Main process',
+    message:
+      'Something went wrong. Contact your administrator or Pomerium representative.',
+  } as Electron.MessageBoxSyncOptions;
+
+  if ('spawnargs' in err) {
+    msg.title = 'Incorrect CLI supplied.';
+    msg.message = 'Make sure the correct version for your OS is installed.';
+  }
+  console.log(err);
+  dialog.showMessageBoxSync(msg);
+  app.exit(1);
+});
 
 app.on('activate', async () => {
   // On macOS it's common to re-create a window in the app when the
