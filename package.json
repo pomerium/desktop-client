@@ -85,11 +85,11 @@
     },
     "extraResources": [
       {
-        "from": "system_files/${platform}/common",
+        "from": "system_files/${os}/common",
         "to": "assets/"
       },
       {
-        "from": "system_files/${platform}/${arch}",
+        "from": "system_files/${os}/${arch}",
         "to": "assets/"
       },
       "./assets/**"
