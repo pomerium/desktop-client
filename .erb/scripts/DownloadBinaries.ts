@@ -29,6 +29,9 @@ const resolveDetails = (platform: string, arch: string) => {
       details.format = 'zip';
       details.binary = 'pomerium-cli.exe';
       break;
+    case 'darwin':
+      details.platform = 'mac';
+      break;
   }
 
   switch (arch) {
