@@ -48,8 +48,8 @@
       ],
       "type": "distribution",
       "hardenedRuntime": true,
-      "entitlements": "system_files/darwin/common/entitlements.mac.plist",
-      "entitlementsInherit": "system_files/darwin/common/entitlements.mac.plist",
+      "entitlements": "system_files/mac/common/entitlements.mac.plist",
+      "entitlementsInherit": "system_files/mac/common/entitlements.mac.plist",
       "gatekeeperAssess": false
     },
     "dmg": {
