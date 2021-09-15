@@ -1,0 +1,8 @@
+*       text    eol=lf
+/**/pomerium-cli binary
+*.exe   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.ico   binary
+*.icns  binary
