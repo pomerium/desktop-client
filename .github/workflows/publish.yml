@@ -1,9 +1,8 @@
 name: Publish
 
 on:   
-  release:
-    types:
-      - created
+  push:
+    branches: ['master']
 
 jobs:
   publish:
@@ -26,10 +25,6 @@ jobs:
         run: |
           yarn install
 
-      - name: Download pomerium-cli artifacts
-        run: |
-          yarn download
-
       - name: Import Apple CSC
         uses: apple-actions/import-codesign-certs@v1
         with: 
@@ -47,6 +42,6 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_KEY_ISSUER: ${{ secrets.APPLE_ID_KEY_ISSUER }}
         run: |
-          yarn package -ml --arm64 --x64 --publish always
-          yarn package -w --publish always
+          yarn release -ml --arm64 --x64
+          yarn release -w
 
