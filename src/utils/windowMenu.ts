@@ -139,7 +139,7 @@ export default class MenuBuilder {
         {
           label: 'Documentation',
           click() {
-            shell.openExternal('https://github.com/pomerium/desktop-client');
+            shell.openExternal('https://pomerium.com/docs/client.html');
           },
         },
       ],
@@ -217,7 +217,7 @@ export default class MenuBuilder {
           {
             label: 'Documentation',
             click() {
-              shell.openExternal('https://github.com/pomerium/desktop-client');
+              shell.openExternal('https://pomerium.com/docs/client.html');
             },
           },
         ],
