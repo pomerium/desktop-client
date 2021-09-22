@@ -222,7 +222,12 @@ const ConnectForm: FC<Props> = () => {
 
         <FieldWrapper
           description={
-            "OPTIONAL. Pomerium Proxy Url. Useful if the Destination URL isn't publicly resolvable"
+            <>
+              The Pomerium proxy service address. This is required if the{' '}
+              <strong>Destination URL</strong> can&apos;t be resolved from DNS
+              or a local <code>hosts</code> entry, or if the proxy service uses
+              a non-standard port.
+            </>
           }
           label="Alternate Pomerium Url"
         >
@@ -237,7 +242,7 @@ const ConnectForm: FC<Props> = () => {
 
         <FieldWrapper
           label="CA File Path"
-          description="OPTIONAL. If Pomerium is using a CA in your system's trusted keychain you can provide the path to it here."
+          description="OPTIONAL. If Pomerium is using a certificate authority that's not in your system's trusted keychain you can provide the path to it here."
         >
           <TextField
             fullWidth
@@ -250,7 +255,7 @@ const ConnectForm: FC<Props> = () => {
 
         <FieldWrapper
           label="CA File Text"
-          description="OPTIONAL. If Pomerium is using a CA in your system's trusted keychain you can copy/paste it here."
+          description="OPTIONAL. If Pomerium is using a certificate authority that's not in your system's trusted keychain you can copy/paste it here."
         >
           <TextField
             fullWidth

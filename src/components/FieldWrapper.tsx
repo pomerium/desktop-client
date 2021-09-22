@@ -7,7 +7,7 @@ import {
   Container,
   Tooltip,
 } from '@material-ui/core';
-import React, { FC, ReactNode } from 'react';
+import React, { FC, ReactFragment, ReactNode } from 'react';
 import { HelpCircle } from 'react-feather';
 import { Theme } from '../utils/theme';
 
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 type FieldWrapperProps = {
   label: string;
-  description: string;
+  description: ReactFragment;
   children: ReactNode;
 };
 
