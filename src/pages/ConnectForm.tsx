@@ -182,8 +182,17 @@ const ConnectForm: FC<Props> = () => {
         </Grid>
 
         <FieldWrapper
-          description="REQUIRED. The url to connect to. The FROM field in a pomerium route."
-          label="Destination Url"
+          description={
+            <>
+              <strong>REQUIRED</strong>
+              <br />
+              The URL to connect to. This should match the <strong>
+                FROM
+              </strong>{' '}
+              field in a pomerium route.
+            </>
+          }
+          label="Destination URL"
         >
           <TextField
             fullWidth
@@ -196,7 +205,13 @@ const ConnectForm: FC<Props> = () => {
         </FieldWrapper>
 
         <FieldWrapper
-          description="Skips TLS verification. No Cert Authority Needed."
+          description={
+            <>
+              <strong>OPTIONAL</strong>
+              <br />
+              Skips TLS verification. No certificate authority Needed.
+            </>
+          }
           label="Disable TLS Verification"
         >
           <Switch
@@ -208,7 +223,16 @@ const ConnectForm: FC<Props> = () => {
         </FieldWrapper>
 
         <FieldWrapper
-          description="OPTIONAL. The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
+          description={
+            <>
+              <strong>OPTIONAL</strong>
+              <br />
+              The port or local address you want to connect to. Ex.
+              <code>:8888</code> <code>or 127.0.0.1:8888</code>
+              <br />
+              If left blank, a random available port will be used.
+            </>
+          }
           label="Local Address"
         >
           <TextField
@@ -222,9 +246,16 @@ const ConnectForm: FC<Props> = () => {
 
         <FieldWrapper
           description={
-            "OPTIONAL. Pomerium Proxy Url. Useful if the Destination URL isn't publicly resolvable"
+            <>
+              <strong>OPTIONAL</strong>
+              <br />
+              The Pomerium proxy service address. This is required if the{' '}
+              <strong>Destination URL</strong> can&apos;t be resolved from DNS
+              or a local <code>hosts</code> entry, or if the proxy service uses
+              a non-standard port.
+            </>
           }
-          label="Alternate Pomerium Url"
+          label="Alternate Pomerium URL"
         >
           <TextField
             fullWidth
@@ -237,7 +268,14 @@ const ConnectForm: FC<Props> = () => {
 
         <FieldWrapper
           label="CA File Path"
-          description="OPTIONAL. If Pomerium is using a CA in your system's trusted keychain you can provide the path to it here."
+          description={
+            <>
+              <strong>OPTIONAL</strong>
+              <br />
+              If Pomerium is using a certificate authority that&apos;s not in
+              your trusted keychain, you can provide the path to it here.
+            </>
+          }
         >
           <TextField
             fullWidth
@@ -250,7 +288,14 @@ const ConnectForm: FC<Props> = () => {
 
         <FieldWrapper
           label="CA File Text"
-          description="OPTIONAL. If Pomerium is using a CA in your system's trusted keychain you can copy/paste it here."
+          description={
+            <>
+              <strong>OPTIONAL</strong>
+              <br />
+              If Pomerium is using a certificate authority that&apos;s not in
+              your trusted keychain, you can copy/paste it here.
+            </>
+          }
         >
           <TextField
             fullWidth
