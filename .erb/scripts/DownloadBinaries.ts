@@ -7,7 +7,7 @@ const { createGunzip } = require('gunzip-stream');
 const tar = require('tar-stream');
 const unzip = require('unzip-stream');
 
-const pomeriumVersion = 'v0.15.2';
+const pomeriumVersion = 'v0.15.3';
 const pomeriumBuilds: { [char: string]: string[] } = {
   linux: ['amd64', 'arm64'],
   windows: ['amd64'],
