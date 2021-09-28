@@ -101,15 +101,8 @@
       "repo": "desktop-client"
     }
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pomerium/desktop-client.git"
-  },
-  "author": {
-    "name": "Pomerium Inc",
-    "email": "info@pomerium.com",
-    "url": "https://pomerium.io/"
-  },
+  "repository": "git+https://github.com/pomerium/desktop-client.git",
+  "author": "Pomerium Inc <info@pomerium.com> (https://pomerium.io/)",
   "contributors": [
     {
       "name": "Nathan Hayfield",
@@ -307,5 +300,7 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  }
+  },
+  "version": "0.0.2",
+  "main": "index.js"
 }
