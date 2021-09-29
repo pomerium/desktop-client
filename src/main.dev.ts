@@ -96,7 +96,9 @@ app.on('ready', async () => {
   });
   trayMenuHelper.setMenu(menu);
   menu.on('ready', async () => {
-    menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    menu.tray.on('click', () => {
+      menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu(connections));
+    });
     ipcMain.on(CONNECT, (evt, args: ConnectionData) => {
       connections.saveConnection(args);
       connections.createMenuConnectionFromData(args);
