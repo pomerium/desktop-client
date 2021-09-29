@@ -1,4 +1,12 @@
-## Starting Development
+# Starting Development
+
+## Get all the dependencies
+
+```bash
+yarn
+```
+
+## Run a dev build
 
 Start the app in the `dev` environment:
 
@@ -6,7 +14,7 @@ Start the app in the `dev` environment:
 yarn start
 ```
 
-## Packaging for Production
+# Packaging for Production
 
 To package apps for the local platform:
 
