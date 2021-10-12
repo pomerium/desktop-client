@@ -16,7 +16,7 @@ import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
 import * as url from 'url';
 import path from 'path';
-import createWindow from './utils/mainWindow';
+import createWindow from './renderer/window';
 import 'regenerator-runtime/runtime';
 import {
   DISCONNECT,
@@ -25,9 +25,9 @@ import {
   prodDebug,
   ConnectionData,
   CONNECT,
-} from './utils/constants';
-import Connections from './utils/connections';
-import TrayMenuHelper from './utils/trayMenuHelper';
+} from './shared/constants';
+import Connections from './main/connections';
+import Helper from './trayMenu/helper';
 
 let mainWindow: BrowserWindow | null;
 
@@ -87,7 +87,7 @@ app.on('ready', async () => {
     })
   );
   const connections = new Connections();
-  const trayMenuHelper = new TrayMenuHelper(connections, mainWindow, null);
+  const trayMenuHelper = new Helper(connections, mainWindow, null);
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
     preloadWindow: true,

@@ -16,9 +16,9 @@ import {
   ThemeProvider,
 } from '@material-ui/core';
 import { create } from 'jss';
-import { createMuiTheme } from './utils/theme';
-import ConnectForm from './pages/ConnectForm';
-import { THEMES } from './utils/constants';
+import { createMuiTheme } from './shared/theme';
+import ConnectForm from './renderer/pages/ConnectForm';
+import { THEMES } from './shared/constants';
 
 const RouteListener: FC = (x) => {
   const history = useHistory();

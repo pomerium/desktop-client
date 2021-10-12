@@ -6,7 +6,7 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 
-import { Theme } from '../utils/theme';
+import { Theme } from '../../shared/theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

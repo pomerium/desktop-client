@@ -6,7 +6,7 @@ import {
   CONNECTION_RESPONSE,
   ConnectionData,
   MenuConnection,
-} from './constants';
+} from '../shared/constants';
 
 export default class Connections {
   connectionsData: Record<ConnectionData['channelID'], ConnectionData> = {};

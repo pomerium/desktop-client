@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import path from 'path';
 import * as child_process from 'child_process';
-import { ConnectionData } from './constants';
+import { ConnectionData } from '../shared/constants';
 
 export const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, 'assets')

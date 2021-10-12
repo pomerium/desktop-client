@@ -13,16 +13,16 @@ import React, { FC, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
 import Store from 'electron-store';
-import { isIp } from '../utils/validators';
+import { isIp } from '../../shared/validators';
 import {
   CONNECTION_CLOSED,
   CONNECTION_RESPONSE,
   ConnectionData,
   DISCONNECT,
-} from '../utils/constants';
+} from '../../shared/constants';
 import TextField from '../components/TextField';
 import FieldWrapper from '../components/FieldWrapper';
-import { Theme } from '../utils/theme';
+import { Theme } from '../../shared/theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {

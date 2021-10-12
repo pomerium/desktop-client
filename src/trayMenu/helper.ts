@@ -11,8 +11,8 @@ import {
 } from 'electron';
 import { Menubar } from 'menubar';
 import path from 'path';
-import { getAssetPath, menuIconPath } from './binaries';
-import Connections from './connections';
+import { getAssetPath, menuIconPath } from '../main/binaries';
+import Connections from '../main/connections';
 
 type ConnectionOption = {
   label: string;
@@ -20,20 +20,20 @@ type ConnectionOption = {
   icon: nativeImage;
 };
 
-export default class TrayMenuHelper {
+export default class Helper {
   connections: Connections;
 
-  mainWindow: BrowserWindow | null;
+  appWindow: BrowserWindow | null;
 
   menu: Menubar | null;
 
   constructor(
     connections: Connections,
-    mainWindow: BrowserWindow | null,
+    appWindow: BrowserWindow | null,
     menu: Menubar | null
   ) {
     this.connections = connections;
-    this.mainWindow = mainWindow;
+    this.appWindow = appWindow;
     this.menu = menu;
   }
 
@@ -45,8 +45,8 @@ export default class TrayMenuHelper {
     this.menu = menu;
   };
 
-  setMainWindow = (mainWindow: BrowserWindow) => {
-    this.mainWindow = mainWindow;
+  setAppWindow = (appWindow: BrowserWindow) => {
+    this.appWindow = appWindow;
   };
 
   buildConnections = () => {
@@ -86,13 +86,13 @@ export default class TrayMenuHelper {
           label: 'Edit',
           icon: nativeImage.createFromPath(path.join(menuIconPath, 'edit.png')),
           click: () => {
-            this.mainWindow?.webContents.send(
+            this.appWindow?.webContents.send(
               'redirectTo',
               `/edit_connect/${connection.channelID}/${
                 connection.child ? 'true' : 'false'
               }`
             );
-            this.mainWindow?.show();
+            this.appWindow?.show();
           },
         });
 
@@ -127,14 +127,14 @@ export default class TrayMenuHelper {
   };
 
   buildMenuTemplate = () => {
-    const { mainWindow, connections, buildConnections } = this;
+    const { appWindow, connections, buildConnections } = this;
     const template: (MenuItemConstructorOptions | MenuItem)[] = [
       {
         label: 'New Connection',
         icon: nativeImage.createFromPath(path.join(menuIconPath, 'add.png')),
         click() {
-          mainWindow?.webContents.send('redirectTo', '/connect');
-          mainWindow?.show();
+          appWindow?.webContents.send('redirectTo', '/connect');
+          appWindow?.show();
         },
       },
     ];
