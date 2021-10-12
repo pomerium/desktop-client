@@ -133,7 +133,7 @@ export default class Helper {
         label: 'New Connection',
         icon: nativeImage.createFromPath(path.join(menuIconPath, 'add.png')),
         click() {
-          appWindow?.webContents.send('redirectTo', '/connect');
+          appWindow?.webContents.send('redirectTo', '/connectForm');
           appWindow?.show();
         },
       },

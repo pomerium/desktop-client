@@ -19,6 +19,7 @@ import { create } from 'jss';
 import { createMuiTheme } from './shared/theme';
 import ConnectForm from './renderer/pages/ConnectForm';
 import { THEMES } from './shared/constants';
+import TopBar from './renderer/components/TopBar';
 
 const RouteListener: FC = (x) => {
   const history = useHistory();
@@ -75,13 +76,14 @@ const App: FC = () => {
   return (
     <ThemeProvider theme={createMuiTheme(defaultSettings)}>
       <StylesProvider jss={jss}>
+        <TopBar />
         <HashRouter>
           <Switch>
             <RouteListener>
               <Route exact path="/">
-                <Redirect to="/connect" />
+                <Redirect to="/connectForm" />
               </Route>
-              <Route exact path="/connect" component={ConnectForm} />
+              <Route exact path="/connectForm" component={ConnectForm} />
               <Route
                 path="/edit_connect/:channelId/:editingConnected"
                 component={ConnectForm}
