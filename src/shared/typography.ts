@@ -32,4 +32,9 @@ export default {
   overline: {
     fontWeight: 500,
   },
+  subtitle2: {
+    fontWeight: 400,
+    color: '#808080',
+    fontSize: 12,
+  },
 };

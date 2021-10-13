@@ -93,7 +93,7 @@ const themesOptions: ThemeOptions[] = [
         main: '#6E43E8',
       },
       secondary: {
-        main: '#E8436A',
+        main: colors.common.white,
       },
     },
     shadows: softShadows,
@@ -114,7 +114,7 @@ const themesOptions: ThemeOptions[] = [
         main: '#6e43e8',
       },
       secondary: {
-        main: '#E8436A',
+        main: colors.common.white,
       },
     },
     shadows: strongShadows,

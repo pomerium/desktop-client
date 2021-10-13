@@ -20,14 +20,16 @@ import { createMuiTheme } from './shared/theme';
 import ConnectForm from './renderer/pages/ConnectForm';
 import { THEMES } from './shared/constants';
 import TopBar from './renderer/components/TopBar';
+import ManageConnections from './renderer/pages/ManageConnections';
+import TopTabs from './renderer/components/TopTabs';
 
-const RouteListener: FC = (x) => {
+const RouteListener: FC = ({ children }) => {
   const history = useHistory();
   ipcRenderer?.on('redirectTo', (_, arg) => {
     history.replace(arg);
   });
   // eslint-disable-next-line react/destructuring-assignment
-  return <>{x.children}</>;
+  return <>{children}</>;
 };
 
 const jss = create({ plugins: [...jssPreset().plugins] });
@@ -76,8 +78,10 @@ const App: FC = () => {
   return (
     <ThemeProvider theme={createMuiTheme(defaultSettings)}>
       <StylesProvider jss={jss}>
-        <TopBar />
         <HashRouter>
+          <TopBar>
+            <TopTabs />
+          </TopBar>
           <Switch>
             <RouteListener>
               <Route exact path="/">
@@ -88,6 +92,7 @@ const App: FC = () => {
                 path="/edit_connect/:channelId/:editingConnected"
                 component={ConnectForm}
               />
+              <Route exact path="/manage" component={ManageConnections} />
             </RouteListener>
           </Switch>
         </HashRouter>

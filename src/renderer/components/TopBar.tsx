@@ -1,11 +1,11 @@
 import { AppBar, Grid, IconButton, Toolbar } from '@material-ui/core';
 
-import React from 'react';
+import React, { FC } from 'react';
 
 import { Search } from 'react-feather';
 import Logo from './Logo';
 
-const TopBar = (): JSX.Element => {
+const TopBar: FC = ({ children }): JSX.Element => {
   return (
     <AppBar position="sticky">
       <Toolbar>
@@ -20,6 +20,7 @@ const TopBar = (): JSX.Element => {
           </Grid>
         </Grid>
       </Toolbar>
+      {children}
     </AppBar>
   );
 };
