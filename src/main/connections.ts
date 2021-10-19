@@ -6,6 +6,7 @@ import {
   CONNECTION_RESPONSE,
   ConnectionData,
   MenuConnection,
+  SAVE_CONNECTION_RESPONSE,
 } from '../shared/constants';
 
 export default class Connections {
@@ -34,9 +35,12 @@ export default class Connections {
     return parseInt(parts[parts.length - 1], 10);
   };
 
-  saveConnection(conn: ConnectionData) {
+  saveConnection(conn: ConnectionData, evt: IpcMainEvent | null) {
     this.connectionsData[conn.channelID] = conn;
     this.store.set('connections', this.connectionsData);
+    evt?.sender.send(SAVE_CONNECTION_RESPONSE, {
+      success: true,
+    });
   }
 
   getConnection(channelID: ConnectionData['channelID']) {
@@ -86,6 +90,7 @@ export default class Connections {
 
   createMenuConnectionFromData(conn: ConnectionData) {
     this.menuConnections[conn.channelID] = {
+      name: conn.name,
       channelID: conn.channelID,
       child: this.menuConnections[conn.channelID]?.child || null,
       output: [],

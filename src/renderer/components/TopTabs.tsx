@@ -39,7 +39,7 @@ const TopTabs = (): JSX.Element => {
               />
             </Tabs>
           </Grid>
-          <Grid item xs={2} justifyContent={'flex-end'}>
+          <Grid item xs={2}>
             <Typography align="center" variant={'subtitle2'}>
               Version: {version}
             </Typography>

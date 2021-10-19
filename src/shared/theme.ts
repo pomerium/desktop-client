@@ -53,6 +53,11 @@ const baseOptions: ThemeOptions = {
         minWidth: 32,
       },
     },
+    MuiButton: {
+      root: {
+        borderRadius: 64,
+      },
+    },
     MuiChip: {
       root: {
         backgroundColor: 'rgba(0,0,0,0.075)',
@@ -87,13 +92,14 @@ const themesOptions: ThemeOptions[] = [
       background: {
         default: colors.common.white,
         dark: '#f7f6fd',
-        paper: colors.common.white,
+        paper: '#E3E3E3',
       },
       primary: {
         main: '#6E43E8',
       },
       secondary: {
         main: colors.common.white,
+        contrastText: '#6E43E8',
       },
     },
     shadows: softShadows,

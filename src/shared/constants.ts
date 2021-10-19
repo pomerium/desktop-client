@@ -8,8 +8,11 @@ export const CONNECTION_RESPONSE = 'connection-response';
 export const CONNECTION_CLOSED = 'connection-close';
 export const DISCONNECT = 'disconnect';
 export const CONNECT = 'connect';
+export const SAVE_CONNECTION = 'save-connection';
+export const SAVE_CONNECTION_RESPONSE = 'save-connection-response';
 
 export interface ConnectionData {
+  name: string;
   destinationUrl: string;
   channelID: string;
   localAddress?: string;
@@ -20,6 +23,7 @@ export interface ConnectionData {
 }
 
 export interface MenuConnection {
+  name: string;
   url: string;
   port: string;
   child: child_process.ChildProcessWithoutNullStreams | null;

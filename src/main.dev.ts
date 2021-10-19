@@ -25,6 +25,7 @@ import {
   prodDebug,
   ConnectionData,
   CONNECT,
+  SAVE_CONNECTION,
 } from './shared/constants';
 import Connections from './main/connections';
 import Helper from './trayMenu/helper';
@@ -100,14 +101,17 @@ app.on('ready', async () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(CONNECT, (evt, args: ConnectionData) => {
-      connections.saveConnection(args);
-      connections.createMenuConnectionFromData(args);
       connections.connect(args.channelID, evt);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(DISCONNECT, (_evt, msg) => {
       connections.disconnect(msg.channelID);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    });
+    ipcMain.on(SAVE_CONNECTION, (evt, args: ConnectionData) => {
+      console.log(args);
+      connections.saveConnection(args, evt);
+      connections.createMenuConnectionFromData(args);
     });
     app.on('before-quit', () => {
       Object.values(connections.getMenuConnections()).forEach((conn) => {
