@@ -4,6 +4,7 @@ import {
   AccordionSummary,
   Box,
   Button,
+  capitalize,
   Container,
   FormControlLabel,
   FormHelperText,
@@ -28,6 +29,7 @@ import TextField from '../components/TextField';
 import { Theme } from '../../shared/theme';
 import Card from '../components/Card';
 import { CheckCircle, ChevronDown } from 'react-feather';
+import { Autocomplete } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -68,6 +70,7 @@ const noErrors = {
   pomeriumUrl: false,
   caFilePath: false,
   caFileText: false,
+  tags: false,
 };
 
 const initialConnectionData: ConnectionData = {
@@ -79,6 +82,7 @@ const initialConnectionData: ConnectionData = {
   caFileText: '',
   caFilePath: '',
   channelID: '',
+  tags: [],
 };
 
 interface QueryParams {
@@ -91,6 +95,7 @@ const ConnectForm: FC<Props> = () => {
   const [errors, setErrors] = useState(noErrors);
   const [connectionData, setConnectionData] = useState(initialConnectionData);
   const [refresh, setRefresh] = useState('');
+  const [tagOptions, setTagOptions] = useState([] as string[]);
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
   };
@@ -122,6 +127,13 @@ const ConnectForm: FC<Props> = () => {
     if (data[channelId]) {
       setConnectionData(data[channelId]);
     }
+    const existingTags = new Set<string>();
+    Object.entries(data).forEach(([_, connection]) => {
+      connection?.tags?.forEach((tag) => {
+        existingTags.add(tag);
+      });
+    });
+    setTagOptions([...existingTags].sort());
   };
 
   const saveName = (value: string): void => {
@@ -132,6 +144,25 @@ const ConnectForm: FC<Props> = () => {
     setErrors({
       ...errors,
       ...{ name: !value.trim() },
+    });
+  };
+
+  const formatTag = (tag: string): string => {
+    return tag
+      .replace(/\s+/g, ' ')
+      .split(' ')
+      .map((word) => capitalize(word.toLocaleLowerCase()))
+      .join(' ');
+  };
+
+  const saveTags = (arr: string[]): void => {
+    setConnectionData({
+      ...connectionData,
+      ...{ tags: arr.map((tag) => formatTag(tag)) },
+    });
+    setErrors({
+      ...errors,
+      ...{ tags: !Array.isArray(arr) },
     });
   };
 
@@ -243,6 +274,32 @@ const ConnectForm: FC<Props> = () => {
                 onChange={(evt): void => saveLocal(evt.target.value)}
                 variant="outlined"
                 helperText="The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                multiple
+                id="tags-outlined"
+                options={tagOptions}
+                value={connectionData.tags || []}
+                onChange={(_, arr) => {
+                  saveTags(arr);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Tags..."
+                    placeholder="Tags"
+                    onKeyDown={(e) => {
+                      const element = e.target as HTMLInputElement;
+                      const value = element.value;
+                      if (e.key === 'Enter' && value.trim()) {
+                        saveTags(connectionData.tags.concat(value));
+                      }
+                    }}
+                  />
+                )}
               />
             </Grid>
           </Grid>

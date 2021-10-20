@@ -20,6 +20,7 @@ export interface ConnectionData {
   disableTLS?: boolean;
   caFilePath?: string;
   caFileText?: string;
+  tags: string[];
 }
 
 export interface MenuConnection {
@@ -29,6 +30,7 @@ export interface MenuConnection {
   child: child_process.ChildProcessWithoutNullStreams | null;
   channelID: string;
   output: string[];
+  tags: string[];
 }
 
 export const THEMES = {
