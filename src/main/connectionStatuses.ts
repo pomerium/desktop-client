@@ -1,4 +1,3 @@
-import Store from 'electron-store';
 import { IpcMainEvent } from 'electron';
 import { spawnTcpConnect } from './binaries';
 import {
@@ -6,57 +5,21 @@ import {
   CONNECTION_RESPONSE,
   ConnectionData,
   MenuConnection,
-  SAVE_CONNECTION_RESPONSE,
 } from '../shared/constants';
+import Connections from '../shared/connections';
 
-export default class Connections {
+export default class ConnectionStatuses {
   connectionsData: Record<ConnectionData['channelID'], ConnectionData> = {};
-
   menuConnections: Record<MenuConnection['channelID'], MenuConnection> = {};
 
-  store: Store;
-
   constructor() {
-    this.store = new Store({ name: 'connections' });
-    const data = this.store.get('connections') as Record<
-      ConnectionData['channelID'],
-      ConnectionData
-    >;
-    if (data) {
-      this.connectionsData = data;
-    }
-    Object.values(this.connectionsData).forEach((conn) => {
-      this.createMenuConnectionFromData(conn);
-    });
+    this.createMenuItems();
   }
 
   getPort = (text: string) => {
     const parts = text.split(':');
     return parseInt(parts[parts.length - 1], 10);
   };
-
-  saveConnection(conn: ConnectionData, evt: IpcMainEvent | null) {
-    this.connectionsData[conn.channelID] = conn;
-    this.store.set('connections', this.connectionsData);
-    evt?.sender.send(SAVE_CONNECTION_RESPONSE, {
-      success: true,
-    });
-  }
-
-  getConnection(channelID: ConnectionData['channelID']) {
-    return this.connectionsData[channelID];
-  }
-
-  deleteConnection(channelID: ConnectionData['channelID']) {
-    this.disconnect(channelID);
-    delete this.connectionsData[channelID];
-    delete this.menuConnections[channelID];
-    this.store.set('connections', this.connectionsData);
-  }
-
-  getConnections() {
-    return this.connectionsData;
-  }
 
   connect(channelID: MenuConnection['channelID'], evt: IpcMainEvent | null) {
     const conn = this.menuConnections[channelID];
@@ -83,9 +46,24 @@ export default class Connections {
     }
   }
 
+  delete(channelID: MenuConnection['channelID']) {
+    this.disconnect(channelID);
+    delete this.menuConnections[channelID];
+    const connHandler = new Connections();
+    connHandler.deleteConnection(channelID);
+  }
+
   disconnect(channelID: MenuConnection['channelID']) {
     this.menuConnections[channelID].child?.kill();
     this.menuConnections[channelID].child = null;
+  }
+
+  createMenuItems() {
+    const connHandler = new Connections();
+    this.connectionsData = connHandler.connectionsData;
+    Object.values(this.connectionsData).forEach((conn) => {
+      this.createMenuConnectionFromData(conn);
+    });
   }
 
   createMenuConnectionFromData(conn: ConnectionData) {
@@ -96,6 +74,7 @@ export default class Connections {
       output: [],
       port: conn.localAddress || '',
       url: conn.destinationUrl,
+      tags: conn.tags,
     };
   }
 

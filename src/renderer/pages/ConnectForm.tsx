@@ -2,34 +2,27 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Box,
   Button,
-  capitalize,
   Container,
   FormControlLabel,
   FormHelperText,
   Grid,
   makeStyles,
-  Paper,
   Switch,
   Typography,
 } from '@material-ui/core';
-import { ipcRenderer } from 'electron';
 import React, { FC, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
-import Store from 'electron-store';
 import { isIp } from '../../shared/validators';
-import {
-  ConnectionData,
-  SAVE_CONNECTION,
-  SAVE_CONNECTION_RESPONSE,
-} from '../../shared/constants';
+import { CONNECTION_SAVED, ConnectionData } from '../../shared/constants';
 import TextField from '../components/TextField';
 import { Theme } from '../../shared/theme';
 import Card from '../components/Card';
 import { CheckCircle, ChevronDown } from 'react-feather';
 import { Autocomplete } from '@material-ui/lab';
+import Connections, { formatTag } from '../../shared/connections';
+import { ipcRenderer } from 'electron';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -73,7 +66,7 @@ const noErrors = {
   tags: false,
 };
 
-const initialConnectionData: ConnectionData = {
+const initialFormData: ConnectionData = {
   name: '',
   destinationUrl: '',
   localAddress: '',
@@ -87,58 +80,48 @@ const initialConnectionData: ConnectionData = {
 
 interface QueryParams {
   channelId: string;
-  editingConnected: string;
 }
 
 const ConnectForm: FC<Props> = () => {
   const classes = useStyles();
   const [errors, setErrors] = useState(noErrors);
-  const [connectionData, setConnectionData] = useState(initialConnectionData);
+  const [formData, setFormData] = useState(initialFormData);
   const [refresh, setRefresh] = useState('');
   const [tagOptions, setTagOptions] = useState([] as string[]);
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
   };
 
-  const { channelId, editingConnected }: QueryParams = useParams();
+  const { channelId }: QueryParams = useParams();
+
   useEffect(() => {
-    if (channelId) {
-      fetchData();
-    }
-  }, [channelId, editingConnected]);
+    fetchData();
+  }, [channelId]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (refresh) {
       setRefresh('');
-      if (channelId) {
-        fetchData();
-      } else {
-        setConnectionData(initialConnectionData);
-      }
+      fetchData();
     }
   }, [refresh]);
 
   const fetchData = (): void => {
-    const store = new Store({ name: 'connections' });
-    const data = store.get('connections') as Record<
-      ConnectionData['channelID'],
-      ConnectionData
-    >;
-    if (data[channelId]) {
-      setConnectionData(data[channelId]);
+    const connHandler = new Connections();
+    if (channelId) {
+      setFormData(connHandler.getConnection(channelId));
+    } else {
+      setFormData(initialFormData);
     }
-    const existingTags = new Set<string>();
-    Object.entries(data).forEach(([_, connection]) => {
-      connection?.tags?.forEach((tag) => {
-        existingTags.add(tag);
-      });
-    });
-    setTagOptions([...existingTags].sort());
+    setTagOptions(connHandler.getExistingTags());
   };
 
   const saveName = (value: string): void => {
-    setConnectionData({
-      ...connectionData,
+    setFormData({
+      ...formData,
       ...{ name: value.trim() },
     });
     setErrors({
@@ -147,17 +130,9 @@ const ConnectForm: FC<Props> = () => {
     });
   };
 
-  const formatTag = (tag: string): string => {
-    return tag
-      .replace(/\s+/g, ' ')
-      .split(' ')
-      .map((word) => capitalize(word.toLocaleLowerCase()))
-      .join(' ');
-  };
-
   const saveTags = (arr: string[]): void => {
-    setConnectionData({
-      ...connectionData,
+    setFormData({
+      ...formData,
       ...{ tags: arr.map((tag) => formatTag(tag)) },
     });
     setErrors({
@@ -167,8 +142,8 @@ const ConnectForm: FC<Props> = () => {
   };
 
   const saveDestination = (value: string): void => {
-    setConnectionData({
-      ...connectionData,
+    setFormData({
+      ...formData,
       ...{ destinationUrl: value.trim() },
     });
     setErrors({
@@ -178,7 +153,7 @@ const ConnectForm: FC<Props> = () => {
   };
 
   const saveLocal = (value: string): void => {
-    setConnectionData({ ...connectionData, ...{ localAddress: value.trim() } });
+    setFormData({ ...formData, ...{ localAddress: value.trim() } });
     setErrors({
       ...errors,
       ...{ localAddress: !isIp(value) && !!value },
@@ -186,39 +161,34 @@ const ConnectForm: FC<Props> = () => {
   };
 
   const savePomeriumUrl = (value: string): void => {
-    setConnectionData({ ...connectionData, ...{ pomeriumUrl: value.trim() } });
+    setFormData({ ...formData, ...{ pomeriumUrl: value.trim() } });
   };
 
   const saveDisableTLS = (): void => {
-    setConnectionData({
-      ...connectionData,
-      ...{ disableTLS: !connectionData.disableTLS },
+    setFormData({
+      ...formData,
+      ...{ disableTLS: !formData.disableTLS },
     });
   };
 
   const saveCaFilePath = (value: string): void => {
-    setConnectionData({ ...connectionData, ...{ caFilePath: value.trim() } });
+    setFormData({ ...formData, ...{ caFilePath: value.trim() } });
   };
 
   const saveCaFileText = (value: string): void => {
-    setConnectionData({ ...connectionData, ...{ caFileText: value.trim() } });
+    setFormData({ ...formData, ...{ caFileText: value.trim() } });
   };
-
-  useEffect(() => {
-    ipcRenderer.removeAllListeners(SAVE_CONNECTION_RESPONSE);
-    ipcRenderer.on(SAVE_CONNECTION_RESPONSE, (_, msg) => {
-      console.log(msg);
-    });
-  }, [connectionData.channelID]);
 
   const saveConnection = (): void => {
     if (Object.values(errors).every((error) => !error)) {
-      const args: ConnectionData = { ...connectionData };
+      const args: ConnectionData = { ...formData };
       if (!args.channelID) {
         args.channelID = uuidv4();
       }
-      setConnectionData(args);
-      ipcRenderer.send(SAVE_CONNECTION, args);
+      setFormData(args);
+      const connHandler = new Connections();
+      connHandler.saveConnection(args);
+      ipcRenderer.send(CONNECTION_SAVED);
     }
   };
 
@@ -233,7 +203,7 @@ const ConnectForm: FC<Props> = () => {
           <Grid container alignItems="flex-start">
             <Grid item xs={12}>
               <Typography variant="h3" color="textPrimary">
-                {connectionData.channelID ? 'Edit' : 'Add'} Connection
+                {formData.channelID ? 'Edit' : 'Add'} Connection
               </Typography>
             </Grid>
           </Grid>
@@ -246,7 +216,7 @@ const ConnectForm: FC<Props> = () => {
                 fullWidth
                 required
                 label={'Name'}
-                value={connectionData.name}
+                value={formData.name}
                 onChange={(evt): void => saveName(evt.target.value)}
                 variant="outlined"
                 autoFocus
@@ -258,7 +228,7 @@ const ConnectForm: FC<Props> = () => {
                 fullWidth
                 required
                 label={'Destination URL'}
-                value={connectionData.destinationUrl}
+                value={formData.destinationUrl}
                 onChange={(evt): void => saveDestination(evt.target.value)}
                 variant="outlined"
                 autoFocus
@@ -270,7 +240,7 @@ const ConnectForm: FC<Props> = () => {
                 fullWidth
                 label={'Local Address'}
                 error={errors.localAddress}
-                value={connectionData.localAddress}
+                value={formData.localAddress}
                 onChange={(evt): void => saveLocal(evt.target.value)}
                 variant="outlined"
                 helperText="The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
@@ -281,7 +251,7 @@ const ConnectForm: FC<Props> = () => {
                 multiple
                 id="tags-outlined"
                 options={tagOptions}
-                value={connectionData.tags || []}
+                value={formData.tags || []}
                 onChange={(_, arr) => {
                   saveTags(arr);
                 }}
@@ -295,7 +265,7 @@ const ConnectForm: FC<Props> = () => {
                       const element = e.target as HTMLInputElement;
                       const value = element.value;
                       if (e.key === 'Enter' && value.trim()) {
-                        saveTags(connectionData.tags.concat(value));
+                        saveTags(formData.tags.concat(value));
                       }
                     }}
                   />
@@ -319,7 +289,7 @@ const ConnectForm: FC<Props> = () => {
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={connectionData.disableTLS}
+                      checked={formData.disableTLS}
                       name="disable-tls-verification"
                       color="primary"
                       onChange={saveDisableTLS}
@@ -336,7 +306,7 @@ const ConnectForm: FC<Props> = () => {
                   fullWidth
                   label={'Alternate Pomerium URL'}
                   error={errors.pomeriumUrl}
-                  value={connectionData.pomeriumUrl}
+                  value={formData.pomeriumUrl}
                   onChange={(evt): void => savePomeriumUrl(evt.target.value)}
                   variant="outlined"
                   helperText="Pomerium Proxy Url. Useful if the Destination URL isn't publicly resolvable"
@@ -347,7 +317,7 @@ const ConnectForm: FC<Props> = () => {
                   fullWidth
                   label={'CA File Path'}
                   error={errors.caFilePath}
-                  value={connectionData.caFilePath}
+                  value={formData.caFilePath}
                   onChange={(evt): void => saveCaFilePath(evt.target.value)}
                   variant="outlined"
                   helperText="If Pomerium is using a CA in your system's trusted keychain you can provide the path to it here."
@@ -358,7 +328,7 @@ const ConnectForm: FC<Props> = () => {
                   fullWidth
                   label={'CA File Text'}
                   error={errors.caFileText}
-                  value={connectionData.caFileText}
+                  value={formData.caFileText}
                   onChange={(evt): void => saveCaFileText(evt.target.value)}
                   variant="outlined"
                   multiline
@@ -383,8 +353,8 @@ const ConnectForm: FC<Props> = () => {
               variant="contained"
               disabled={
                 Object.values(errors).some(Boolean) ||
-                !connectionData.name.trim() ||
-                !connectionData.destinationUrl.trim()
+                !formData.name.trim() ||
+                !formData.destinationUrl.trim()
               }
               color="primary"
               onClick={saveConnection}

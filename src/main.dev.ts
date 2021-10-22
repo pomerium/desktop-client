@@ -25,10 +25,10 @@ import {
   prodDebug,
   ConnectionData,
   CONNECT,
-  SAVE_CONNECTION,
+  CONNECTION_SAVED,
 } from './shared/constants';
-import Connections from './main/connections';
 import Helper from './trayMenu/helper';
+import ConnectionStatuses from './main/connectionStatuses';
 
 let mainWindow: BrowserWindow | null;
 
@@ -87,7 +87,8 @@ app.on('ready', async () => {
       slashes: true,
     })
   );
-  const connections = new Connections();
+
+  const connections = new ConnectionStatuses();
   const trayMenuHelper = new Helper(connections, mainWindow, null);
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
@@ -108,10 +109,9 @@ app.on('ready', async () => {
       connections.disconnect(msg.channelID);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(SAVE_CONNECTION, (evt, args: ConnectionData) => {
-      console.log(args);
-      connections.saveConnection(args, evt);
-      connections.createMenuConnectionFromData(args);
+    ipcMain.on(CONNECTION_SAVED, () => {
+      connections.createMenuItems();
+      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     app.on('before-quit', () => {
       Object.values(connections.getMenuConnections()).forEach((conn) => {

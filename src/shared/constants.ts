@@ -8,8 +8,7 @@ export const CONNECTION_RESPONSE = 'connection-response';
 export const CONNECTION_CLOSED = 'connection-close';
 export const DISCONNECT = 'disconnect';
 export const CONNECT = 'connect';
-export const SAVE_CONNECTION = 'save-connection';
-export const SAVE_CONNECTION_RESPONSE = 'save-connection-response';
+export const CONNECTION_SAVED = 'connection-saved';
 
 export interface ConnectionData {
   name: string;

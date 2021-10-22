@@ -12,7 +12,7 @@ import {
 import { Menubar } from 'menubar';
 import path from 'path';
 import { getAssetPath, menuIconPath } from '../main/binaries';
-import Connections from '../main/connections';
+import ConnectionStatuses from '../main/connectionStatuses';
 
 type ConnectionOption = {
   label: string;
@@ -21,14 +21,14 @@ type ConnectionOption = {
 };
 
 export default class Helper {
-  connections: Connections;
+  connections: ConnectionStatuses;
 
   appWindow: BrowserWindow | null;
 
   menu: Menubar | null;
 
   constructor(
-    connections: Connections,
+    connections: ConnectionStatuses,
     appWindow: BrowserWindow | null,
     menu: Menubar | null
   ) {
@@ -37,7 +37,7 @@ export default class Helper {
     this.menu = menu;
   }
 
-  setConnections = (connections: Connections) => {
+  setConnections = (connections: ConnectionStatuses) => {
     this.connections = connections;
   };
 
@@ -112,7 +112,7 @@ export default class Helper {
             path.join(menuIconPath, 'delete.png')
           ),
           click: () => {
-            this.connections.deleteConnection(connection.channelID);
+            this.connections.delete(connection.channelID);
             this.menu?.tray.setContextMenu(
               this.createContextMenu(this.connections)
             );
@@ -164,7 +164,7 @@ export default class Helper {
     return template;
   };
 
-  createContextMenu = (connections: Connections): Menu => {
+  createContextMenu = (connections: ConnectionStatuses): Menu => {
     this.setConnections(connections);
     return Menu.buildFromTemplate(this.buildMenuTemplate());
   };
