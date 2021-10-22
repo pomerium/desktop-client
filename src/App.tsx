@@ -10,6 +10,7 @@ import {
 
 import {
   createStyles,
+  CssBaseline,
   jssPreset,
   makeStyles,
   StylesProvider,
@@ -77,6 +78,7 @@ const App: FC = () => {
   useStyles();
   return (
     <ThemeProvider theme={createMuiTheme(defaultSettings)}>
+      <CssBaseline />
       <StylesProvider jss={jss}>
         <HashRouter>
           <TopBar>

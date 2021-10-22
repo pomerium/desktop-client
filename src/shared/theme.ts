@@ -90,9 +90,9 @@ const themesOptions: ThemeOptions[] = [
         active: colors.blueGrey[600],
       },
       background: {
-        default: colors.common.white,
+        default: '#E3E3E3',
         dark: '#f7f6fd',
-        paper: '#E3E3E3',
+        paper: colors.common.white,
       },
       primary: {
         main: '#6E43E8',

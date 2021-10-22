@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: 20,
   },
   accordion: {
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.background.paper,
     marginTop: theme.spacing(2),
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
@@ -227,7 +227,7 @@ const ConnectForm: FC<Props> = () => {
   };
 
   return (
-    <Container component={Paper} maxWidth={false}>
+    <Container maxWidth={false}>
       <form onSubmit={handleSubmit}>
         <Grid className={classes.titleGrid}>
           <Grid container alignItems="flex-start">
@@ -405,7 +405,6 @@ const ConnectForm: FC<Props> = () => {
           </Grid>
         </Grid>
       </form>
-      <Box minHeight={'90px'} overflow={'hidden'} />
     </Container>
   );
 };

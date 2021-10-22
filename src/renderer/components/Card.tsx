@@ -5,7 +5,7 @@ import { Theme } from '../../shared/theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardContainer: {
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2),
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
