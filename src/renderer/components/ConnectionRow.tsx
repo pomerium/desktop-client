@@ -9,6 +9,7 @@ import {
   capitalize,
 } from '@material-ui/core';
 import { MoreVertical } from 'react-feather';
+import { ipcRenderer } from 'electron';
 import {
   CONNECT,
   ConnectionData,
@@ -17,7 +18,6 @@ import {
   DUPLICATE,
   EXPORT,
 } from '../../shared/constants';
-import { ipcRenderer } from 'electron';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
 
@@ -70,11 +70,11 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           </IconButton>
         </Grid>
         <Grid item xs={3}>
-          <Typography variant={'h6'}>{capitalize(connection.name)}</Typography>
+          <Typography variant="h6">{capitalize(connection.name)}</Typography>
         </Grid>
         <Grid item xs={5} />
         <Grid container item xs={2} justifyContent="flex-end">
-          <Typography variant={'subtitle2'}>
+          <Typography variant="subtitle2">
             {connected ? 'Connected' : 'Disconnected'}
           </Typography>
         </Grid>

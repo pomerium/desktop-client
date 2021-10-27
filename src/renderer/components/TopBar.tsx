@@ -1,11 +1,11 @@
 import { AppBar, Grid, IconButton, Toolbar } from '@material-ui/core';
 
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 
 import { Search } from 'react-feather';
 import Logo from '../icons/Logo';
 
-const TopBar: FC = ({ children }): JSX.Element => {
+const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
   return (
     <AppBar position="sticky">
       <Toolbar>

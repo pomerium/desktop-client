@@ -7,9 +7,9 @@ import {
   Toolbar,
   Typography,
 } from '@material-ui/core';
-import { version } from '../../package.json';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { version } from '../../package.json';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -26,11 +26,7 @@ const TopTabs = (): JSX.Element => {
       <Toolbar disableGutters>
         <Grid container alignItems="center">
           <Grid item xs={10}>
-            <Tabs
-              value={'/manage'}
-              indicatorColor="primary"
-              textColor="primary"
-            >
+            <Tabs value="/manage" indicatorColor="primary" textColor="primary">
               <Tab
                 label="MANAGE CONNECTIONS"
                 to="/manage"

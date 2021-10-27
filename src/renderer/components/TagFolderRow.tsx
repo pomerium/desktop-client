@@ -7,10 +7,9 @@ import {
   MenuItem,
   Menu,
 } from '@material-ui/core';
-import ClosedFolder from '../icons/ClosedFolder';
-import OpenFolder from '../icons/OpenFolder';
 import { PropsWithChildren } from 'react';
 import { MoreVertical } from 'react-feather';
+import { ipcRenderer } from 'electron';
 import {
   CONNECT_ALL,
   DELETE_ALL,
@@ -18,7 +17,8 @@ import {
   EXPORT_ALL,
   FolderActionData,
 } from '../../shared/constants';
-import { ipcRenderer } from 'electron';
+import ClosedFolder from '../icons/ClosedFolder';
+import OpenFolder from '../icons/OpenFolder';
 
 type FolderProps = {
   folderName: string;
@@ -49,7 +49,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
 
   return (
     <Grid container>
-      <Grid container item xs={12} alignItems={'center'}>
+      <Grid container item xs={12} alignItems="center">
         <Grid item xs={1}>
           <IconButton
             key={'menuButton' + folderName}
@@ -61,13 +61,13 @@ const TagFolderRow: React.FC<FolderProps> = ({
           </IconButton>
         </Grid>
         <Grid item xs={3}>
-          <Typography variant={'h6'}>{folderName}</Typography>
+          <Typography variant="h6">{folderName}</Typography>
         </Grid>
         <Grid item xs={5} />
-        <Grid container item xs={2} justifyContent={'flex-end'}>
-          <Typography variant={'subtitle2'}>7 of 7 connected</Typography>
+        <Grid container item xs={2} justifyContent="flex-end">
+          <Typography variant="subtitle2">7 of 7 connected</Typography>
         </Grid>
-        <Grid container item xs={1} justifyContent={'center'}>
+        <Grid container item xs={1} justifyContent="center">
           <IconButton
             aria-controls="folder-menu"
             aria-haspopup="true"

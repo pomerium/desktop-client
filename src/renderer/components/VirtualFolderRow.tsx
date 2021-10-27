@@ -7,12 +7,12 @@ import {
   MenuItem,
   Menu,
 } from '@material-ui/core';
-import VirtualClosedFolder from '../icons/VirtualClosedFolder';
-import VirtualOpenFolder from '../icons/VirtualOpenFolder';
 import { PropsWithChildren } from 'react';
 import { MoreVertical } from 'react-feather';
-import { EXPORT_ALL, FolderActionData } from '../../shared/constants';
 import { ipcRenderer } from 'electron';
+import VirtualClosedFolder from '../icons/VirtualClosedFolder';
+import VirtualOpenFolder from '../icons/VirtualOpenFolder';
+import { EXPORT_ALL, FolderActionData } from '../../shared/constants';
 
 type VirtualFolderProps = {
   folderName: string;
@@ -55,7 +55,7 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
           </IconButton>
         </Grid>
         <Grid item xs={3}>
-          <Typography variant={'h6'}>{folderName}</Typography>
+          <Typography variant="h6">{folderName}</Typography>
         </Grid>
         <Grid item xs={5} />
         <Grid container item xs={2} justifyContent="flex-end">

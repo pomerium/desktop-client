@@ -73,7 +73,7 @@ const ManageConnections = (): JSX.Element => {
                 type="button"
                 variant="contained"
                 component={Link}
-                to={'/connectForm'}
+                to="/connectForm"
                 color="primary"
                 endIcon={<Plus />}
               >
@@ -87,7 +87,10 @@ const ManageConnections = (): JSX.Element => {
       <Card>
         {folderNames.map((folderName) => {
           return (
-            <TagFolderRow folderName={folderName}>
+            <TagFolderRow
+              key={'folderRow' + folderName}
+              folderName={folderName}
+            >
               {connections
                 .filter(
                   (connection) => connection?.tags?.indexOf(folderName) >= 0
@@ -104,7 +107,7 @@ const ManageConnections = (): JSX.Element => {
             </TagFolderRow>
           );
         })}
-        <VirtualFolderRow folderName={'All Connections'}>
+        <VirtualFolderRow folderName="All Connections">
           {connections.map((conn) => {
             return (
               <ConnectionRow
@@ -115,7 +118,7 @@ const ManageConnections = (): JSX.Element => {
             );
           })}
         </VirtualFolderRow>
-        <VirtualFolderRow folderName={'Untagged'}>
+        <VirtualFolderRow folderName="Untagged">
           {connections
             .filter((connection) => !connection?.tags?.length)
             .map((conn) => {

@@ -14,15 +14,15 @@ import {
 import React, { FC, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
+import { CheckCircle, ChevronDown } from 'react-feather';
+import { Autocomplete } from '@material-ui/lab';
+import { ipcRenderer } from 'electron';
 import { isIp } from '../../shared/validators';
 import { CONNECTION_SAVED, ConnectionData } from '../../shared/constants';
 import TextField from '../components/TextField';
 import { Theme } from '../../shared/theme';
 import Card from '../components/Card';
-import { CheckCircle, ChevronDown } from 'react-feather';
-import { Autocomplete } from '@material-ui/lab';
 import Connections, { formatTag } from '../../shared/connections';
-import { ipcRenderer } from 'electron';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -215,7 +215,7 @@ const ConnectForm: FC<Props> = () => {
               <TextField
                 fullWidth
                 required
-                label={'Name'}
+                label="Name"
                 value={formData.name}
                 onChange={(evt): void => saveName(evt.target.value)}
                 variant="outlined"
@@ -227,7 +227,7 @@ const ConnectForm: FC<Props> = () => {
               <TextField
                 fullWidth
                 required
-                label={'Destination URL'}
+                label="Destination URL"
                 value={formData.destinationUrl}
                 onChange={(evt): void => saveDestination(evt.target.value)}
                 variant="outlined"
@@ -238,7 +238,7 @@ const ConnectForm: FC<Props> = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label={'Local Address'}
+                label="Local Address"
                 error={errors.localAddress}
                 value={formData.localAddress}
                 onChange={(evt): void => saveLocal(evt.target.value)}
@@ -263,7 +263,7 @@ const ConnectForm: FC<Props> = () => {
                     placeholder="Tags"
                     onKeyDown={(e) => {
                       const element = e.target as HTMLInputElement;
-                      const value = element.value;
+                      const { value } = element;
                       if (e.key === 'Enter' && value.trim()) {
                         saveTags(formData.tags.concat(value));
                       }
@@ -281,7 +281,7 @@ const ConnectForm: FC<Props> = () => {
             aria-controls="advanced-settings-content"
             id="advanced-settings-header"
           >
-            <Typography variant={'h5'}>Advanced Settings</Typography>
+            <Typography variant="h5">Advanced Settings</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>
@@ -304,7 +304,7 @@ const ConnectForm: FC<Props> = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label={'Alternate Pomerium URL'}
+                  label="Alternate Pomerium URL"
                   error={errors.pomeriumUrl}
                   value={formData.pomeriumUrl}
                   onChange={(evt): void => savePomeriumUrl(evt.target.value)}
@@ -315,7 +315,7 @@ const ConnectForm: FC<Props> = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label={'CA File Path'}
+                  label="CA File Path"
                   error={errors.caFilePath}
                   value={formData.caFilePath}
                   onChange={(evt): void => saveCaFilePath(evt.target.value)}
@@ -326,7 +326,7 @@ const ConnectForm: FC<Props> = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label={'CA File Text'}
+                  label="CA File Text"
                   error={errors.caFileText}
                   value={formData.caFileText}
                   onChange={(evt): void => saveCaFileText(evt.target.value)}

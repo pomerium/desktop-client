@@ -1,6 +1,6 @@
 import { Card as BaseCard, CardContent, makeStyles } from '@material-ui/core';
 
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { Theme } from '../../shared/theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const Card: FC = ({ children }): JSX.Element => {
+const Card: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
   const classes = useStyles();
   return (
     <BaseCard className={classes.cardContainer}>
