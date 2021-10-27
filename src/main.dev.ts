@@ -26,6 +26,14 @@ import {
   ConnectionData,
   CONNECT,
   CONNECTION_SAVED,
+  FolderActionData,
+  CONNECT_ALL,
+  DISCONNECT_ALL,
+  DELETE_ALL,
+  EXPORT_ALL,
+  DELETE,
+  EXPORT,
+  DUPLICATE,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import ConnectionStatuses from './main/connectionStatuses';
@@ -109,10 +117,35 @@ app.on('ready', async () => {
       connections.disconnect(msg.channelID);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
+    ipcMain.on(DELETE, (_evt, args: ConnectionData) => {
+      connections.delete(args.channelID);
+      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    });
+    ipcMain.on(EXPORT, (_evt, args: ConnectionData) => {
+      console.log(EXPORT + ' ' + args.channelID + ' action was called.');
+    });
+    ipcMain.on(DUPLICATE, (_evt, args: ConnectionData) => {
+      console.log(DUPLICATE + ' ' + args.channelID + ' action was called.');
+    });
     ipcMain.on(CONNECTION_SAVED, () => {
       connections.createMenuItems();
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
+    ipcMain.on(CONNECT_ALL, (_, args: FolderActionData) => {
+      console.log(CONNECT_ALL + ' ' + args.folderName + ' action was called.');
+    });
+    ipcMain.on(DISCONNECT_ALL, (_, args: FolderActionData) => {
+      console.log(
+        DISCONNECT_ALL + ' ' + args.folderName + ' action was called.'
+      );
+    });
+    ipcMain.on(DELETE_ALL, (_, args: FolderActionData) => {
+      console.log(DELETE_ALL + ' ' + args.folderName + ' action was called.');
+    });
+    ipcMain.on(EXPORT_ALL, (_, args: FolderActionData) => {
+      console.log(EXPORT_ALL + ' ' + args.folderName + ' action was called.');
+    });
+
     app.on('before-quit', () => {
       Object.values(connections.getMenuConnections()).forEach((conn) => {
         connections.disconnect(conn.channelID);

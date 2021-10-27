@@ -6,9 +6,21 @@ export const prodDebug = process.env.DEBUG_PROD === 'true';
 
 export const CONNECTION_RESPONSE = 'connection-response';
 export const CONNECTION_CLOSED = 'connection-close';
+export const DISCONNECT_ALL = 'disconnect-all';
 export const DISCONNECT = 'disconnect';
+export const CONNECT_ALL = 'connect-all';
 export const CONNECT = 'connect';
+export const DELETE = 'delete';
+export const DELETE_ALL = 'delete-all';
+export const DUPLICATE = 'duplicate';
+export const EXPORT = 'export';
+export const EXPORT_ALL = 'export-all';
+export const IMPORT = 'import';
 export const CONNECTION_SAVED = 'connection-saved';
+
+export interface FolderActionData {
+  folderName: string;
+}
 
 export interface ConnectionData {
   name: string;

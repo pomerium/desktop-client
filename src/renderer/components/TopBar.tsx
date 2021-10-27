@@ -3,7 +3,7 @@ import { AppBar, Grid, IconButton, Toolbar } from '@material-ui/core';
 import React, { FC } from 'react';
 
 import { Search } from 'react-feather';
-import Logo from './Logo';
+import Logo from '../icons/Logo';
 
 const TopBar: FC = ({ children }): JSX.Element => {
   return (

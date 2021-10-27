@@ -1,8 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Button,
   Container,
   Grid,
@@ -10,9 +7,14 @@ import {
   Typography,
 } from '@material-ui/core';
 import Card from '../components/Card';
-import { ChevronDown, Download, Plus } from 'react-feather';
+import { Download, Plus } from 'react-feather';
 import { Theme } from '../../shared/theme';
 import { Link } from 'react-router-dom';
+import Connections from '../../shared/connections';
+import { ConnectionData } from '../../shared/constants';
+import TagFolderRow from '../components/TagFolderRow';
+import ConnectionRow from '../components/ConnectionRow';
+import VirtualFolderRow from '../components/VirtualFolderRow';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -32,8 +34,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const ManageConnections = (): JSX.Element => {
   const classes = useStyles();
+  const [folderNames, setFolderNames] = useState([] as string[]);
+  const [connections, setConnections] = useState([] as ConnectionData[]);
 
-  useEffect(() => {}, []);
+  const fetchData = (): void => {
+    const connHandler = new Connections();
+    setFolderNames(connHandler.getExistingTags());
+    setConnections(Object.values(connHandler.getConnections()));
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <Container maxWidth={false}>
@@ -44,7 +56,7 @@ const ManageConnections = (): JSX.Element => {
               Manage Connections
             </Typography>
           </Grid>
-          <Grid item xs={6} container justify="flex-end">
+          <Grid item xs={6} container justifyContent="flex-end">
             <Grid item>
               <Button
                 type="button"
@@ -73,16 +85,37 @@ const ManageConnections = (): JSX.Element => {
       </Grid>
 
       <Card>
-        <Accordion className={classes.accordion} square={true}>
-          <AccordionSummary
-            expandIcon={<ChevronDown />}
-            aria-controls="advanced-settings-content"
-            id="advanced-settings-header"
-          >
-            <Typography variant={'h5'}>Advanced Settings</Typography>
-          </AccordionSummary>
-          <AccordionDetails>hello</AccordionDetails>
-        </Accordion>
+        {folderNames.map((folderName) => {
+          return (
+            <TagFolderRow folderName={folderName}>
+              {connections
+                .filter(
+                  (connection) => connection?.tags?.indexOf(folderName) >= 0
+                )
+                .map((conn) => {
+                  return (
+                    <ConnectionRow folderName={folderName} connection={conn} />
+                  );
+                })}
+            </TagFolderRow>
+          );
+        })}
+        <VirtualFolderRow folderName={'All Connections'}>
+          {connections.map((conn) => {
+            return (
+              <ConnectionRow folderName={'All Connections'} connection={conn} />
+            );
+          })}
+        </VirtualFolderRow>
+        <VirtualFolderRow folderName={'Untagged'}>
+          {connections
+            .filter((connection) => !connection?.tags?.length)
+            .map((conn) => {
+              return (
+                <ConnectionRow folderName={'Untagged'} connection={conn} />
+              );
+            })}
+        </VirtualFolderRow>
       </Card>
     </Container>
   );
