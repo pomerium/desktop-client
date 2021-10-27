@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
 const TopTabs = (): JSX.Element => {
   const classes = useStyles();
   return (
-    <AppBar position="sticky" color={'secondary'} className={classes.root}>
+    <AppBar position="sticky" color="secondary" className={classes.root}>
       <Toolbar disableGutters>
         <Grid container alignItems="center">
           <Grid item xs={10}>
@@ -40,7 +40,7 @@ const TopTabs = (): JSX.Element => {
             </Tabs>
           </Grid>
           <Grid item xs={2}>
-            <Typography align="center" variant={'subtitle2'}>
+            <Typography align="center" variant="subtitle2">
               Version: {version}
             </Typography>
           </Grid>

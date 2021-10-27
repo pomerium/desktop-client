@@ -15,7 +15,7 @@ const TopBar: FC = ({ children }): JSX.Element => {
           </Grid>
           <Grid item xs={1}>
             <IconButton>
-              <Search color={'white'} />
+              <Search color="white" />
             </IconButton>
           </Grid>
         </Grid>

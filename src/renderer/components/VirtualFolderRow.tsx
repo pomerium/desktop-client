@@ -43,7 +43,7 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
 
   return (
     <Grid container>
-      <Grid container item xs={12} alignItems={'center'}>
+      <Grid container item xs={12} alignItems="center">
         <Grid item xs={1}>
           <IconButton
             key={'menuButton' + folderName}
@@ -58,10 +58,10 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
           <Typography variant={'h6'}>{folderName}</Typography>
         </Grid>
         <Grid item xs={5} />
-        <Grid container item xs={2} justifyContent={'flex-end'}>
-          <Typography variant={'subtitle2'}>7 of 7 connected</Typography>
+        <Grid container item xs={2} justifyContent="flex-end">
+          <Typography variant="subtitle2">7 of 7 connected</Typography>
         </Grid>
-        <Grid container item xs={1} justifyContent={'center'}>
+        <Grid container item xs={1} justifyContent="center">
           <IconButton
             aria-controls="folder-menu"
             aria-haspopup="true"

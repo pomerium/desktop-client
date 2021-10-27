@@ -6,10 +6,10 @@ import {
   makeStyles,
   Typography,
 } from '@material-ui/core';
-import Card from '../components/Card';
 import { Download, Plus } from 'react-feather';
-import { Theme } from '../../shared/theme';
 import { Link } from 'react-router-dom';
+import Card from '../components/Card';
+import { Theme } from '../../shared/theme';
 import Connections from '../../shared/connections';
 import { ConnectionData } from '../../shared/constants';
 import TagFolderRow from '../components/TagFolderRow';
@@ -94,7 +94,11 @@ const ManageConnections = (): JSX.Element => {
                 )
                 .map((conn) => {
                   return (
-                    <ConnectionRow folderName={folderName} connection={conn} />
+                    <ConnectionRow
+                      key={'connectionRow' + folderName + conn.channelID}
+                      folderName={folderName}
+                      connection={conn}
+                    />
                   );
                 })}
             </TagFolderRow>
@@ -103,7 +107,11 @@ const ManageConnections = (): JSX.Element => {
         <VirtualFolderRow folderName={'All Connections'}>
           {connections.map((conn) => {
             return (
-              <ConnectionRow folderName={'All Connections'} connection={conn} />
+              <ConnectionRow
+                key={'connectionRowAllConnections' + conn.channelID}
+                folderName="All Connections"
+                connection={conn}
+              />
             );
           })}
         </VirtualFolderRow>
@@ -112,7 +120,11 @@ const ManageConnections = (): JSX.Element => {
             .filter((connection) => !connection?.tags?.length)
             .map((conn) => {
               return (
-                <ConnectionRow folderName={'Untagged'} connection={conn} />
+                <ConnectionRow
+                  key={'connectionRowUntagged' + conn.channelID}
+                  folderName="Untagged"
+                  connection={conn}
+                />
               );
             })}
         </VirtualFolderRow>

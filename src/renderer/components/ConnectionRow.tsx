@@ -56,8 +56,8 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
 
   return (
     <Grid container>
-      <Grid container item xs={12} alignItems={'center'}>
-        <Grid container item xs={1} justifyContent={'flex-end'}>
+      <Grid container item xs={12} alignItems="center">
+        <Grid container item xs={1} justifyContent="flex-end">
           <IconButton
             key={'menuButton' + folderName}
             aria-label={
@@ -73,12 +73,12 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           <Typography variant={'h6'}>{capitalize(connection.name)}</Typography>
         </Grid>
         <Grid item xs={5} />
-        <Grid container item xs={2} justifyContent={'flex-end'}>
+        <Grid container item xs={2} justifyContent="flex-end">
           <Typography variant={'subtitle2'}>
             {connected ? 'Connected' : 'Disconnected'}
           </Typography>
         </Grid>
-        <Grid container item xs={1} justifyContent={'center'}>
+        <Grid container item xs={1} justifyContent="center">
           <IconButton
             aria-controls="connection-menu"
             aria-haspopup="true"

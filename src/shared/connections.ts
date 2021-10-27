@@ -1,6 +1,6 @@
 import Store from 'electron-store';
-import { ConnectionData, MenuConnection } from './constants';
 import { capitalize } from '@material-ui/core';
+import { ConnectionData, MenuConnection } from './constants';
 
 export const formatTag = (tag: string): string => {
   return tag
@@ -12,7 +12,9 @@ export const formatTag = (tag: string): string => {
 
 export default class Connections {
   connectionsData: Record<ConnectionData['channelID'], ConnectionData> = {};
+
   menuConnections: Record<MenuConnection['channelID'], MenuConnection> = {};
+
   store: Store;
 
   constructor() {
