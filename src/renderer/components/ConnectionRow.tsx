@@ -10,13 +10,16 @@ import {
 } from '@material-ui/core';
 import { MoreVertical } from 'react-feather';
 import { ipcRenderer } from 'electron';
+import { Link } from 'react-router-dom';
 import {
   CONNECT,
   ConnectionData,
   DELETE,
   DISCONNECT,
   DUPLICATE,
+  EDIT,
   EXPORT,
+  VIEW,
 } from '../../shared/constants';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
@@ -75,7 +78,9 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
         <Grid item xs={3}>
           <Typography variant="h6">{capitalize(connection.name)}</Typography>
         </Grid>
-        <Grid item xs={5} />
+        <Grid item xs={5}>
+          <Link to={'/view_connection/' + connection.connectionID} />
+        </Grid>
         <Grid container item xs={2} justifyContent="flex-end">
           <Typography variant="subtitle2">
             {connected ? 'Connected' : 'Disconnected'}
@@ -107,6 +112,12 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
               onClick={() => handleMenuClick(DISCONNECT)}
             >
               Disconnect
+            </MenuItem>
+            <MenuItem key="edit" onClick={() => handleMenuClick(EDIT)}>
+              Edit
+            </MenuItem>
+            <MenuItem key="view" onClick={() => handleMenuClick(VIEW)}>
+              View
             </MenuItem>
             <MenuItem
               key={DUPLICATE}

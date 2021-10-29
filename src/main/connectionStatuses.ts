@@ -10,6 +10,7 @@ import Connections from '../shared/connections';
 
 export default class ConnectionStatuses {
   connectionsData: Record<ConnectionData['connectionID'], ConnectionData> = {};
+
   menuConnections: Record<MenuConnection['connectionID'], MenuConnection> = {};
 
   constructor() {

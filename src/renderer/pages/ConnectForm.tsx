@@ -19,7 +19,7 @@ import { CheckCircle, ChevronDown } from 'react-feather';
 import { Autocomplete } from '@material-ui/lab';
 import { ipcRenderer } from 'electron';
 import { isIp } from '../../shared/validators';
-import { CONNECTION_SAVED, ConnectionData } from '../../shared/constants';
+import { ConnectionData, QueryParams, VIEW } from '../../shared/constants';
 import TextField from '../components/TextField';
 import { Theme } from '../../shared/theme';
 import Card from '../components/Card';
@@ -79,10 +79,6 @@ const initialFormData: ConnectionData = {
   tags: [],
 };
 
-interface QueryParams {
-  connectionID: string;
-}
-
 const ConnectForm: FC<Props> = () => {
   const classes = useStyles();
   const [errors, setErrors] = useState(noErrors);
@@ -123,7 +119,7 @@ const ConnectForm: FC<Props> = () => {
   const saveName = (value: string): void => {
     setFormData({
       ...formData,
-      ...{ name: value.trim() },
+      ...{ name: value },
     });
     setErrors({
       ...errors,
@@ -189,7 +185,7 @@ const ConnectForm: FC<Props> = () => {
       setFormData(args);
       const connHandler = new Connections();
       connHandler.saveConnection(args);
-      ipcRenderer.send(CONNECTION_SAVED);
+      ipcRenderer.send(VIEW, args);
     }
   };
 

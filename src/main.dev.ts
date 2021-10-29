@@ -34,6 +34,9 @@ import {
   DELETE,
   EXPORT,
   DUPLICATE,
+  VIEW,
+  EDIT,
+  VIEW_CONNECTION_LIST,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import ConnectionStatuses from './main/connectionStatuses';
@@ -120,6 +123,21 @@ app.on('ready', async () => {
     ipcMain.on(DELETE, (_evt, args: ConnectionData) => {
       connections.delete(args.connectionID);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    });
+    ipcMain.on(EDIT, (_evt, args: ConnectionData) => {
+      mainWindow?.webContents.send(
+        'redirectTo',
+        `/edit_connect/${args.connectionID}`
+      );
+    });
+    ipcMain.on(VIEW, (_evt, args: ConnectionData) => {
+      mainWindow?.webContents.send(
+        'redirectTo',
+        `/view_connection/${args.connectionID}`
+      );
+    });
+    ipcMain.on(VIEW_CONNECTION_LIST, () => {
+      mainWindow?.webContents.send('redirectTo', `/manage`);
     });
     ipcMain.on(EXPORT, (_evt, args: ConnectionData) => {
       console.log(EXPORT + ' ' + args.connectionID + ' action was called.');

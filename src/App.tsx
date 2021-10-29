@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import {
   useHistory,
   HashRouter,
@@ -23,8 +23,11 @@ import { THEMES } from './shared/constants';
 import TopBar from './renderer/components/TopBar';
 import ManageConnections from './renderer/pages/ManageConnections';
 import TopTabs from './renderer/components/TopTabs';
+import ConnectionView from './renderer/pages/ConnectionView';
 
-const RouteListener: FC = ({ children }) => {
+const RouteListener: FC = ({
+  children,
+}: PropsWithChildren<unknown>): JSX.Element => {
   const history = useHistory();
   ipcRenderer?.on('redirectTo', (_, arg) => {
     history.replace(arg);
@@ -93,6 +96,10 @@ const App: FC = () => {
               <Route
                 path="/edit_connect/:connectionID"
                 component={ConnectForm}
+              />
+              <Route
+                path="/view_connection/:connectionID"
+                component={ConnectionView}
               />
               <Route exact path="/manage" component={ManageConnections} />
             </RouteListener>

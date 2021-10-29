@@ -10,6 +10,9 @@ export const DISCONNECT_ALL = 'disconnect-all';
 export const DISCONNECT = 'disconnect';
 export const CONNECT_ALL = 'connect-all';
 export const CONNECT = 'connect';
+export const EDIT = 'edit';
+export const VIEW = 'view';
+export const VIEW_CONNECTION_LIST = 'view-connection-list';
 export const DELETE = 'delete';
 export const DELETE_ALL = 'delete-all';
 export const DUPLICATE = 'duplicate';
@@ -20,6 +23,10 @@ export const CONNECTION_SAVED = 'connection-saved';
 
 export interface FolderActionData {
   folderName: string;
+}
+
+export interface QueryParams {
+  connectionID: string;
 }
 
 export interface ConnectionData {
