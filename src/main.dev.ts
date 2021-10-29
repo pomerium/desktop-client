@@ -110,22 +110,22 @@ app.on('ready', async () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(CONNECT, (evt, args: ConnectionData) => {
-      connections.connect(args.channelID, evt);
+      connections.connect(args.connectionID, evt);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(DISCONNECT, (_evt, msg) => {
-      connections.disconnect(msg.channelID);
+      connections.disconnect(msg.connectionID);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(DELETE, (_evt, args: ConnectionData) => {
-      connections.delete(args.channelID);
+      connections.delete(args.connectionID);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(EXPORT, (_evt, args: ConnectionData) => {
-      console.log(EXPORT + ' ' + args.channelID + ' action was called.');
+      console.log(EXPORT + ' ' + args.connectionID + ' action was called.');
     });
     ipcMain.on(DUPLICATE, (_evt, args: ConnectionData) => {
-      console.log(DUPLICATE + ' ' + args.channelID + ' action was called.');
+      console.log(DUPLICATE + ' ' + args.connectionID + ' action was called.');
     });
     ipcMain.on(CONNECTION_SAVED, () => {
       connections.createMenuItems();
@@ -148,7 +148,7 @@ app.on('ready', async () => {
 
     app.on('before-quit', () => {
       Object.values(connections.getMenuConnections()).forEach((conn) => {
-        connections.disconnect(conn.channelID);
+        connections.disconnect(conn.connectionID);
       });
       mainWindow?.removeAllListeners('close');
       mainWindow?.close();

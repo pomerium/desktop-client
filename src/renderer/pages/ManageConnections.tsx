@@ -98,7 +98,7 @@ const ManageConnections = (): JSX.Element => {
                 .map((conn) => {
                   return (
                     <ConnectionRow
-                      key={'connectionRow' + folderName + conn.channelID}
+                      key={'connectionRow' + folderName + conn.connectionID}
                       folderName={folderName}
                       connection={conn}
                     />
@@ -111,7 +111,7 @@ const ManageConnections = (): JSX.Element => {
           {connections.map((conn) => {
             return (
               <ConnectionRow
-                key={'connectionRowAllConnections' + conn.channelID}
+                key={'connectionRowAllConnections' + conn.connectionID}
                 folderName="All Connections"
                 connection={conn}
               />
@@ -124,7 +124,7 @@ const ManageConnections = (): JSX.Element => {
             .map((conn) => {
               return (
                 <ConnectionRow
-                  key={'connectionRowUntagged' + conn.channelID}
+                  key={'connectionRowUntagged' + conn.connectionID}
                   folderName="Untagged"
                   connection={conn}
                 />

@@ -9,8 +9,8 @@ import {
 import Connections from '../shared/connections';
 
 export default class ConnectionStatuses {
-  connectionsData: Record<ConnectionData['channelID'], ConnectionData> = {};
-  menuConnections: Record<MenuConnection['channelID'], MenuConnection> = {};
+  connectionsData: Record<ConnectionData['connectionID'], ConnectionData> = {};
+  menuConnections: Record<MenuConnection['connectionID'], MenuConnection> = {};
 
   constructor() {
     this.createMenuItems();
@@ -21,41 +21,44 @@ export default class ConnectionStatuses {
     return parseInt(parts[parts.length - 1], 10);
   };
 
-  connect(channelID: MenuConnection['channelID'], evt: IpcMainEvent | null) {
-    const conn = this.menuConnections[channelID];
-    if (conn.channelID) {
-      this.disconnect(conn.channelID);
-      const child = spawnTcpConnect(this.connectionsData[channelID]);
+  connect(
+    connectionID: MenuConnection['connectionID'],
+    evt: IpcMainEvent | null
+  ) {
+    const conn = this.menuConnections[connectionID];
+    if (conn.connectionID) {
+      this.disconnect(conn.connectionID);
+      const child = spawnTcpConnect(this.connectionsData[connectionID]);
       child.stderr.setEncoding('utf8');
       conn.child = child;
       child.stderr.on('data', (data) => {
         conn.output.push(data.toString());
         evt?.sender.send(CONNECTION_RESPONSE, {
           output: conn.output,
-          channelID,
+          connectionID,
         });
         conn.port = `:${this.getPort(data.toString())}`;
       });
       child.on('exit', (code) => {
         evt?.sender.send(CONNECTION_CLOSED, {
           code,
-          channelID,
+          connectionID,
         });
         child.removeAllListeners();
       });
     }
   }
 
-  delete(channelID: MenuConnection['channelID']) {
-    this.disconnect(channelID);
-    delete this.menuConnections[channelID];
+  delete(connectionID: MenuConnection['connectionID']) {
+    this.disconnect(connectionID);
+    delete this.menuConnections[connectionID];
     const connHandler = new Connections();
-    connHandler.deleteConnection(channelID);
+    connHandler.deleteConnection(connectionID);
   }
 
-  disconnect(channelID: MenuConnection['channelID']) {
-    this.menuConnections[channelID].child?.kill();
-    this.menuConnections[channelID].child = null;
+  disconnect(connectionID: MenuConnection['connectionID']) {
+    this.menuConnections[connectionID].child?.kill();
+    this.menuConnections[connectionID].child = null;
   }
 
   createMenuItems() {
@@ -67,10 +70,10 @@ export default class ConnectionStatuses {
   }
 
   createMenuConnectionFromData(conn: ConnectionData) {
-    this.menuConnections[conn.channelID] = {
+    this.menuConnections[conn.connectionID] = {
       name: conn.name,
-      channelID: conn.channelID,
-      child: this.menuConnections[conn.channelID]?.child || null,
+      connectionID: conn.connectionID,
+      child: this.menuConnections[conn.connectionID]?.child || null,
       output: [],
       port: conn.localAddress || '',
       url: conn.destinationUrl,

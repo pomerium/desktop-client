@@ -11,16 +11,16 @@ export const formatTag = (tag: string): string => {
 };
 
 export default class Connections {
-  connectionsData: Record<ConnectionData['channelID'], ConnectionData> = {};
+  connectionsData: Record<ConnectionData['connectionID'], ConnectionData> = {};
 
-  menuConnections: Record<MenuConnection['channelID'], MenuConnection> = {};
+  menuConnections: Record<MenuConnection['connectionID'], MenuConnection> = {};
 
   store: Store;
 
   constructor() {
     this.store = new Store({ name: 'connections' });
     const data = this.store.get('connections') as Record<
-      ConnectionData['channelID'],
+      ConnectionData['connectionID'],
       ConnectionData
     >;
     if (data) {
@@ -34,16 +34,16 @@ export default class Connections {
   };
 
   saveConnection(conn: ConnectionData) {
-    this.connectionsData[conn.channelID] = conn;
+    this.connectionsData[conn.connectionID] = conn;
     this.store.set('connections', this.connectionsData);
   }
 
-  getConnection(channelID: ConnectionData['channelID']) {
-    return this.connectionsData[channelID];
+  getConnection(connectionID: ConnectionData['connectionID']) {
+    return this.connectionsData[connectionID];
   }
 
-  deleteConnection(channelID: ConnectionData['channelID']) {
-    delete this.connectionsData[channelID];
+  deleteConnection(connectionID: ConnectionData['connectionID']) {
+    delete this.connectionsData[connectionID];
     this.store.set('connections', this.connectionsData);
   }
 

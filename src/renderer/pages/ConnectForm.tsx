@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import {
   Accordion,
   AccordionDetails,
@@ -74,12 +75,12 @@ const initialFormData: ConnectionData = {
   disableTLS: false,
   caFileText: '',
   caFilePath: '',
-  channelID: '',
+  connectionID: '',
   tags: [],
 };
 
 interface QueryParams {
-  channelId: string;
+  connectionID: string;
 }
 
 const ConnectForm: FC<Props> = () => {
@@ -92,11 +93,21 @@ const ConnectForm: FC<Props> = () => {
     evt.preventDefault();
   };
 
-  const { channelId }: QueryParams = useParams();
+  const { connectionID }: QueryParams = useParams();
+
+  const fetchData = (): void => {
+    const connHandler = new Connections();
+    if (connectionID) {
+      setFormData(connHandler.getConnection(connectionID));
+    } else {
+      setFormData(initialFormData);
+    }
+    setTagOptions(connHandler.getExistingTags());
+  };
 
   useEffect(() => {
     fetchData();
-  }, [channelId]);
+  }, [connectionID]);
 
   useEffect(() => {
     fetchData();
@@ -108,16 +119,6 @@ const ConnectForm: FC<Props> = () => {
       fetchData();
     }
   }, [refresh]);
-
-  const fetchData = (): void => {
-    const connHandler = new Connections();
-    if (channelId) {
-      setFormData(connHandler.getConnection(channelId));
-    } else {
-      setFormData(initialFormData);
-    }
-    setTagOptions(connHandler.getExistingTags());
-  };
 
   const saveName = (value: string): void => {
     setFormData({
@@ -182,8 +183,8 @@ const ConnectForm: FC<Props> = () => {
   const saveConnection = (): void => {
     if (Object.values(errors).every((error) => !error)) {
       const args: ConnectionData = { ...formData };
-      if (!args.channelID) {
-        args.channelID = uuidv4();
+      if (!args.connectionID) {
+        args.connectionID = uuidv4();
       }
       setFormData(args);
       const connHandler = new Connections();
@@ -203,7 +204,7 @@ const ConnectForm: FC<Props> = () => {
           <Grid container alignItems="flex-start">
             <Grid item xs={12}>
               <Typography variant="h3" color="textPrimary">
-                {formData.channelID ? 'Edit' : 'Add'} Connection
+                {formData.connectionID ? 'Edit' : 'Add'} Connection
               </Typography>
             </Grid>
           </Grid>

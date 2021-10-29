@@ -61,7 +61,10 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           <IconButton
             key={'menuButton' + folderName}
             aria-label={
-              'toggle connected for ' + folderName + ' ' + connection.channelID
+              'toggle connected for ' +
+              folderName +
+              ' ' +
+              connection.connectionID
             }
             component="span"
             onClick={toggleConnected}
@@ -90,7 +93,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             <MoreVertical />
           </IconButton>
           <Menu
-            id={'connection-menu' + folderName + connection.channelID}
+            id={'connection-menu' + folderName + connection.connectionID}
             anchorEl={menuAnchor}
             keepMounted
             open={Boolean(menuAnchor)}

@@ -25,7 +25,7 @@ export interface FolderActionData {
 export interface ConnectionData {
   name: string;
   destinationUrl: string;
-  channelID: string;
+  connectionID: string;
   localAddress?: string;
   pomeriumUrl?: string;
   disableTLS?: boolean;
@@ -39,7 +39,7 @@ export interface MenuConnection {
   url: string;
   port: string;
   child: child_process.ChildProcessWithoutNullStreams | null;
-  channelID: string;
+  connectionID: string;
   output: string[];
   tags: string[];
 }

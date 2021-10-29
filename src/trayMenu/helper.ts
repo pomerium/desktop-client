@@ -61,7 +61,7 @@ export default class Helper {
               path.join(menuIconPath, 'disconnect.png')
             ),
             click: () => {
-              this.connections.disconnect(connection.channelID);
+              this.connections.disconnect(connection.connectionID);
               this.menu?.tray.setContextMenu(
                 this.createContextMenu(this.connections)
               );
@@ -74,7 +74,7 @@ export default class Helper {
               path.join(menuIconPath, 'connect.png')
             ),
             click: () => {
-              this.connections.connect(connection.channelID, null);
+              this.connections.connect(connection.connectionID, null);
               this.menu?.tray.setContextMenu(
                 this.createContextMenu(this.connections)
               );
@@ -88,7 +88,7 @@ export default class Helper {
           click: () => {
             this.appWindow?.webContents.send(
               'redirectTo',
-              `/edit_connect/${connection.channelID}/${
+              `/edit_connect/${connection.connectionID}/${
                 connection.child ? 'true' : 'false'
               }`
             );
@@ -112,7 +112,7 @@ export default class Helper {
             path.join(menuIconPath, 'delete.png')
           ),
           click: () => {
-            this.connections.delete(connection.channelID);
+            this.connections.delete(connection.connectionID);
             this.menu?.tray.setContextMenu(
               this.createContextMenu(this.connections)
             );

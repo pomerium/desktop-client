@@ -90,7 +90,10 @@ const App: FC = () => {
                 <Redirect to="/connectForm" />
               </Route>
               <Route exact path="/connectForm" component={ConnectForm} />
-              <Route path="/edit_connect/:channelId" component={ConnectForm} />
+              <Route
+                path="/edit_connect/:connectionID"
+                component={ConnectForm}
+              />
               <Route exact path="/manage" component={ManageConnections} />
             </RouteListener>
           </Switch>
