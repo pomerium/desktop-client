@@ -1,23 +1,28 @@
 import {
-  app,
   BrowserWindow,
   clipboard,
+  ipcMain,
   Menu,
   MenuItem,
   MenuItemConstructorOptions,
   nativeImage,
-  shell,
   Tray,
 } from 'electron';
 import { Menubar } from 'menubar';
 import path from 'path';
 import { getAssetPath, menuIconPath } from '../main/binaries';
 import ConnectionStatuses from '../main/connectionStatuses';
+import {
+  CONNECT,
+  CONNECT_ALL,
+  DISCONNECT,
+  DISCONNECT_ALL,
+} from '../shared/constants';
 
 type ConnectionOption = {
   label: string;
   click(): void;
-  icon: nativeImage;
+  icon?: nativeImage;
 };
 
 export default class Helper {
@@ -127,38 +132,79 @@ export default class Helper {
   };
 
   buildMenuTemplate = () => {
-    const { appWindow, connections, buildConnections } = this;
-    const template: (MenuItemConstructorOptions | MenuItem)[] = [
-      {
-        label: 'New Connection',
-        icon: nativeImage.createFromPath(path.join(menuIconPath, 'add.png')),
-        click() {
-          appWindow?.webContents.send('redirectTo', '/connectForm');
-          appWindow?.show();
-        },
-      },
-    ];
-    if (Object.values(connections.getMenuConnections()).length) {
-      template.push({
-        label: 'Connections',
-        submenu: buildConnections(),
-      });
-    }
-
+    const { appWindow } = this;
+    const template: (MenuItemConstructorOptions | MenuItem)[] = [];
     template.push({
-      label: 'Help',
-      icon: nativeImage.createFromPath(path.join(menuIconPath, 'help.png')),
+      label: 'Connections',
+      icon: nativeImage.createFromPath(path.join(menuIconPath, 'add.png')),
       click() {
-        shell.openExternal('https://github.com/pomerium/desktop-client#readme');
+        appWindow?.webContents.send('redirectTo', '/connectForm');
+        appWindow?.show();
+      },
+    });
+
+    const connectionItems: MenuItemConstructorOptions[] = [];
+
+    connectionItems.push({
+      label: 'Connect All',
+      click() {
+        ipcMain.emit(CONNECT_ALL, {}, { folderName: 'All Connections' });
+      },
+    });
+
+    connectionItems.push({
+      label: 'Disconnect All',
+      click() {
+        ipcMain.emit(DISCONNECT_ALL, {}, { folderName: 'All Connections' });
+      },
+    });
+
+    connectionItems.push({
+      type: 'separator',
+    });
+
+    connectionItems.push({
+      label: 'Connection 1',
+      icon: nativeImage.createFromPath(
+        path.join(menuIconPath, 'connected.png')
+      ),
+      click() {
+        ipcMain.emit(DISCONNECT, {}, { connectionID: 'test' });
+      },
+    });
+
+    connectionItems.push({
+      label: 'Connection 2',
+      icon: nativeImage.createFromPath(
+        path.join(menuIconPath, 'disconnected.png')
+      ),
+      click() {
+        ipcMain.emit(CONNECT, {}, { connectionID: 'test' });
       },
     });
 
     template.push({
-      label: 'Quit',
-      icon: nativeImage.createFromPath(path.join(menuIconPath, 'quit.png')),
+      label: 'All Connections',
+      icon: nativeImage.createFromPath(path.join(menuIconPath, 'folder.png')),
+      submenu: connectionItems,
+    });
+
+    template.push({
+      label: 'Manage Connections',
+      accelerator: 'CommandOrControl+M',
       click() {
-        app.quit();
+        appWindow?.webContents.send('redirectTo', '/manage');
+        appWindow?.show();
       },
+    });
+
+    template.push({
+      type: 'separator',
+    });
+
+    template.push({
+      label: 'Quit',
+      role: 'quit',
     });
 
     return template;
