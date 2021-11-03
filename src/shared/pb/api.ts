@@ -1,6 +1,5 @@
 /* eslint-disable */
-import { util, configure, Writer, Reader } from 'protobufjs/minimal';
-import * as Long from 'long';
+import Long from 'long';
 import {
   makeGenericClientConstructor,
   ChannelCredentials,
@@ -15,6 +14,7 @@ import {
   ClientReadableStream,
   ServiceError,
 } from '@grpc/grpc-js';
+import _m0 from 'protobufjs/minimal';
 
 export const protobufPackage = 'pomerium.cli';
 
@@ -230,7 +230,10 @@ export interface Connection {
 const baseRecord: object = { tags: '' };
 
 export const Record = {
-  encode(message: Record, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: Record,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.id !== undefined) {
       writer.uint32(10).string(message.id);
     }
@@ -243,8 +246,8 @@ export const Record = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Record {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Record {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseRecord } as Record;
     message.tags = [];
@@ -323,15 +326,18 @@ export const Record = {
 const baseRecords: object = {};
 
 export const Records = {
-  encode(message: Records, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: Records,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     for (const v of message.records) {
       Record.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Records {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Records {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseRecords } as Records;
     message.records = [];
@@ -387,7 +393,10 @@ export const Records = {
 const baseSelector: object = {};
 
 export const Selector = {
-  encode(message: Selector, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: Selector,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.all !== undefined) {
       writer.uint32(8).bool(message.all);
     }
@@ -403,8 +412,8 @@ export const Selector = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Selector {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Selector {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseSelector } as Selector;
     while (reader.pos < end) {
@@ -481,15 +490,18 @@ export const Selector = {
 const baseSelector_IdFilter: object = { ids: '' };
 
 export const Selector_IdFilter = {
-  encode(message: Selector_IdFilter, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: Selector_IdFilter,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     for (const v of message.ids) {
       writer.uint32(10).string(v!);
     }
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Selector_IdFilter {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Selector_IdFilter {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseSelector_IdFilter } as Selector_IdFilter;
     message.ids = [];
@@ -545,16 +557,16 @@ const baseSelector_TagFilter: object = { tags: '' };
 export const Selector_TagFilter = {
   encode(
     message: Selector_TagFilter,
-    writer: Writer = Writer.create()
-  ): Writer {
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     for (const v of message.tags) {
       writer.uint32(18).string(v!);
     }
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Selector_TagFilter {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Selector_TagFilter {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseSelector_TagFilter } as Selector_TagFilter;
     message.tags = [];
@@ -608,12 +620,18 @@ export const Selector_TagFilter = {
 const baseDeleteRecordsResponse: object = {};
 
 export const DeleteRecordsResponse = {
-  encode(_: DeleteRecordsResponse, writer: Writer = Writer.create()): Writer {
+  encode(
+    _: DeleteRecordsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): DeleteRecordsResponse {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): DeleteRecordsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseDeleteRecordsResponse } as DeleteRecordsResponse;
     while (reader.pos < end) {
@@ -646,7 +664,10 @@ export const DeleteRecordsResponse = {
 const baseExportRequest: object = { removeTags: false, format: 0 };
 
 export const ExportRequest = {
-  encode(message: ExportRequest, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: ExportRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.selector !== undefined) {
       Selector.encode(message.selector, writer.uint32(10).fork()).ldelim();
     }
@@ -659,8 +680,8 @@ export const ExportRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): ExportRequest {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ExportRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseExportRequest } as ExportRequest;
     while (reader.pos < end) {
@@ -731,15 +752,18 @@ export const ExportRequest = {
 const baseConfigData: object = {};
 
 export const ConfigData = {
-  encode(message: ConfigData, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: ConfigData,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
     }
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): ConfigData {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ConfigData {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseConfigData } as ConfigData;
     message.data = new Uint8Array();
@@ -785,7 +809,10 @@ export const ConfigData = {
 const baseImportRequest: object = {};
 
 export const ImportRequest = {
-  encode(message: ImportRequest, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: ImportRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.overrideTag !== undefined) {
       writer.uint32(10).string(message.overrideTag);
     }
@@ -795,8 +822,8 @@ export const ImportRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): ImportRequest {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ImportRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseImportRequest } as ImportRequest;
     message.data = new Uint8Array();
@@ -853,12 +880,15 @@ export const ImportRequest = {
 const baseImportResponse: object = {};
 
 export const ImportResponse = {
-  encode(_: ImportResponse, writer: Writer = Writer.create()): Writer {
+  encode(
+    _: ImportResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): ImportResponse {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ImportResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseImportResponse } as ImportResponse;
     while (reader.pos < end) {
@@ -896,8 +926,8 @@ const baseListenerUpdateRequest: object = {
 export const ListenerUpdateRequest = {
   encode(
     message: ListenerUpdateRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     for (const v of message.connectionIds) {
       writer.uint32(10).string(v!);
     }
@@ -907,8 +937,11 @@ export const ListenerUpdateRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): ListenerUpdateRequest {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ListenerUpdateRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseListenerUpdateRequest } as ListenerUpdateRequest;
     message.connectionIds = [];
@@ -974,7 +1007,10 @@ export const ListenerUpdateRequest = {
 const baseListenerStatus: object = {};
 
 export const ListenerStatus = {
-  encode(message: ListenerStatus, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: ListenerStatus,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     Object.entries(message.active).forEach(([key, value]) => {
       ListenerStatus_ActiveEntry.encode(
         { key: key as any, value },
@@ -990,8 +1026,8 @@ export const ListenerStatus = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): ListenerStatus {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListenerStatus {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseListenerStatus } as ListenerStatus;
     message.active = {};
@@ -1086,8 +1122,8 @@ const baseListenerStatus_ActiveEntry: object = { key: '', value: '' };
 export const ListenerStatus_ActiveEntry = {
   encode(
     message: ListenerStatus_ActiveEntry,
-    writer: Writer = Writer.create()
-  ): Writer {
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.key !== '') {
       writer.uint32(10).string(message.key);
     }
@@ -1098,10 +1134,10 @@ export const ListenerStatus_ActiveEntry = {
   },
 
   decode(
-    input: Reader | Uint8Array,
+    input: _m0.Reader | Uint8Array,
     length?: number
   ): ListenerStatus_ActiveEntry {
-    const reader = input instanceof Reader ? input : new Reader(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
       ...baseListenerStatus_ActiveEntry,
@@ -1164,8 +1200,8 @@ const baseListenerStatus_ErrorsEntry: object = { key: '', value: '' };
 export const ListenerStatus_ErrorsEntry = {
   encode(
     message: ListenerStatus_ErrorsEntry,
-    writer: Writer = Writer.create()
-  ): Writer {
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.key !== '') {
       writer.uint32(10).string(message.key);
     }
@@ -1176,10 +1212,10 @@ export const ListenerStatus_ErrorsEntry = {
   },
 
   decode(
-    input: Reader | Uint8Array,
+    input: _m0.Reader | Uint8Array,
     length?: number
   ): ListenerStatus_ErrorsEntry {
-    const reader = input instanceof Reader ? input : new Reader(input);
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
       ...baseListenerStatus_ErrorsEntry,
@@ -1240,12 +1276,18 @@ export const ListenerStatus_ErrorsEntry = {
 const baseStatusUpdatesRequest: object = {};
 
 export const StatusUpdatesRequest = {
-  encode(_: StatusUpdatesRequest, writer: Writer = Writer.create()): Writer {
+  encode(
+    _: StatusUpdatesRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): StatusUpdatesRequest {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): StatusUpdatesRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseStatusUpdatesRequest } as StatusUpdatesRequest;
     while (reader.pos < end) {
@@ -1280,8 +1322,8 @@ const baseConnectionStatusUpdates: object = { id: '', peerAddr: '', status: 0 };
 export const ConnectionStatusUpdates = {
   encode(
     message: ConnectionStatusUpdates,
-    writer: Writer = Writer.create()
-  ): Writer {
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.id !== '') {
       writer.uint32(10).string(message.id);
     }
@@ -1297,8 +1339,11 @@ export const ConnectionStatusUpdates = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): ConnectionStatusUpdates {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ConnectionStatusUpdates {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
       ...baseConnectionStatusUpdates,
@@ -1384,7 +1429,10 @@ export const ConnectionStatusUpdates = {
 const baseConnection: object = { remoteAddr: '' };
 
 export const Connection = {
-  encode(message: Connection, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: Connection,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.name !== undefined) {
       writer.uint32(10).string(message.name);
     }
@@ -1406,8 +1454,8 @@ export const Connection = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): Connection {
-    const reader = input instanceof Reader ? input : new Reader(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Connection {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseConnection } as Connection;
     while (reader.pos < end) {
@@ -1808,9 +1856,7 @@ export type DeepPartial<T> = T extends Builtin
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-// If you get a compile-error about 'Constructor<Long> and ... have no overlap',
-// add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.
-if (util.Long !== Long) {
-  util.Long = Long as any;
-  configure();
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
 }

@@ -16,7 +16,7 @@
     "start:main": "cross-env NODE_ENV=development electron -r ./.erb/scripts/BabelRegister ./src/main.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development webpack serve --config ./.erb/configs/webpack.config.renderer.dev.babel.js",
     "test": "jest --passWithNoTests ",
-    "protoc": ".erb/scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js --proto_path=. api.proto && prettier --write ./src/shared/pb"
+    "protoc": ".erb/scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && prettier --write ./src/shared/pb"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
