@@ -1,0 +1,62 @@
+#!/bin/bash
+set -euo pipefail
+
+_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+_protoc_version="3.14.0"
+_protoc_path="/tmp/pomerium-protoc/protoc-$_protoc_version"
+_protoc_3pp_path="/tmp/pomerium-protoc-3pp"
+
+_os="linux"
+if [ "$(uname -s)" == "Darwin" ]; then
+  _os="osx"
+fi
+
+# fetch_zip dir name url
+download() {
+  local dst="$1/$2"
+  if [ -d "$dst" ]; then
+    return
+  fi
+
+  echo downloading "$2"
+  local archive
+  archive="$(mktemp)"
+  curl -L -o "$archive" "$3"
+  mkdir -p "$dst"
+  tar xzf "$archive" -C "$dst" --strip-components=1
+  rm "$archive"
+}
+
+download $_protoc_3pp_path protoc-gen-validate https://github.com/envoyproxy/protoc-gen-validate/tarball/v0.6.1
+download $_protoc_3pp_path data-plane-api https://github.com/envoyproxy/data-plane-api/tarball/main
+download $_protoc_3pp_path xds https://github.com/cncf/xds/tarball/main
+download $_protoc_3pp_path googleapis https://github.com/googleapis/googleapis/tarball/master
+
+mkdir -p "$_protoc_path" "$_protoc_3pp_path"
+if [ ! -f "$_protoc_path/bin/protoc" ]; then
+  echo "downloading protoc"
+  curl -L \
+    -o protoc.zip \
+    "https://github.com/protocolbuffers/protobuf/releases/download/v$_protoc_version/protoc-$_protoc_version-$_os-x86_64.zip"
+  unzip -o -d "$_protoc_path" protoc.zip
+  rm protoc.zip
+fi
+
+if [ ! -x "$GOPATH/bin/protoc-gen-validate" ]; then
+  echo "installing protoc-gen-validate"
+  pushd $(pwd)
+  cd "$_protoc_3pp_path/protoc-gen-validate" && make build
+  popd
+fi
+
+exec "$_protoc_path/bin/protoc" \
+  -I "$_protoc_3pp_path/data-plane-api" \
+  -I "$_protoc_3pp_path/udpa" \
+  -I "$_protoc_3pp_path/xds" \
+  -I "$_protoc_3pp_path/protoc-gen-validate" \
+  -I "$_protoc_3pp_path/googleapis" \
+  --experimental_allow_proto3_optional \
+  --plugin="protoc-gen-go=$_dir/protoc-gen-go" \
+  --plugin="protoc-gen-validate=$_dir/protoc-gen-validate" \
+  --plugin="node_modules/ts-proto/protoc-gen-ts_proto" \
+  "$@"
