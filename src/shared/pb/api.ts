@@ -143,10 +143,12 @@ export interface ListenerStatus_ErrorsEntry {
   value: string;
 }
 
-export interface StatusUpdatesRequest {}
+export interface StatusUpdatesRequest {
+  connectionId: string;
+}
 
 /** ConnectionStatusUpdates represent connection state changes */
-export interface ConnectionStatusUpdates {
+export interface ConnectionStatusUpdate {
   /** record this event relates to */
   id: string;
   /**
@@ -154,12 +156,14 @@ export interface ConnectionStatusUpdates {
    * distinguish between individual TCP connections
    */
   peerAddr: string;
-  status: ConnectionStatusUpdates_ConnectionStatus;
+  status: ConnectionStatusUpdate_ConnectionStatus;
   /** in case the connection failed or terminated, last error may be available */
   lastError?: string | undefined;
+  /** provides an authentication URL when AUTH_REQUIRED status is set */
+  authUrl?: string | undefined;
 }
 
-export enum ConnectionStatusUpdates_ConnectionStatus {
+export enum ConnectionStatusUpdate_ConnectionStatus {
   CONNECTION_STATUS_UNDEFINED = 0,
   CONNECTION_STATUS_CONNECTING = 1,
   CONNECTION_STATUS_AUTH_REQUIRED = 2,
@@ -168,45 +172,45 @@ export enum ConnectionStatusUpdates_ConnectionStatus {
   UNRECOGNIZED = -1,
 }
 
-export function connectionStatusUpdates_ConnectionStatusFromJSON(
+export function connectionStatusUpdate_ConnectionStatusFromJSON(
   object: any
-): ConnectionStatusUpdates_ConnectionStatus {
+): ConnectionStatusUpdate_ConnectionStatus {
   switch (object) {
     case 0:
     case 'CONNECTION_STATUS_UNDEFINED':
-      return ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_UNDEFINED;
+      return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_UNDEFINED;
     case 1:
     case 'CONNECTION_STATUS_CONNECTING':
-      return ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_CONNECTING;
+      return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTING;
     case 2:
     case 'CONNECTION_STATUS_AUTH_REQUIRED':
-      return ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_AUTH_REQUIRED;
+      return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_AUTH_REQUIRED;
     case 3:
     case 'CONNECTION_STATUS_CONNECTED':
-      return ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_CONNECTED;
+      return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTED;
     case 4:
     case 'CONNECTION_STATUS_DISCONNECTED':
-      return ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED;
+      return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED;
     case -1:
     case 'UNRECOGNIZED':
     default:
-      return ConnectionStatusUpdates_ConnectionStatus.UNRECOGNIZED;
+      return ConnectionStatusUpdate_ConnectionStatus.UNRECOGNIZED;
   }
 }
 
-export function connectionStatusUpdates_ConnectionStatusToJSON(
-  object: ConnectionStatusUpdates_ConnectionStatus
+export function connectionStatusUpdate_ConnectionStatusToJSON(
+  object: ConnectionStatusUpdate_ConnectionStatus
 ): string {
   switch (object) {
-    case ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_UNDEFINED:
+    case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_UNDEFINED:
       return 'CONNECTION_STATUS_UNDEFINED';
-    case ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_CONNECTING:
+    case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTING:
       return 'CONNECTION_STATUS_CONNECTING';
-    case ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_AUTH_REQUIRED:
+    case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_AUTH_REQUIRED:
       return 'CONNECTION_STATUS_AUTH_REQUIRED';
-    case ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_CONNECTED:
+    case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTED:
       return 'CONNECTION_STATUS_CONNECTED';
-    case ConnectionStatusUpdates_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED:
+    case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED:
       return 'CONNECTION_STATUS_DISCONNECTED';
     default:
       return 'UNKNOWN';
@@ -1273,13 +1277,16 @@ export const ListenerStatus_ErrorsEntry = {
   },
 };
 
-const baseStatusUpdatesRequest: object = {};
+const baseStatusUpdatesRequest: object = { connectionId: '' };
 
 export const StatusUpdatesRequest = {
   encode(
-    _: StatusUpdatesRequest,
+    message: StatusUpdatesRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
+    if (message.connectionId !== '') {
+      writer.uint32(10).string(message.connectionId);
+    }
     return writer;
   },
 
@@ -1293,6 +1300,9 @@ export const StatusUpdatesRequest = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.connectionId = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1301,27 +1311,35 @@ export const StatusUpdatesRequest = {
     return message;
   },
 
-  fromJSON(_: any): StatusUpdatesRequest {
+  fromJSON(object: any): StatusUpdatesRequest {
     const message = { ...baseStatusUpdatesRequest } as StatusUpdatesRequest;
+    if (object.connectionId !== undefined && object.connectionId !== null) {
+      message.connectionId = String(object.connectionId);
+    } else {
+      message.connectionId = '';
+    }
     return message;
   },
 
-  toJSON(_: StatusUpdatesRequest): unknown {
+  toJSON(message: StatusUpdatesRequest): unknown {
     const obj: any = {};
+    message.connectionId !== undefined &&
+      (obj.connectionId = message.connectionId);
     return obj;
   },
 
-  fromPartial(_: DeepPartial<StatusUpdatesRequest>): StatusUpdatesRequest {
+  fromPartial(object: DeepPartial<StatusUpdatesRequest>): StatusUpdatesRequest {
     const message = { ...baseStatusUpdatesRequest } as StatusUpdatesRequest;
+    message.connectionId = object.connectionId ?? '';
     return message;
   },
 };
 
-const baseConnectionStatusUpdates: object = { id: '', peerAddr: '', status: 0 };
+const baseConnectionStatusUpdate: object = { id: '', peerAddr: '', status: 0 };
 
-export const ConnectionStatusUpdates = {
+export const ConnectionStatusUpdate = {
   encode(
-    message: ConnectionStatusUpdates,
+    message: ConnectionStatusUpdate,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== '') {
@@ -1336,18 +1354,19 @@ export const ConnectionStatusUpdates = {
     if (message.lastError !== undefined) {
       writer.uint32(34).string(message.lastError);
     }
+    if (message.authUrl !== undefined) {
+      writer.uint32(42).string(message.authUrl);
+    }
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): ConnectionStatusUpdates {
+  ): ConnectionStatusUpdate {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseConnectionStatusUpdates,
-    } as ConnectionStatusUpdates;
+    const message = { ...baseConnectionStatusUpdate } as ConnectionStatusUpdate;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1363,6 +1382,9 @@ export const ConnectionStatusUpdates = {
         case 4:
           message.lastError = reader.string();
           break;
+        case 5:
+          message.authUrl = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1371,10 +1393,8 @@ export const ConnectionStatusUpdates = {
     return message;
   },
 
-  fromJSON(object: any): ConnectionStatusUpdates {
-    const message = {
-      ...baseConnectionStatusUpdates,
-    } as ConnectionStatusUpdates;
+  fromJSON(object: any): ConnectionStatusUpdate {
+    const message = { ...baseConnectionStatusUpdate } as ConnectionStatusUpdate;
     if (object.id !== undefined && object.id !== null) {
       message.id = String(object.id);
     } else {
@@ -1386,7 +1406,7 @@ export const ConnectionStatusUpdates = {
       message.peerAddr = '';
     }
     if (object.status !== undefined && object.status !== null) {
-      message.status = connectionStatusUpdates_ConnectionStatusFromJSON(
+      message.status = connectionStatusUpdate_ConnectionStatusFromJSON(
         object.status
       );
     } else {
@@ -1397,31 +1417,36 @@ export const ConnectionStatusUpdates = {
     } else {
       message.lastError = undefined;
     }
+    if (object.authUrl !== undefined && object.authUrl !== null) {
+      message.authUrl = String(object.authUrl);
+    } else {
+      message.authUrl = undefined;
+    }
     return message;
   },
 
-  toJSON(message: ConnectionStatusUpdates): unknown {
+  toJSON(message: ConnectionStatusUpdate): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
     message.peerAddr !== undefined && (obj.peerAddr = message.peerAddr);
     message.status !== undefined &&
-      (obj.status = connectionStatusUpdates_ConnectionStatusToJSON(
+      (obj.status = connectionStatusUpdate_ConnectionStatusToJSON(
         message.status
       ));
     message.lastError !== undefined && (obj.lastError = message.lastError);
+    message.authUrl !== undefined && (obj.authUrl = message.authUrl);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<ConnectionStatusUpdates>
-  ): ConnectionStatusUpdates {
-    const message = {
-      ...baseConnectionStatusUpdates,
-    } as ConnectionStatusUpdates;
+    object: DeepPartial<ConnectionStatusUpdate>
+  ): ConnectionStatusUpdate {
+    const message = { ...baseConnectionStatusUpdate } as ConnectionStatusUpdate;
     message.id = object.id ?? '';
     message.peerAddr = object.peerAddr ?? '';
     message.status = object.status ?? 0;
     message.lastError = object.lastError ?? undefined;
+    message.authUrl = object.authUrl ?? undefined;
     return message;
   },
 };
@@ -1730,6 +1755,18 @@ export const ListenerService = {
       Buffer.from(ListenerStatus.encode(value).finish()),
     responseDeserialize: (value: Buffer) => ListenerStatus.decode(value),
   },
+  /** GetStatus returns current listener status for active tunnels */
+  getStatus: {
+    path: '/pomerium.cli.Listener/GetStatus',
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: Selector) =>
+      Buffer.from(Selector.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => Selector.decode(value),
+    responseSerialize: (value: ListenerStatus) =>
+      Buffer.from(ListenerStatus.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => ListenerStatus.decode(value),
+  },
   /**
    * StatusUpdates opens a stream to listen to connection status updates
    * a client has to subscribe and continuously
@@ -1739,25 +1776,30 @@ export const ListenerService = {
     path: '/pomerium.cli.Listener/StatusUpdates',
     requestStream: false,
     responseStream: true,
-    requestSerialize: (value: Selector) =>
-      Buffer.from(Selector.encode(value).finish()),
-    requestDeserialize: (value: Buffer) => Selector.decode(value),
-    responseSerialize: (value: ConnectionStatusUpdates) =>
-      Buffer.from(ConnectionStatusUpdates.encode(value).finish()),
+    requestSerialize: (value: StatusUpdatesRequest) =>
+      Buffer.from(StatusUpdatesRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => StatusUpdatesRequest.decode(value),
+    responseSerialize: (value: ConnectionStatusUpdate) =>
+      Buffer.from(ConnectionStatusUpdate.encode(value).finish()),
     responseDeserialize: (value: Buffer) =>
-      ConnectionStatusUpdates.decode(value),
+      ConnectionStatusUpdate.decode(value),
   },
 } as const;
 
 export interface ListenerServer extends UntypedServiceImplementation {
   /** Listen starts connection listener */
   update: handleUnaryCall<ListenerUpdateRequest, ListenerStatus>;
+  /** GetStatus returns current listener status for active tunnels */
+  getStatus: handleUnaryCall<Selector, ListenerStatus>;
   /**
    * StatusUpdates opens a stream to listen to connection status updates
    * a client has to subscribe and continuously
    * listen to the broadcasted updates
    */
-  statusUpdates: handleServerStreamingCall<Selector, ConnectionStatusUpdates>;
+  statusUpdates: handleServerStreamingCall<
+    StatusUpdatesRequest,
+    ConnectionStatusUpdate
+  >;
 }
 
 export interface ListenerClient extends Client {
@@ -1777,20 +1819,36 @@ export interface ListenerClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: ListenerStatus) => void
   ): ClientUnaryCall;
+  /** GetStatus returns current listener status for active tunnels */
+  getStatus(
+    request: Selector,
+    callback: (error: ServiceError | null, response: ListenerStatus) => void
+  ): ClientUnaryCall;
+  getStatus(
+    request: Selector,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ListenerStatus) => void
+  ): ClientUnaryCall;
+  getStatus(
+    request: Selector,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ListenerStatus) => void
+  ): ClientUnaryCall;
   /**
    * StatusUpdates opens a stream to listen to connection status updates
    * a client has to subscribe and continuously
    * listen to the broadcasted updates
    */
   statusUpdates(
-    request: Selector,
+    request: StatusUpdatesRequest,
     options?: Partial<CallOptions>
-  ): ClientReadableStream<ConnectionStatusUpdates>;
+  ): ClientReadableStream<ConnectionStatusUpdate>;
   statusUpdates(
-    request: Selector,
+    request: StatusUpdatesRequest,
     metadata?: Metadata,
     options?: Partial<CallOptions>
-  ): ClientReadableStream<ConnectionStatusUpdates>;
+  ): ClientReadableStream<ConnectionStatusUpdate>;
 }
 
 export const ListenerClient = makeGenericClientConstructor(
