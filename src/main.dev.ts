@@ -9,7 +9,7 @@
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
 import 'core-js/stable';
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, globalShortcut, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
@@ -109,16 +109,22 @@ app.on('ready', async () => {
   });
   trayMenuHelper.setMenu(menu);
   menu.on('ready', async () => {
+    globalShortcut.register('CommandOrControl+M', () => {
+      mainWindow?.webContents.send('redirectTo', '/manage');
+      mainWindow?.show();
+    });
     menu.tray.on('click', () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(CONNECT, (evt, args: ConnectionData) => {
-      connections.connect(args.connectionID, evt);
-      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    ipcMain.on(CONNECT, (_evt, args: ConnectionData) => {
+      console.log(CONNECT + ' ' + args.connectionID + ' action was called.');
+      // connections.connect(args.connectionID, evt);
+      // menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(DISCONNECT, (_evt, msg) => {
-      connections.disconnect(msg.connectionID);
-      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    ipcMain.on(DISCONNECT, (_evt, args: ConnectionData) => {
+      console.log(DISCONNECT + ' ' + args.connectionID + ' action was called.');
+      // connections.disconnect(msg.connectionID);
+      // menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(DELETE, (_evt, args: ConnectionData) => {
       connections.delete(args.connectionID);
