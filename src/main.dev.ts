@@ -11,6 +11,7 @@
 import 'core-js/stable';
 import { app, BrowserWindow, dialog, globalShortcut, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
+import * as grpc from '@grpc/grpc-js';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
@@ -37,9 +38,14 @@ import {
   VIEW,
   EDIT,
   VIEW_CONNECTION_LIST,
+  SAVE,
+  SAVE_RESPONSE,
+  GET_RECORDS,
+  GET_RECORDS_RESPONSE,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import ConnectionStatuses from './main/connectionStatuses';
+import { ConfigClient, Record, Selector } from './shared/pb/api';
 
 let mainWindow: BrowserWindow | null;
 
@@ -59,6 +65,11 @@ if (isProd) {
 if (isDev || prodDebug) {
   require('electron-debug')();
 }
+
+const configClient = new ConfigClient(
+  '127.0.0.1:8800',
+  grpc.ChannelCredentials.createInsecure()
+);
 
 process.on('uncaughtException', (err) => {
   const msg = {
@@ -116,6 +127,24 @@ app.on('ready', async () => {
     menu.tray.on('click', () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu(connections));
     });
+    ipcMain.on(SAVE, (evt, args: Record) => {
+      configClient.upsert(args, (err, res) => {
+        evt?.sender.send(SAVE_RESPONSE, {
+          err,
+          res,
+        });
+      });
+    });
+    ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
+      configClient.list(selector, (err, res) => {
+        console.log(err);
+        console.log(res);
+        evt?.sender.send(GET_RECORDS_RESPONSE, {
+          err,
+          res,
+        });
+      });
+    });
     ipcMain.on(CONNECT, (_evt, args: ConnectionData) => {
       console.log(CONNECT + ' ' + args.connectionID + ' action was called.');
       // connections.connect(args.connectionID, evt);
@@ -130,17 +159,11 @@ app.on('ready', async () => {
       connections.delete(args.connectionID);
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(EDIT, (_evt, args: ConnectionData) => {
-      mainWindow?.webContents.send(
-        'redirectTo',
-        `/edit_connect/${args.connectionID}`
-      );
+    ipcMain.on(EDIT, (_evt, id: string) => {
+      mainWindow?.webContents.send('redirectTo', `/edit_connect/${id}`);
     });
-    ipcMain.on(VIEW, (_evt, args: ConnectionData) => {
-      mainWindow?.webContents.send(
-        'redirectTo',
-        `/view_connection/${args.connectionID}`
-      );
+    ipcMain.on(VIEW, (_evt, id: string) => {
+      mainWindow?.webContents.send('redirectTo', `/view_connection/${id}`);
     });
     ipcMain.on(VIEW_CONNECTION_LIST, () => {
       mainWindow?.webContents.send('redirectTo', `/manage`);

@@ -16,13 +16,13 @@ import { ipcRenderer } from 'electron';
 import { ChevronDown } from 'react-feather';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
-import Connections from '../../shared/connections';
 import {
   CONNECT,
-  ConnectionData,
   DELETE,
   DISCONNECT,
   EDIT,
+  GET_RECORDS,
+  GET_RECORDS_RESPONSE,
   QueryParams,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
@@ -31,6 +31,7 @@ import Disconnected from '../icons/Disconnected';
 import Edit from '../icons/Edit';
 import Export from '../icons/Export';
 import Delete from '../icons/Delete';
+import { Connection, Record, Selector } from '../../shared/pb/api';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -50,14 +51,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const ConnectionView = (): JSX.Element => {
   const classes = useStyles();
-  const [connection, setConnection] = useState({} as ConnectionData);
+  const [tags, setTags] = useState([] as Record['tags']);
+  const [connection, setConnection] = useState({} as Connection);
   const [connected, setConnected] = React.useState(Math.random() < 0.5);
   const { connectionID }: QueryParams = useParams();
-
-  const fetchData = (): void => {
-    const connHandler = new Connections();
-    setConnection(connHandler.getConnection(connectionID));
-  };
 
   const toggleConnected = () => {
     if (connected) {
@@ -74,8 +71,18 @@ const ConnectionView = (): JSX.Element => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (connectionID) {
+      ipcRenderer.once(GET_RECORDS_RESPONSE, (_, args) => {
+        if (args?.res?.records?.length === 1) {
+          setTags(args.res.records[0].tags || []);
+          setConnection(args.res.records[0].conn);
+        }
+      });
+      ipcRenderer.send(GET_RECORDS, {
+        ids: { ids: [connectionID] },
+      } as Selector);
+    }
+  }, [connectionID]);
 
   if (Object.keys(connection).length) {
     return (
@@ -93,7 +100,7 @@ const ConnectionView = (): JSX.Element => {
                   size="small"
                   type="button"
                   color="primary"
-                  onClick={() => ipcRenderer.send(EDIT, connection)}
+                  onClick={() => ipcRenderer.send(EDIT, connectionID)}
                   endIcon={<Edit />}
                 >
                   Edit
@@ -104,7 +111,7 @@ const ConnectionView = (): JSX.Element => {
                   size="small"
                   type="button"
                   color="primary"
-                  onClick={() => alert('export')}
+                  onClick={() => console.log('export')}
                   endIcon={<Export />}
                 >
                   Export
@@ -157,7 +164,7 @@ const ConnectionView = (): JSX.Element => {
               </Grid>
               <Grid item xs={8}>
                 <Typography variant="subtitle2">
-                  {connection.destinationUrl}
+                  {connection.remoteAddr}
                 </Typography>
               </Grid>
             </Grid>
@@ -166,11 +173,11 @@ const ConnectionView = (): JSX.Element => {
             </Grid>
             <Grid container item xs={12} alignItems="center">
               <Grid item xs={4}>
-                <Typography variant="h6">Local Address</Typography>
+                <Typography variant="h6">Listener Address</Typography>
               </Grid>
               <Grid item xs={8}>
                 <Typography variant="subtitle2">
-                  {connection.localAddress}
+                  {connection.listenAddr}
                 </Typography>
               </Grid>
             </Grid>
@@ -182,9 +189,7 @@ const ConnectionView = (): JSX.Element => {
                 <Typography variant="h6">Tags</Typography>
               </Grid>
               <Grid item xs={8}>
-                <Typography variant="subtitle2">
-                  {connection?.tags?.join(', ')}
-                </Typography>
+                <Typography variant="subtitle2">{tags?.join(', ')}</Typography>
               </Grid>
             </Grid>
           </Grid>
@@ -206,7 +211,7 @@ const ConnectionView = (): JSX.Element => {
                 </Grid>
                 <Grid item xs={8}>
                   <Typography variant="subtitle2">
-                    {connection.disableTLS ? 'Yes' : 'No'}
+                    {connection.disableTlsVerification ? 'Yes' : 'No'}
                   </Typography>
                 </Grid>
               </Grid>
@@ -231,9 +236,7 @@ const ConnectionView = (): JSX.Element => {
                   <Typography variant="h6">CA File</Typography>
                 </Grid>
                 <Grid item xs={8}>
-                  <Typography variant="subtitle2">
-                    {connection?.caFileText || ''}
-                  </Typography>
+                  <Typography variant="subtitle2">todo</Typography>
                 </Grid>
               </Grid>
             </Grid>
