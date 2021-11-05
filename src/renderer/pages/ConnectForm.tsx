@@ -97,7 +97,9 @@ const ConnectForm: FC<Props> = () => {
         }
       });
       ipcRenderer.send(GET_RECORDS, {
-        ids: { ids: [connectionID] },
+        all: false,
+        ids: [connectionID],
+        tags: [],
       } as Selector);
     }
   }, [connectionID]);

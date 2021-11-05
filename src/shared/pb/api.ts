@@ -30,20 +30,17 @@ export interface Records {
   records: Record[];
 }
 
+/**
+ * Selector defines record filter
+ * one of the options must be set
+ * we do not use oneof as it results in inconveniences on the JS client side
+ */
 export interface Selector {
   /** all records */
-  all: boolean | undefined;
+  all: boolean;
   /** only return connections matching tag(s) */
-  tags: Selector_TagFilter | undefined;
-  /** only return specific connection(s) */
-  ids: Selector_IdFilter | undefined;
-}
-
-export interface Selector_IdFilter {
   ids: string[];
-}
-
-export interface Selector_TagFilter {
+  /** only return specific connection(s) */
   tags: string[];
 }
 
@@ -394,24 +391,21 @@ export const Records = {
   },
 };
 
-const baseSelector: object = {};
+const baseSelector: object = { all: false, ids: '', tags: '' };
 
 export const Selector = {
   encode(
     message: Selector,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.all !== undefined) {
+    if (message.all === true) {
       writer.uint32(8).bool(message.all);
     }
-    if (message.tags !== undefined) {
-      Selector_TagFilter.encode(
-        message.tags,
-        writer.uint32(18).fork()
-      ).ldelim();
+    for (const v of message.ids) {
+      writer.uint32(18).string(v!);
     }
-    if (message.ids !== undefined) {
-      Selector_IdFilter.encode(message.ids, writer.uint32(26).fork()).ldelim();
+    for (const v of message.tags) {
+      writer.uint32(26).string(v!);
     }
     return writer;
   },
@@ -420,6 +414,8 @@ export const Selector = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseSelector } as Selector;
+    message.ids = [];
+    message.tags = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -427,10 +423,10 @@ export const Selector = {
           message.all = reader.bool();
           break;
         case 2:
-          message.tags = Selector_TagFilter.decode(reader, reader.uint32());
+          message.ids.push(reader.string());
           break;
         case 3:
-          message.ids = Selector_IdFilter.decode(reader, reader.uint32());
+          message.tags.push(reader.string());
           break;
         default:
           reader.skipType(tag & 7);
@@ -442,155 +438,18 @@ export const Selector = {
 
   fromJSON(object: any): Selector {
     const message = { ...baseSelector } as Selector;
+    message.ids = [];
+    message.tags = [];
     if (object.all !== undefined && object.all !== null) {
       message.all = Boolean(object.all);
     } else {
-      message.all = undefined;
+      message.all = false;
     }
-    if (object.tags !== undefined && object.tags !== null) {
-      message.tags = Selector_TagFilter.fromJSON(object.tags);
-    } else {
-      message.tags = undefined;
-    }
-    if (object.ids !== undefined && object.ids !== null) {
-      message.ids = Selector_IdFilter.fromJSON(object.ids);
-    } else {
-      message.ids = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: Selector): unknown {
-    const obj: any = {};
-    message.all !== undefined && (obj.all = message.all);
-    message.tags !== undefined &&
-      (obj.tags = message.tags
-        ? Selector_TagFilter.toJSON(message.tags)
-        : undefined);
-    message.ids !== undefined &&
-      (obj.ids = message.ids
-        ? Selector_IdFilter.toJSON(message.ids)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<Selector>): Selector {
-    const message = { ...baseSelector } as Selector;
-    message.all = object.all ?? undefined;
-    if (object.tags !== undefined && object.tags !== null) {
-      message.tags = Selector_TagFilter.fromPartial(object.tags);
-    } else {
-      message.tags = undefined;
-    }
-    if (object.ids !== undefined && object.ids !== null) {
-      message.ids = Selector_IdFilter.fromPartial(object.ids);
-    } else {
-      message.ids = undefined;
-    }
-    return message;
-  },
-};
-
-const baseSelector_IdFilter: object = { ids: '' };
-
-export const Selector_IdFilter = {
-  encode(
-    message: Selector_IdFilter,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    for (const v of message.ids) {
-      writer.uint32(10).string(v!);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Selector_IdFilter {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseSelector_IdFilter } as Selector_IdFilter;
-    message.ids = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.ids.push(reader.string());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Selector_IdFilter {
-    const message = { ...baseSelector_IdFilter } as Selector_IdFilter;
-    message.ids = [];
     if (object.ids !== undefined && object.ids !== null) {
       for (const e of object.ids) {
         message.ids.push(String(e));
       }
     }
-    return message;
-  },
-
-  toJSON(message: Selector_IdFilter): unknown {
-    const obj: any = {};
-    if (message.ids) {
-      obj.ids = message.ids.map((e) => e);
-    } else {
-      obj.ids = [];
-    }
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<Selector_IdFilter>): Selector_IdFilter {
-    const message = { ...baseSelector_IdFilter } as Selector_IdFilter;
-    message.ids = [];
-    if (object.ids !== undefined && object.ids !== null) {
-      for (const e of object.ids) {
-        message.ids.push(e);
-      }
-    }
-    return message;
-  },
-};
-
-const baseSelector_TagFilter: object = { tags: '' };
-
-export const Selector_TagFilter = {
-  encode(
-    message: Selector_TagFilter,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    for (const v of message.tags) {
-      writer.uint32(18).string(v!);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Selector_TagFilter {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseSelector_TagFilter } as Selector_TagFilter;
-    message.tags = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 2:
-          message.tags.push(reader.string());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Selector_TagFilter {
-    const message = { ...baseSelector_TagFilter } as Selector_TagFilter;
-    message.tags = [];
     if (object.tags !== undefined && object.tags !== null) {
       for (const e of object.tags) {
         message.tags.push(String(e));
@@ -599,8 +458,14 @@ export const Selector_TagFilter = {
     return message;
   },
 
-  toJSON(message: Selector_TagFilter): unknown {
+  toJSON(message: Selector): unknown {
     const obj: any = {};
+    message.all !== undefined && (obj.all = message.all);
+    if (message.ids) {
+      obj.ids = message.ids.map((e) => e);
+    } else {
+      obj.ids = [];
+    }
     if (message.tags) {
       obj.tags = message.tags.map((e) => e);
     } else {
@@ -609,8 +474,15 @@ export const Selector_TagFilter = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Selector_TagFilter>): Selector_TagFilter {
-    const message = { ...baseSelector_TagFilter } as Selector_TagFilter;
+  fromPartial(object: DeepPartial<Selector>): Selector {
+    const message = { ...baseSelector } as Selector;
+    message.all = object.all ?? false;
+    message.ids = [];
+    if (object.ids !== undefined && object.ids !== null) {
+      for (const e of object.ids) {
+        message.ids.push(e);
+      }
+    }
     message.tags = [];
     if (object.tags !== undefined && object.tags !== null) {
       for (const e of object.tags) {
