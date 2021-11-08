@@ -8,13 +8,19 @@ import {
 } from '@material-ui/core';
 import { Download, Plus } from 'react-feather';
 import { Link } from 'react-router-dom';
+import { ipcRenderer } from 'electron';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
-import Connections from '../../shared/connections';
-import { ConnectionData } from '../../shared/constants';
 import TagFolderRow from '../components/TagFolderRow';
 import ConnectionRow from '../components/ConnectionRow';
 import VirtualFolderRow from '../components/VirtualFolderRow';
+import { Record, Selector } from '../../shared/pb/api';
+import {
+  GET_RECORDS,
+  GET_RECORDS_RESPONSE,
+  GET_UNIQUE_TAGS,
+  GET_UNIQUE_TAGS_RESPONSE,
+} from '../../shared/constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -35,104 +41,124 @@ const useStyles = makeStyles((theme: Theme) => ({
 const ManageConnections = (): JSX.Element => {
   const classes = useStyles();
   const [folderNames, setFolderNames] = useState([] as string[]);
-  const [connections, setConnections] = useState([] as ConnectionData[]);
-
-  const fetchData = (): void => {
-    const connHandler = new Connections();
-    setFolderNames(connHandler.getExistingTags());
-    setConnections(Object.values(connHandler.getConnections()));
-  };
+  const [connections, setConnections] = useState([] as Record[]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchData();
+    ipcRenderer.once(GET_UNIQUE_TAGS_RESPONSE, (_, args) => {
+      if (args.tags && !args.err) {
+        setFolderNames(args.tags);
+      }
+    });
+    ipcRenderer.send(GET_UNIQUE_TAGS);
+    ipcRenderer.once(GET_RECORDS_RESPONSE, (_, args) => {
+      console.log('called');
+      if (args.err) {
+        setError(args.err);
+      } else {
+        setConnections(args.res.records);
+      }
+    });
+    ipcRenderer.send(GET_RECORDS, {
+      all: true,
+      ids: [],
+      tags: [],
+    } as Selector);
   }, []);
 
-  return (
-    <Container maxWidth={false}>
-      <Grid className={classes.titleGrid}>
-        <Grid container alignItems="flex-start">
-          <Grid item xs={6}>
-            <Typography variant="h3" color="textPrimary">
-              Manage Connections
-            </Typography>
-          </Grid>
-          <Grid item xs={6} container justifyContent="flex-end">
-            <Grid item>
-              <Button
-                type="button"
-                color="primary"
-                onClick={() => alert('todo')}
-                endIcon={<Download />}
-              >
-                Import
-              </Button>
+  if (connections.length > 0) {
+    return (
+      <Container maxWidth={false}>
+        <Grid className={classes.titleGrid}>
+          <Grid container alignItems="flex-start">
+            <Grid item xs={6}>
+              <Typography variant="h3" color="textPrimary">
+                Manage Connections
+              </Typography>
             </Grid>
-            <Grid item xs={1} />
-            <Grid item>
-              <Button
-                type="button"
-                variant="contained"
-                component={Link}
-                to="/connectForm"
-                color="primary"
-                endIcon={<Plus />}
-              >
-                New Connection
-              </Button>
+            <Grid item xs={6} container justifyContent="flex-end">
+              <Grid item>
+                <Button
+                  type="button"
+                  color="primary"
+                  onClick={() => alert('todo')}
+                  endIcon={<Download />}
+                >
+                  Import
+                </Button>
+              </Grid>
+              <Grid item xs={1} />
+              <Grid item>
+                <Button
+                  type="button"
+                  variant="contained"
+                  component={Link}
+                  to="/connectForm"
+                  color="primary"
+                  endIcon={<Plus />}
+                >
+                  New Connection
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
 
-      <Card>
-        {folderNames.map((folderName) => {
-          return (
-            <TagFolderRow
-              key={'folderRow' + folderName}
-              folderName={folderName}
-            >
-              {connections
-                .filter(
-                  (connection) => connection?.tags?.indexOf(folderName) >= 0
-                )
-                .map((conn) => {
-                  return (
-                    <ConnectionRow
-                      key={'connectionRow' + folderName + conn.connectionID}
-                      folderName={folderName}
-                      connection={conn}
-                    />
-                  );
-                })}
-            </TagFolderRow>
-          );
-        })}
-        <VirtualFolderRow folderName="All Connections">
-          {connections.map((conn) => {
+        <Card>
+          {folderNames.map((folderName) => {
             return (
-              <ConnectionRow
-                key={'connectionRowAllConnections' + conn.connectionID}
-                folderName="All Connections"
-                connection={conn}
-              />
+              <TagFolderRow
+                key={'folderRow' + folderName}
+                folderName={folderName}
+              >
+                {connections
+                  .filter(
+                    (connection) => connection?.tags?.indexOf(folderName) >= 0
+                  )
+                  .map((record) => {
+                    return (
+                      <ConnectionRow
+                        key={'connectionRow' + folderName + record.id}
+                        folderName={folderName}
+                        connectionID={record?.id || ''}
+                        connectionName={record?.conn?.name || ''}
+                      />
+                    );
+                  })}
+              </TagFolderRow>
             );
           })}
-        </VirtualFolderRow>
-        <VirtualFolderRow folderName="Untagged">
-          {connections
-            .filter((connection) => !connection?.tags?.length)
-            .map((conn) => {
+          <VirtualFolderRow folderName="All Connections">
+            {connections.map((record) => {
               return (
                 <ConnectionRow
-                  key={'connectionRowUntagged' + conn.connectionID}
-                  folderName="Untagged"
-                  connection={conn}
+                  key={'connectionRowAllConnections' + record.id}
+                  folderName="All Connections"
+                  connectionID={record?.id || ''}
+                  connectionName={record?.conn?.name || ''}
                 />
               );
             })}
-        </VirtualFolderRow>
-      </Card>
-    </Container>
-  );
+          </VirtualFolderRow>
+          <VirtualFolderRow folderName="Untagged">
+            {connections
+              .filter((connection) => !connection?.tags?.length)
+              .map((record) => {
+                return (
+                  <ConnectionRow
+                    key={'connectionRowUntagged' + record.id}
+                    folderName="Untagged"
+                    connectionID={record?.id || ''}
+                    connectionName={record?.conn?.name || ''}
+                  />
+                );
+              })}
+          </VirtualFolderRow>
+        </Card>
+      </Container>
+    );
+  }
+
+  return <></>;
 };
 export default ManageConnections;

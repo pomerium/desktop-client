@@ -13,7 +13,6 @@ import { ipcRenderer } from 'electron';
 import { Link } from 'react-router-dom';
 import {
   CONNECT,
-  ConnectionData,
   DELETE,
   DISCONNECT,
   DUPLICATE,
@@ -26,12 +25,14 @@ import Disconnected from '../icons/Disconnected';
 
 type ConnectionRowProps = {
   folderName: string;
-  connection: ConnectionData;
+  connectionName: string;
+  connectionID: string;
 };
 
 const ConnectionRow: React.FC<ConnectionRowProps> = ({
   folderName,
-  connection,
+  connectionName,
+  connectionID,
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [connected, setConnected] = React.useState(Math.random() < 0.5);
@@ -45,14 +46,14 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
 
   const handleMenuClick = (action: string) => {
     setMenuAnchor(null);
-    ipcRenderer.send(action, connection);
+    ipcRenderer.send(action, connectionID);
   };
 
   const toggleConnected = () => {
     if (connected) {
-      ipcRenderer.send(DISCONNECT, connection);
+      ipcRenderer.send(DISCONNECT, connectionID);
     } else {
-      ipcRenderer.send(CONNECT, connection);
+      ipcRenderer.send(CONNECT, connectionID);
     }
     setConnected(!connected);
   };
@@ -64,10 +65,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           <IconButton
             key={'menuButton' + folderName}
             aria-label={
-              'toggle connected for ' +
-              folderName +
-              ' ' +
-              connection.connectionID
+              'toggle connected for ' + folderName + ' ' + connectionID
             }
             component="span"
             onClick={toggleConnected}
@@ -76,10 +74,10 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           </IconButton>
         </Grid>
         <Grid item xs={3}>
-          <Typography variant="h6">{capitalize(connection.name)}</Typography>
+          <Typography variant="h6">{capitalize(connectionName)}</Typography>
         </Grid>
         <Grid item xs={5}>
-          <Link to={'/view_connection/' + connection.connectionID} />
+          <Link to={'/view_connection/' + connectionID} />
         </Grid>
         <Grid container item xs={2} justifyContent="flex-end">
           <Typography variant="subtitle2">
@@ -92,13 +90,13 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             aria-haspopup="true"
             onClick={toggleMenu}
             aria-label={
-              'Menu for connection: ' + folderName + '-' + connection.name
+              'Menu for connection: ' + folderName + '-' + connectionName
             }
           >
             <MoreVertical />
           </IconButton>
           <Menu
-            id={'connection-menu' + folderName + connection.connectionID}
+            id={'connection-menu' + folderName + connectionID}
             anchorEl={menuAnchor}
             keepMounted
             open={Boolean(menuAnchor)}

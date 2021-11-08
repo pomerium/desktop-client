@@ -20,6 +20,8 @@ import { ipcRenderer } from 'electron';
 import {
   GET_RECORDS,
   GET_RECORDS_RESPONSE,
+  GET_UNIQUE_TAGS,
+  GET_UNIQUE_TAGS_RESPONSE,
   QueryParams,
   SAVE,
   SAVE_RESPONSE,
@@ -110,6 +112,15 @@ const ConnectForm: FC<Props> = () => {
       // reset data here for id or intialdata
     }
   }, [refresh]);
+
+  useEffect(() => {
+    ipcRenderer.once(GET_UNIQUE_TAGS_RESPONSE, (_, args) => {
+      if (args.tags && !args.err) {
+        setTagOptions(args.tags);
+      }
+    });
+    ipcRenderer.send(GET_UNIQUE_TAGS);
+  }, []);
 
   const saveName = (value: string): void => {
     setConnection({

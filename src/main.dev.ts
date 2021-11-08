@@ -27,7 +27,6 @@ import {
   ConnectionData,
   CONNECT,
   CONNECTION_SAVED,
-  FolderActionData,
   CONNECT_ALL,
   DISCONNECT_ALL,
   DELETE_ALL,
@@ -42,10 +41,18 @@ import {
   SAVE_RESPONSE,
   GET_RECORDS,
   GET_RECORDS_RESPONSE,
+  GET_UNIQUE_TAGS,
+  GET_UNIQUE_TAGS_RESPONSE,
+  DELETE_RESPONSE,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import ConnectionStatuses from './main/connectionStatuses';
-import { ConfigClient, Record, Selector } from './shared/pb/api';
+import {
+  ConfigClient,
+  GetTagsRequest,
+  Record,
+  Selector,
+} from './shared/pb/api';
 
 let mainWindow: BrowserWindow | null;
 
@@ -137,26 +144,36 @@ app.on('ready', async () => {
     });
     ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
       configClient.list(selector, (err, res) => {
-        console.log(err);
-        console.log(res);
         evt?.sender.send(GET_RECORDS_RESPONSE, {
           err,
           res,
         });
       });
     });
-    ipcMain.on(CONNECT, (_evt, args: ConnectionData) => {
-      console.log(CONNECT + ' ' + args.connectionID + ' action was called.');
+    ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
+      configClient.getTags(GetTagsRequest, (err, res) => {
+        evt?.sender.send(GET_UNIQUE_TAGS_RESPONSE, {
+          err,
+          tags: res?.tags || [],
+        });
+      });
+    });
+    ipcMain.on(CONNECT, (_evt, id: string) => {
+      console.log(CONNECT + ' ' + id + ' action was called.');
       // connections.connect(args.connectionID, evt);
       // menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(DISCONNECT, (_evt, args: ConnectionData) => {
-      console.log(DISCONNECT + ' ' + args.connectionID + ' action was called.');
+    ipcMain.on(DISCONNECT, (_evt, id: string) => {
+      console.log(DISCONNECT + ' ' + id + ' action was called.');
       // connections.disconnect(msg.connectionID);
       // menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(DELETE, (_evt, args: ConnectionData) => {
-      connections.delete(args.connectionID);
+    ipcMain.on(DELETE, (evt, id: string) => {
+      configClient.delete({ ids: [id], tags: [], all: false }, (err, _) => {
+        evt?.sender.send(DELETE_RESPONSE, {
+          err,
+        });
+      });
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(EDIT, (_evt, id: string) => {
@@ -178,19 +195,21 @@ app.on('ready', async () => {
       connections.createMenuItems();
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(CONNECT_ALL, (_, args: FolderActionData) => {
-      console.log(CONNECT_ALL + ' ' + args.folderName + ' action was called.');
+    ipcMain.on(CONNECT_ALL, (_, tag: string) => {
+      console.log(CONNECT_ALL + ' ' + tag + ' action was called.');
     });
-    ipcMain.on(DISCONNECT_ALL, (_, args: FolderActionData) => {
-      console.log(
-        DISCONNECT_ALL + ' ' + args.folderName + ' action was called.'
-      );
+    ipcMain.on(DISCONNECT_ALL, (_, tag: string) => {
+      console.log(DISCONNECT_ALL + ' ' + tag + ' action was called.');
     });
-    ipcMain.on(DELETE_ALL, (_, args: FolderActionData) => {
-      console.log(DELETE_ALL + ' ' + args.folderName + ' action was called.');
+    ipcMain.on(DELETE_ALL, (evt, tag: string) => {
+      configClient.delete({ ids: [], tags: [tag], all: false }, (err, _) => {
+        evt?.sender.send(DELETE_RESPONSE, {
+          err,
+        });
+      });
     });
-    ipcMain.on(EXPORT_ALL, (_, args: FolderActionData) => {
-      console.log(EXPORT_ALL + ' ' + args.folderName + ' action was called.');
+    ipcMain.on(EXPORT_ALL, (_, tag: string) => {
+      console.log(EXPORT_ALL + ' ' + tag + ' action was called.');
     });
 
     app.on('before-quit', () => {

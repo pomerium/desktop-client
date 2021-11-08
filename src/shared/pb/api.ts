@@ -99,6 +99,12 @@ export function exportRequest_FormatToJSON(
   }
 }
 
+export interface GetTagsRequest {}
+
+export interface GetTagsResponse {
+  tags: string[];
+}
+
 export interface ConfigData {
   data: Uint8Array;
 }
@@ -621,6 +627,112 @@ export const ExportRequest = {
     }
     message.removeTags = object.removeTags ?? false;
     message.format = object.format ?? 0;
+    return message;
+  },
+};
+
+const baseGetTagsRequest: object = {};
+
+export const GetTagsRequest = {
+  encode(
+    _: GetTagsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetTagsRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseGetTagsRequest } as GetTagsRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetTagsRequest {
+    const message = { ...baseGetTagsRequest } as GetTagsRequest;
+    return message;
+  },
+
+  toJSON(_: GetTagsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<GetTagsRequest>): GetTagsRequest {
+    const message = { ...baseGetTagsRequest } as GetTagsRequest;
+    return message;
+  },
+};
+
+const baseGetTagsResponse: object = { tags: '' };
+
+export const GetTagsResponse = {
+  encode(
+    message: GetTagsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.tags) {
+      writer.uint32(10).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetTagsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseGetTagsResponse } as GetTagsResponse;
+    message.tags = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tags.push(reader.string());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetTagsResponse {
+    const message = { ...baseGetTagsResponse } as GetTagsResponse;
+    message.tags = [];
+    if (object.tags !== undefined && object.tags !== null) {
+      for (const e of object.tags) {
+        message.tags.push(String(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: GetTagsResponse): unknown {
+    const obj: any = {};
+    if (message.tags) {
+      obj.tags = message.tags.map((e) => e);
+    } else {
+      obj.tags = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<GetTagsResponse>): GetTagsResponse {
+    const message = { ...baseGetTagsResponse } as GetTagsResponse;
+    message.tags = [];
+    if (object.tags !== undefined && object.tags !== null) {
+      for (const e of object.tags) {
+        message.tags.push(e);
+      }
+    }
     return message;
   },
 };
@@ -1483,6 +1595,17 @@ export const ConfigService = {
       Buffer.from(Record.encode(value).finish()),
     responseDeserialize: (value: Buffer) => Record.decode(value),
   },
+  getTags: {
+    path: '/pomerium.cli.Config/GetTags',
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetTagsRequest) =>
+      Buffer.from(GetTagsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => GetTagsRequest.decode(value),
+    responseSerialize: (value: GetTagsResponse) =>
+      Buffer.from(GetTagsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => GetTagsResponse.decode(value),
+  },
   export: {
     path: '/pomerium.cli.Config/Export',
     requestStream: false,
@@ -1511,6 +1634,7 @@ export interface ConfigServer extends UntypedServiceImplementation {
   list: handleUnaryCall<Selector, Records>;
   delete: handleUnaryCall<Selector, DeleteRecordsResponse>;
   upsert: handleUnaryCall<Record, Record>;
+  getTags: handleUnaryCall<GetTagsRequest, GetTagsResponse>;
   export: handleUnaryCall<ExportRequest, ConfigData>;
   import: handleUnaryCall<ImportRequest, ImportResponse>;
 }
@@ -1569,6 +1693,21 @@ export interface ConfigClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: Record) => void
+  ): ClientUnaryCall;
+  getTags(
+    request: GetTagsRequest,
+    callback: (error: ServiceError | null, response: GetTagsResponse) => void
+  ): ClientUnaryCall;
+  getTags(
+    request: GetTagsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetTagsResponse) => void
+  ): ClientUnaryCall;
+  getTags(
+    request: GetTagsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetTagsResponse) => void
   ): ClientUnaryCall;
   export(
     request: ExportRequest,
