@@ -1,13 +1,13 @@
 import * as React from 'react';
+import { PropsWithChildren } from 'react';
 import {
-  Typography,
+  Divider,
   Grid,
   IconButton,
-  Divider,
-  MenuItem,
   Menu,
+  MenuItem,
+  Typography,
 } from '@material-ui/core';
-import { PropsWithChildren } from 'react';
 import { MoreVertical } from 'react-feather';
 import { ipcRenderer } from 'electron';
 import {
@@ -15,17 +15,24 @@ import {
   DELETE_ALL,
   DISCONNECT_ALL,
   EXPORT_ALL,
-  FolderActionData,
+  UPDATE_LISTENERS,
 } from '../../shared/constants';
 import ClosedFolder from '../icons/ClosedFolder';
 import OpenFolder from '../icons/OpenFolder';
+import { ListenerUpdateRequest } from '../../shared/pb/api';
 
 type FolderProps = {
   folderName: string;
+  totalListeners: number;
+  connectedListeners: number;
+  connectionIds: string[];
 };
 
 const TagFolderRow: React.FC<FolderProps> = ({
   folderName,
+  totalListeners,
+  connectedListeners,
+  connectionIds,
   children,
 }: PropsWithChildren<FolderProps>): JSX.Element => {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -44,7 +51,17 @@ const TagFolderRow: React.FC<FolderProps> = ({
 
   const handleMenuClick = (action: string) => {
     setMenuAnchor(null);
-    ipcRenderer.send(action, { folderName } as FolderActionData);
+    switch (action) {
+      case CONNECT_ALL:
+      case DISCONNECT_ALL:
+        ipcRenderer.send(UPDATE_LISTENERS, {
+          connectionIds,
+          connected: action === CONNECT_ALL,
+        } as ListenerUpdateRequest);
+        break;
+      default:
+        ipcRenderer.send(action, folderName);
+    }
   };
 
   return (
@@ -65,7 +82,9 @@ const TagFolderRow: React.FC<FolderProps> = ({
         </Grid>
         <Grid item xs={5} />
         <Grid container item xs={2} justifyContent="flex-end">
-          <Typography variant="subtitle2">7 of 7 connected</Typography>
+          <Typography variant="subtitle2">
+            {connectedListeners} of {totalListeners} connected
+          </Typography>
         </Grid>
         <Grid container item xs={1} justifyContent="center">
           <IconButton

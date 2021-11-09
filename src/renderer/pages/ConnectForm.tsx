@@ -15,16 +15,14 @@ import {
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CheckCircle, ChevronDown } from 'react-feather';
-import { Autocomplete } from '@material-ui/lab';
+import { Alert, Autocomplete } from '@material-ui/lab';
 import { ipcRenderer } from 'electron';
+import { ServiceError } from '@grpc/grpc-js';
 import {
   GET_RECORDS,
-  GET_RECORDS_RESPONSE,
   GET_UNIQUE_TAGS,
-  GET_UNIQUE_TAGS_RESPONSE,
   QueryParams,
-  SAVE,
-  SAVE_RESPONSE,
+  SAVE_RECORD,
   VIEW,
 } from '../../shared/constants';
 import TextField from '../components/TextField';
@@ -76,7 +74,7 @@ const initialConnData: Connection = {
 
 const ConnectForm: FC<Props> = () => {
   const classes = useStyles();
-  const [error, setError] = useState([]);
+  const [error, setError] = useState(null as ServiceError | null);
   const [tags, setTags] = useState<string[]>([]);
   const [connection, setConnection] = useState(initialConnData);
   const [refresh, setRefresh] = useState('');
@@ -86,11 +84,9 @@ const ConnectForm: FC<Props> = () => {
   };
   const { connectionID }: QueryParams = useParams();
 
-  // todo something with error and refresh and add tagOptions
-
   useEffect(() => {
     if (connectionID) {
-      ipcRenderer.once(GET_RECORDS_RESPONSE, (_, args) => {
+      ipcRenderer.once(GET_RECORDS, (_, args) => {
         if (args.err) {
           setError(args.err);
         } else if (args.res.records.length === 1) {
@@ -114,7 +110,7 @@ const ConnectForm: FC<Props> = () => {
   }, [refresh]);
 
   useEffect(() => {
-    ipcRenderer.once(GET_UNIQUE_TAGS_RESPONSE, (_, args) => {
+    ipcRenderer.once(GET_UNIQUE_TAGS, (_, args) => {
       if (args.tags && !args.err) {
         setTagOptions(args.tags);
       }
@@ -164,24 +160,19 @@ const ConnectForm: FC<Props> = () => {
     if (connectionID) {
       record.id = connectionID;
     }
-    ipcRenderer.once(SAVE_RESPONSE, (_, args) => {
+    ipcRenderer.once(SAVE_RECORD, (_, args) => {
       if (args.err) {
         setError(args.err);
       } else if (args.res) {
         ipcRenderer.send(VIEW, args.res.id);
       }
     });
-    ipcRenderer.send(SAVE, record);
+    ipcRenderer.send(SAVE_RECORD, record);
   };
 
   const discardChanges = (): void => {
     setRefresh('yes');
   };
-
-  function saveCaFilePath(value: string) {
-    console.log(value);
-    // do nothing with value
-  }
 
   return (
     <Container maxWidth={false}>
@@ -195,6 +186,8 @@ const ConnectForm: FC<Props> = () => {
             </Grid>
           </Grid>
         </Grid>
+
+        {error && <Alert severity="error">{error.details}</Alert>}
 
         <Card>
           <Grid container spacing={2}>
@@ -272,6 +265,18 @@ const ConnectForm: FC<Props> = () => {
           <AccordionDetails>
             <Grid container spacing={2}>
               <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Pomerium URL"
+                  value={connection?.pomeriumUrl}
+                  onChange={(evt): void => savePomeriumUrl(evt.target.value)}
+                  variant="outlined"
+                  autoFocus
+                  helperText="Location of Pomerium Service"
+                />
+              </Grid>
+              <Grid item xs={12}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -286,26 +291,6 @@ const ConnectForm: FC<Props> = () => {
                 <FormHelperText className={classes.leftPad}>
                   Skips TLS verification. No Cert Authority Needed.
                 </FormHelperText>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Alternate Pomerium URL"
-                  value={connection.pomeriumUrl}
-                  onChange={(evt): void => savePomeriumUrl(evt.target.value)}
-                  variant="outlined"
-                  helperText="Pomerium Proxy Url. Useful if the Destination URL isn't publicly resolvable"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="CA File Path"
-                  value="todo file picker"
-                  onChange={(evt): void => saveCaFilePath(evt.target.value)}
-                  variant="outlined"
-                  helperText="If Pomerium is using a CA in your system's trusted keychain you can provide the path to it here."
-                />
               </Grid>
             </Grid>
           </AccordionDetails>

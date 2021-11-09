@@ -14,16 +14,17 @@ import {
 import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { ChevronDown } from 'react-feather';
+import { ServiceError } from '@grpc/grpc-js';
+import { Alert } from '@material-ui/lab';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
 import {
-  CONNECT,
   DELETE,
-  DISCONNECT,
   EDIT,
   GET_RECORDS,
-  GET_RECORDS_RESPONSE,
+  LISTENER_STATUS,
   QueryParams,
+  UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
 import Connected from '../icons/Connected';
@@ -31,7 +32,12 @@ import Disconnected from '../icons/Disconnected';
 import Edit from '../icons/Edit';
 import Export from '../icons/Export';
 import Delete from '../icons/Delete';
-import { Connection, Record, Selector } from '../../shared/pb/api';
+import {
+  Connection,
+  ListenerUpdateRequest,
+  Record,
+  Selector,
+} from '../../shared/pb/api';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -53,16 +59,15 @@ const ConnectionView = (): JSX.Element => {
   const classes = useStyles();
   const [tags, setTags] = useState([] as Record['tags']);
   const [connection, setConnection] = useState({} as Connection);
-  const [connected, setConnected] = React.useState(Math.random() < 0.5);
+  const [error, setError] = useState(null as ServiceError | null);
+  const [connected, setConnected] = useState(false);
   const { connectionID }: QueryParams = useParams();
 
   const toggleConnected = () => {
-    if (connected) {
-      ipcRenderer.send(DISCONNECT, connection);
-    } else {
-      ipcRenderer.send(CONNECT, connection);
-    }
-    setConnected(!connected);
+    ipcRenderer.send(UPDATE_LISTENERS, {
+      connectionIds: [connectionID],
+      connected: !connected,
+    } as ListenerUpdateRequest);
   };
 
   const deleteAndRedirect = () => {
@@ -71,14 +76,26 @@ const ConnectionView = (): JSX.Element => {
   };
 
   useEffect(() => {
+    ipcRenderer.on(LISTENER_STATUS, (_, args) => {
+      if (args.err) {
+        setError(args.err);
+      } else {
+        setConnected(Object.keys(args?.res?.active).indexOf(connectionID) > -1);
+      }
+    });
     if (connectionID) {
-      ipcRenderer.once(GET_RECORDS_RESPONSE, (_, args) => {
+      ipcRenderer.once(GET_RECORDS, (_, args) => {
         if (args?.res?.records?.length === 1) {
           setTags(args.res.records[0].tags || []);
           setConnection(args.res.records[0].conn);
         }
       });
       ipcRenderer.send(GET_RECORDS, {
+        all: false,
+        ids: [connectionID],
+        tags: [],
+      } as Selector);
+      ipcRenderer.send(LISTENER_STATUS, {
         all: false,
         ids: [connectionID],
         tags: [],
@@ -258,6 +275,7 @@ const ConnectionView = (): JSX.Element => {
             </Grid>
           </AccordionDetails>
         </Accordion>
+        {error && <Alert severity="error">{error.message}</Alert>}
         <Box minHeight="20px" />
       </Container>
     );

@@ -20,15 +20,11 @@ import path from 'path';
 import createWindow from './renderer/window';
 import 'regenerator-runtime/runtime';
 import {
-  DISCONNECT,
   isDev,
   isProd,
   prodDebug,
   ConnectionData,
-  CONNECT,
   CONNECTION_SAVED,
-  CONNECT_ALL,
-  DISCONNECT_ALL,
   DELETE_ALL,
   EXPORT_ALL,
   DELETE,
@@ -37,19 +33,19 @@ import {
   VIEW,
   EDIT,
   VIEW_CONNECTION_LIST,
-  SAVE,
-  SAVE_RESPONSE,
+  SAVE_RECORD,
   GET_RECORDS,
-  GET_RECORDS_RESPONSE,
   GET_UNIQUE_TAGS,
-  GET_UNIQUE_TAGS_RESPONSE,
-  DELETE_RESPONSE,
+  UPDATE_LISTENERS,
+  LISTENER_STATUS,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import ConnectionStatuses from './main/connectionStatuses';
 import {
   ConfigClient,
   GetTagsRequest,
+  ListenerClient,
+  ListenerUpdateRequest,
   Record,
   Selector,
 } from './shared/pb/api';
@@ -74,6 +70,11 @@ if (isDev || prodDebug) {
 }
 
 const configClient = new ConfigClient(
+  '127.0.0.1:8800',
+  grpc.ChannelCredentials.createInsecure()
+);
+
+const listenerClient = new ListenerClient(
   '127.0.0.1:8800',
   grpc.ChannelCredentials.createInsecure()
 );
@@ -134,47 +135,62 @@ app.on('ready', async () => {
     menu.tray.on('click', () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(SAVE, (evt, args: Record) => {
+    ipcMain.on(SAVE_RECORD, (evt, args: Record) => {
       configClient.upsert(args, (err, res) => {
-        evt?.sender.send(SAVE_RESPONSE, {
+        evt?.sender.send(SAVE_RECORD, {
           err,
           res,
         });
       });
     });
     ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
       configClient.list(selector, (err, res) => {
-        evt?.sender.send(GET_RECORDS_RESPONSE, {
+        sendTo?.send(GET_RECORDS, {
           err,
           res,
         });
       });
     });
     ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
       configClient.getTags(GetTagsRequest, (err, res) => {
-        evt?.sender.send(GET_UNIQUE_TAGS_RESPONSE, {
+        sendTo?.send(GET_UNIQUE_TAGS, {
           err,
           tags: res?.tags || [],
         });
       });
     });
-    ipcMain.on(CONNECT, (_evt, id: string) => {
-      console.log(CONNECT + ' ' + id + ' action was called.');
-      // connections.connect(args.connectionID, evt);
-      // menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
-    });
-    ipcMain.on(DISCONNECT, (_evt, id: string) => {
-      console.log(DISCONNECT + ' ' + id + ' action was called.');
-      // connections.disconnect(msg.connectionID);
-      // menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
-    });
     ipcMain.on(DELETE, (evt, id: string) => {
-      configClient.delete({ ids: [id], tags: [], all: false }, (err, _) => {
-        evt?.sender.send(DELETE_RESPONSE, {
+      configClient.delete({ ids: [id], tags: [], all: false }, (err) => {
+        evt?.sender.send(DELETE, {
           err,
         });
+        if (!err) {
+          ipcMain.emit(GET_RECORDS, {}, {
+            all: true,
+            ids: [],
+            tags: [],
+          } as Selector);
+          ipcMain.emit(GET_UNIQUE_TAGS);
+        }
       });
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    });
+    ipcMain.on(DELETE_ALL, (evt, tag: string) => {
+      configClient.delete({ ids: [], tags: [tag], all: false }, (err) => {
+        evt?.sender.send(DELETE, {
+          err,
+        });
+        if (!err) {
+          ipcMain.emit(GET_RECORDS, {}, {
+            all: true,
+            ids: [],
+            tags: [],
+          } as Selector);
+          ipcMain.emit(GET_UNIQUE_TAGS);
+        }
+      });
     });
     ipcMain.on(EDIT, (_evt, id: string) => {
       mainWindow?.webContents.send('redirectTo', `/edit_connect/${id}`);
@@ -195,16 +211,19 @@ app.on('ready', async () => {
       connections.createMenuItems();
       menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
-    ipcMain.on(CONNECT_ALL, (_, tag: string) => {
-      console.log(CONNECT_ALL + ' ' + tag + ' action was called.');
-    });
-    ipcMain.on(DISCONNECT_ALL, (_, tag: string) => {
-      console.log(DISCONNECT_ALL + ' ' + tag + ' action was called.');
-    });
-    ipcMain.on(DELETE_ALL, (evt, tag: string) => {
-      configClient.delete({ ids: [], tags: [tag], all: false }, (err, _) => {
-        evt?.sender.send(DELETE_RESPONSE, {
+    ipcMain.on(UPDATE_LISTENERS, (evt, args: ListenerUpdateRequest) => {
+      listenerClient.update(args, (err, res) => {
+        evt?.sender.send(LISTENER_STATUS, {
           err,
+          res,
+        });
+      });
+    });
+    ipcMain.on(LISTENER_STATUS, (evt, args: Selector) => {
+      listenerClient.getStatus(args, (err, res) => {
+        evt?.sender.send(LISTENER_STATUS, {
+          err,
+          res,
         });
       });
     });

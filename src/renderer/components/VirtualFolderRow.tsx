@@ -12,14 +12,18 @@ import { MoreVertical } from 'react-feather';
 import { ipcRenderer } from 'electron';
 import VirtualClosedFolder from '../icons/VirtualClosedFolder';
 import VirtualOpenFolder from '../icons/VirtualOpenFolder';
-import { EXPORT_ALL, FolderActionData } from '../../shared/constants';
+import { EXPORT_ALL } from '../../shared/constants';
 
 type VirtualFolderProps = {
   folderName: string;
+  totalListeners: number;
+  connectedListeners: number;
 };
 
 const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
   folderName,
+  totalListeners,
+  connectedListeners,
   children,
 }: PropsWithChildren<VirtualFolderProps>): JSX.Element => {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -38,7 +42,7 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
 
   const handleMenuClick = (action: string) => {
     setMenuAnchor(null);
-    ipcRenderer.send(action, { folderName } as FolderActionData);
+    ipcRenderer.send(action, folderName);
   };
 
   return (
@@ -59,7 +63,9 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
         </Grid>
         <Grid item xs={5} />
         <Grid container item xs={2} justifyContent="flex-end">
-          <Typography variant="subtitle2">7 of 7 connected</Typography>
+          <Typography variant="subtitle2">
+            {connectedListeners} of {totalListeners} connected
+          </Typography>
         </Grid>
         <Grid container item xs={1} justifyContent="center">
           <IconButton

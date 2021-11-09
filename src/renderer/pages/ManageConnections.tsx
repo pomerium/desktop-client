@@ -9,17 +9,19 @@ import {
 import { Download, Plus } from 'react-feather';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
+import { Alert } from '@material-ui/lab';
+import { ServiceError } from '@grpc/grpc-js';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
 import TagFolderRow from '../components/TagFolderRow';
 import ConnectionRow from '../components/ConnectionRow';
 import VirtualFolderRow from '../components/VirtualFolderRow';
-import { Record, Selector } from '../../shared/pb/api';
+import { ListenerStatus, Record, Selector } from '../../shared/pb/api';
 import {
+  DELETE,
   GET_RECORDS,
-  GET_RECORDS_RESPONSE,
   GET_UNIQUE_TAGS,
-  GET_UNIQUE_TAGS_RESPONSE,
+  LISTENER_STATUS,
 } from '../../shared/constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -42,31 +44,69 @@ const ManageConnections = (): JSX.Element => {
   const classes = useStyles();
   const [folderNames, setFolderNames] = useState([] as string[]);
   const [connections, setConnections] = useState([] as Record[]);
-  const [error, setError] = useState(null);
+  const [listeners, setListeners] = useState({
+    active: {},
+    errors: {},
+  } as ListenerStatus);
+  const [error, setError] = useState(null as ServiceError | null);
+
+  const getConnectedCount = (conns: Record[]) => {
+    return (
+      conns
+        .map((rec) => rec.id as string)
+        .filter((id) => Object.keys(listeners.active).includes(id)).length || 0
+    );
+  };
 
   useEffect(() => {
-    ipcRenderer.once(GET_UNIQUE_TAGS_RESPONSE, (_, args) => {
+    ipcRenderer.on(GET_UNIQUE_TAGS, (_, args) => {
       if (args.tags && !args.err) {
         setFolderNames(args.tags);
       }
     });
-    ipcRenderer.send(GET_UNIQUE_TAGS);
-    ipcRenderer.once(GET_RECORDS_RESPONSE, (_, args) => {
-      console.log('called');
+    ipcRenderer.on(GET_RECORDS, (_, args) => {
       if (args.err) {
         setError(args.err);
       } else {
         setConnections(args.res.records);
       }
     });
+    ipcRenderer.on(LISTENER_STATUS, (_, args) => {
+      if (args.err) {
+        setError(args.err);
+      } else {
+        setListeners(args.res);
+      }
+    });
+    ipcRenderer.on(DELETE, (_, args) => {
+      if (args.err) {
+        setError(args.err);
+      }
+    });
+    ipcRenderer.send(LISTENER_STATUS, {
+      all: true,
+      ids: [],
+      tags: [],
+    } as Selector);
+    ipcRenderer.send(GET_UNIQUE_TAGS);
     ipcRenderer.send(GET_RECORDS, {
       all: true,
       ids: [],
       tags: [],
     } as Selector);
+
+    return function cleanup() {
+      ipcRenderer.removeAllListeners(GET_UNIQUE_TAGS);
+      ipcRenderer.removeAllListeners(GET_RECORDS);
+      ipcRenderer.removeAllListeners(LISTENER_STATUS);
+      ipcRenderer.removeAllListeners(DELETE);
+    };
   }, []);
 
   if (connections.length > 0) {
+    const untagged = connections.filter(
+      (connection) => !connection?.tags?.length
+    );
     return (
       <Container maxWidth={false}>
         <Grid className={classes.titleGrid}>
@@ -104,31 +144,48 @@ const ManageConnections = (): JSX.Element => {
           </Grid>
         </Grid>
 
+        {error && <Alert severity="error">{error.message}</Alert>}
+        {!!Object.keys(listeners.errors).length &&
+          Object.values(listeners.errors).map((err) => (
+            <Alert key={'err' + Math.random()} severity="error">
+              {err}
+            </Alert>
+          ))}
+
         <Card>
           {folderNames.map((folderName) => {
+            const folderConns = connections.filter(
+              (connection) => connection?.tags?.indexOf(folderName) >= 0
+            );
             return (
               <TagFolderRow
                 key={'folderRow' + folderName}
                 folderName={folderName}
+                connectedListeners={getConnectedCount(folderConns)}
+                totalListeners={folderConns.length}
+                connectionIds={folderConns.map((rec) => rec.id as string)}
               >
-                {connections
-                  .filter(
-                    (connection) => connection?.tags?.indexOf(folderName) >= 0
-                  )
-                  .map((record) => {
-                    return (
-                      <ConnectionRow
-                        key={'connectionRow' + folderName + record.id}
-                        folderName={folderName}
-                        connectionID={record?.id || ''}
-                        connectionName={record?.conn?.name || ''}
-                      />
-                    );
-                  })}
+                {folderConns.map((record) => {
+                  return (
+                    <ConnectionRow
+                      key={'connectionRow' + folderName + record.id}
+                      folderName={folderName}
+                      connectionID={record?.id || ''}
+                      connectionName={record?.conn?.name || ''}
+                      connected={Object.keys(listeners.active).includes(
+                        record?.id as string
+                      )}
+                    />
+                  );
+                })}
               </TagFolderRow>
             );
           })}
-          <VirtualFolderRow folderName="All Connections">
+          <VirtualFolderRow
+            folderName="All Connections"
+            totalListeners={connections.length}
+            connectedListeners={getConnectedCount(connections)}
+          >
             {connections.map((record) => {
               return (
                 <ConnectionRow
@@ -136,23 +193,31 @@ const ManageConnections = (): JSX.Element => {
                   folderName="All Connections"
                   connectionID={record?.id || ''}
                   connectionName={record?.conn?.name || ''}
+                  connected={Object.keys(listeners.active).includes(
+                    record?.id as string
+                  )}
                 />
               );
             })}
           </VirtualFolderRow>
-          <VirtualFolderRow folderName="Untagged">
-            {connections
-              .filter((connection) => !connection?.tags?.length)
-              .map((record) => {
-                return (
-                  <ConnectionRow
-                    key={'connectionRowUntagged' + record.id}
-                    folderName="Untagged"
-                    connectionID={record?.id || ''}
-                    connectionName={record?.conn?.name || ''}
-                  />
-                );
-              })}
+          <VirtualFolderRow
+            folderName="Untagged"
+            totalListeners={untagged.length}
+            connectedListeners={getConnectedCount(untagged)}
+          >
+            {untagged.map((record) => {
+              return (
+                <ConnectionRow
+                  key={'connectionRowUntagged' + record.id}
+                  folderName="Untagged"
+                  connectionID={record?.id || ''}
+                  connectionName={record?.conn?.name || ''}
+                  connected={Object.keys(listeners.active).includes(
+                    record?.id as string
+                  )}
+                />
+              );
+            })}
           </VirtualFolderRow>
         </Card>
       </Container>

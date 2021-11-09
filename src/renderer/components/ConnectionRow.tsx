@@ -18,24 +18,27 @@ import {
   DUPLICATE,
   EDIT,
   EXPORT,
+  UPDATE_LISTENERS,
   VIEW,
 } from '../../shared/constants';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
+import { ListenerUpdateRequest } from '../../shared/pb/api';
 
 type ConnectionRowProps = {
   folderName: string;
   connectionName: string;
   connectionID: string;
+  connected: boolean;
 };
 
 const ConnectionRow: React.FC<ConnectionRowProps> = ({
   folderName,
   connectionName,
   connectionID,
+  connected,
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
-  const [connected, setConnected] = React.useState(Math.random() < 0.5);
 
   const toggleMenu = (e) => {
     setMenuAnchor(e.currentTarget);
@@ -50,12 +53,10 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   };
 
   const toggleConnected = () => {
-    if (connected) {
-      ipcRenderer.send(DISCONNECT, connectionID);
-    } else {
-      ipcRenderer.send(CONNECT, connectionID);
-    }
-    setConnected(!connected);
+    ipcRenderer.send(UPDATE_LISTENERS, {
+      connectionIds: [connectionID],
+      connected: !connected,
+    } as ListenerUpdateRequest);
   };
 
   return (
@@ -102,15 +103,16 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             open={Boolean(menuAnchor)}
             onClose={handleMenuClose}
           >
-            <MenuItem key={CONNECT} onClick={() => handleMenuClick(CONNECT)}>
-              Connect
-            </MenuItem>
-            <MenuItem
-              key={DISCONNECT}
-              onClick={() => handleMenuClick(DISCONNECT)}
-            >
-              Disconnect
-            </MenuItem>
+            {!connected && (
+              <MenuItem key={CONNECT} onClick={toggleConnected}>
+                Connect
+              </MenuItem>
+            )}
+            {connected && (
+              <MenuItem key={DISCONNECT} onClick={toggleConnected}>
+                Disconnect
+              </MenuItem>
+            )}
             <MenuItem key="edit" onClick={() => handleMenuClick(EDIT)}>
               Edit
             </MenuItem>
