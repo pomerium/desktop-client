@@ -64,10 +64,10 @@ interface Props {
 }
 
 const initialConnData: Connection = {
-  name: '',
+  name: undefined,
   remoteAddr: '',
-  listenAddr: '',
-  pomeriumUrl: '',
+  listenAddr: undefined,
+  pomeriumUrl: undefined,
   disableTlsVerification: false,
   caCert: undefined,
 };
@@ -86,7 +86,7 @@ const ConnectForm: FC<Props> = () => {
 
   useEffect(() => {
     if (connectionID) {
-      ipcRenderer.once(GET_RECORDS, (_, args) => {
+      ipcRenderer.on(GET_RECORDS, (_, args) => {
         if (args.err) {
           setError(args.err);
         } else if (args.res.records.length === 1) {
@@ -100,6 +100,10 @@ const ConnectForm: FC<Props> = () => {
         tags: [],
       } as Selector);
     }
+
+    return function cleanup() {
+      ipcRenderer.removeAllListeners(GET_RECORDS);
+    };
   }, [connectionID]);
 
   useEffect(() => {
@@ -121,7 +125,7 @@ const ConnectForm: FC<Props> = () => {
   const saveName = (value: string): void => {
     setConnection({
       ...connection,
-      ...{ name: value },
+      ...{ name: value || undefined },
     });
   };
 
@@ -137,11 +141,17 @@ const ConnectForm: FC<Props> = () => {
   };
 
   const saveLocal = (value: string): void => {
-    setConnection({ ...connection, ...{ listenAddr: value.trim() } });
+    setConnection({
+      ...connection,
+      ...{ listenAddr: value.trim() || undefined },
+    });
   };
 
   const savePomeriumUrl = (value: string): void => {
-    setConnection({ ...connection, ...{ pomeriumUrl: value.trim() } });
+    setConnection({
+      ...connection,
+      ...{ pomeriumUrl: value.trim() || undefined },
+    });
   };
 
   const saveDisableTLS = (): void => {
@@ -196,7 +206,7 @@ const ConnectForm: FC<Props> = () => {
                 fullWidth
                 required
                 label="Name"
-                value={connection?.name}
+                value={connection?.name || ''}
                 onChange={(evt): void => saveName(evt.target.value)}
                 variant="outlined"
                 autoFocus
@@ -219,7 +229,7 @@ const ConnectForm: FC<Props> = () => {
               <TextField
                 fullWidth
                 label="Local Address"
-                value={connection?.listenAddr}
+                value={connection?.listenAddr || ''}
                 onChange={(evt): void => saveLocal(evt.target.value)}
                 variant="outlined"
                 helperText="The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
@@ -269,7 +279,7 @@ const ConnectForm: FC<Props> = () => {
                   fullWidth
                   required
                   label="Pomerium URL"
-                  value={connection?.pomeriumUrl}
+                  value={connection?.pomeriumUrl || ''}
                   onChange={(evt): void => savePomeriumUrl(evt.target.value)}
                   variant="outlined"
                   autoFocus

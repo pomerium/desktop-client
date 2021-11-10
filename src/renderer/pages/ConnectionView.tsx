@@ -101,6 +101,10 @@ const ConnectionView = (): JSX.Element => {
         tags: [],
       } as Selector);
     }
+    return function cleanup() {
+      ipcRenderer.removeAllListeners(GET_RECORDS);
+      ipcRenderer.removeAllListeners(LISTENER_STATUS);
+    };
   }, [connectionID]);
 
   if (Object.keys(connection).length) {
@@ -245,17 +249,6 @@ const ConnectionView = (): JSX.Element => {
                   <Typography variant="subtitle2">
                     {connection.pomeriumUrl}
                   </Typography>
-                </Grid>
-              </Grid>
-              <Grid item xs={12}>
-                <Divider />
-              </Grid>
-              <Grid container item xs={12} alignItems="center">
-                <Grid item xs={4}>
-                  <Typography variant="h6">CA File</Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <Typography variant="subtitle2">todo</Typography>
                 </Grid>
               </Grid>
             </Grid>
