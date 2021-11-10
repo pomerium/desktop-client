@@ -24,7 +24,6 @@ import {
   isProd,
   prodDebug,
   ConnectionData,
-  CONNECTION_SAVED,
   DELETE_ALL,
   EXPORT_ALL,
   DELETE,
@@ -119,7 +118,7 @@ app.on('ready', async () => {
   );
 
   const connections = new ConnectionStatuses();
-  const trayMenuHelper = new Helper(connections, mainWindow, null);
+  const trayMenuHelper = new Helper([], [], mainWindow, null);
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
     preloadWindow: true,
@@ -133,7 +132,7 @@ app.on('ready', async () => {
       mainWindow?.show();
     });
     menu.tray.on('click', () => {
-      menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu(connections));
+      menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu());
     });
     ipcMain.on(SAVE_RECORD, (evt, args: Record) => {
       configClient.upsert(args, (err, res) => {
@@ -141,6 +140,8 @@ app.on('ready', async () => {
           err,
           res,
         });
+        trayMenuHelper.updateRecord(res);
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
     ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
@@ -150,6 +151,14 @@ app.on('ready', async () => {
           err,
           res,
         });
+        if (selector.all) {
+          trayMenuHelper.updateRecords(res.records);
+        } else {
+          res.records.forEach((rec) => {
+            trayMenuHelper.updateRecord(rec);
+          });
+        }
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
     ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
@@ -159,6 +168,8 @@ app.on('ready', async () => {
           err,
           tags: res?.tags || [],
         });
+        trayMenuHelper.updateTags(res.tags);
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
     ipcMain.on(DELETE, (evt, id: string) => {
@@ -175,7 +186,6 @@ app.on('ready', async () => {
           ipcMain.emit(GET_UNIQUE_TAGS);
         }
       });
-      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
     });
     ipcMain.on(DELETE_ALL, (evt, tag: string) => {
       configClient.delete({ ids: [], tags: [tag], all: false }, (err) => {
@@ -207,10 +217,6 @@ app.on('ready', async () => {
     ipcMain.on(DUPLICATE, (_evt, args: ConnectionData) => {
       console.log(DUPLICATE + ' ' + args.connectionID + ' action was called.');
     });
-    ipcMain.on(CONNECTION_SAVED, () => {
-      connections.createMenuItems();
-      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
-    });
     ipcMain.on(UPDATE_LISTENERS, (evt, args: ListenerUpdateRequest) => {
       listenerClient.update(args, (err, res) => {
         evt?.sender.send(LISTENER_STATUS, {
@@ -238,5 +244,12 @@ app.on('ready', async () => {
       mainWindow?.removeAllListeners('close');
       mainWindow?.close();
     });
+
+    ipcMain.emit(GET_RECORDS, {}, {
+      all: true,
+      ids: [],
+      tags: [],
+    } as Selector);
+    ipcMain.emit(GET_UNIQUE_TAGS);
   });
 });

@@ -1,6 +1,5 @@
 import {
   BrowserWindow,
-  clipboard,
   ipcMain,
   Menu,
   MenuItem,
@@ -11,40 +10,29 @@ import {
 import { Menubar } from 'menubar';
 import path from 'path';
 import { getAssetPath, menuIconPath } from '../main/binaries';
-import ConnectionStatuses from '../main/connectionStatuses';
-import {
-  CONNECT,
-  CONNECT_ALL,
-  DISCONNECT,
-  DISCONNECT_ALL,
-} from '../shared/constants';
-
-type ConnectionOption = {
-  label: string;
-  click(): void;
-  icon?: nativeImage;
-};
+import { CONNECT_ALL, DISCONNECT, DISCONNECT_ALL } from '../shared/constants';
+import { Record } from '../shared/pb/api';
 
 export default class Helper {
-  connections: ConnectionStatuses;
+  records: Record[];
+
+  tags: string[];
 
   appWindow: BrowserWindow | null;
 
   menu: Menubar | null;
 
   constructor(
-    connections: ConnectionStatuses,
+    records: Record[],
+    tags: string[],
     appWindow: BrowserWindow | null,
     menu: Menubar | null
   ) {
-    this.connections = connections;
+    this.records = records;
     this.appWindow = appWindow;
     this.menu = menu;
+    this.tags = tags;
   }
-
-  setConnections = (connections: ConnectionStatuses) => {
-    this.connections = connections;
-  };
 
   setMenu = (menu: Menubar) => {
     this.menu = menu;
@@ -54,81 +42,59 @@ export default class Helper {
     this.appWindow = appWindow;
   };
 
-  buildConnections = () => {
-    return Object.values(this.connections.getMenuConnections()).map(
-      (connection) => {
-        const connectionOptions: ConnectionOption[] = [];
+  updateTags = (tags: string[]) => {
+    this.tags = tags;
+  };
 
-        if (connection.child) {
-          connectionOptions.push({
-            label: 'Disconnect',
-            icon: nativeImage.createFromPath(
-              path.join(menuIconPath, 'disconnect.png')
-            ),
-            click: () => {
-              this.connections.disconnect(connection.connectionID);
-              this.menu?.tray.setContextMenu(
-                this.createContextMenu(this.connections)
-              );
-            },
-          });
-        } else {
-          connectionOptions.push({
-            label: 'Connect',
-            icon: nativeImage.createFromPath(
-              path.join(menuIconPath, 'connect.png')
-            ),
-            click: () => {
-              this.connections.connect(connection.connectionID, null);
-              this.menu?.tray.setContextMenu(
-                this.createContextMenu(this.connections)
-              );
-            },
-          });
-        }
+  updateRecords = (records: Record[]) => {
+    this.records = records;
+  };
 
-        connectionOptions.push({
-          label: 'Edit',
-          icon: nativeImage.createFromPath(path.join(menuIconPath, 'edit.png')),
-          click: () => {
-            this.appWindow?.webContents.send(
-              'redirectTo',
-              `/edit_connect/${connection.connectionID}/${
-                connection.child ? 'true' : 'false'
-              }`
-            );
-            this.appWindow?.show();
-          },
-        });
+  updateRecord = (record: Record) => {
+    const index = this.records.findIndex((rec) => rec.id === record.id);
+    if (index > -1) {
+      this.records[index] = record;
+    } else {
+      this.records.push(record);
+    }
+  };
 
-        connectionOptions.push({
-          label: 'Copy Port',
-          icon: nativeImage.createFromPath(
-            path.join(menuIconPath, 'clipboard.png')
-          ),
-          click: () => {
-            clipboard.writeText(connection.port);
-          },
-        });
+  buildFolderSubmenu = (
+    folderName: string,
+    filtered: Record[]
+  ): MenuItemConstructorOptions[] => {
+    const connectionItems: MenuItemConstructorOptions[] = [];
 
-        connectionOptions.push({
-          label: 'Delete',
-          icon: nativeImage.createFromPath(
-            path.join(menuIconPath, 'delete.png')
-          ),
-          click: () => {
-            this.connections.delete(connection.connectionID);
-            this.menu?.tray.setContextMenu(
-              this.createContextMenu(this.connections)
-            );
-          },
-        });
-        return {
-          label: `${connection.url} -> ${connection.port}`,
-          submenu: connectionOptions,
-        };
-      }
-    );
+    connectionItems.push({
+      label: 'Connect All',
+      click() {
+        ipcMain.emit(CONNECT_ALL, {}, folderName);
+      },
+    });
+
+    connectionItems.push({
+      label: 'Disconnect All',
+      click() {
+        ipcMain.emit(DISCONNECT_ALL, {}, folderName);
+      },
+    });
+
+    connectionItems.push({
+      type: 'separator',
+    });
+
+    filtered.forEach((rec) => {
+      connectionItems.push({
+        label: rec?.conn?.name as string,
+        icon: nativeImage.createFromPath(
+          path.join(menuIconPath, 'connected.png')
+        ),
+        click() {
+          ipcMain.emit(DISCONNECT, {}, { connectionID: rec.id });
+        },
+      });
+    });
+    return connectionItems;
   };
 
   buildMenuTemplate = () => {
@@ -143,50 +109,17 @@ export default class Helper {
       },
     });
 
-    const connectionItems: MenuItemConstructorOptions[] = [];
+    this.tags.forEach((tag) => {
+      const conns = this.buildFolderSubmenu(
+        tag,
+        this.records.filter((rec) => rec.tags.includes(tag))
+      );
 
-    connectionItems.push({
-      label: 'Connect All',
-      click() {
-        ipcMain.emit(CONNECT_ALL, {}, { folderName: 'All Connections' });
-      },
-    });
-
-    connectionItems.push({
-      label: 'Disconnect All',
-      click() {
-        ipcMain.emit(DISCONNECT_ALL, {}, { folderName: 'All Connections' });
-      },
-    });
-
-    connectionItems.push({
-      type: 'separator',
-    });
-
-    connectionItems.push({
-      label: 'Connection 1',
-      icon: nativeImage.createFromPath(
-        path.join(menuIconPath, 'connected.png')
-      ),
-      click() {
-        ipcMain.emit(DISCONNECT, {}, { connectionID: 'test' });
-      },
-    });
-
-    connectionItems.push({
-      label: 'Connection 2',
-      icon: nativeImage.createFromPath(
-        path.join(menuIconPath, 'disconnected.png')
-      ),
-      click() {
-        ipcMain.emit(CONNECT, {}, { connectionID: 'test' });
-      },
-    });
-
-    template.push({
-      label: 'All Connections',
-      icon: nativeImage.createFromPath(path.join(menuIconPath, 'folder.png')),
-      submenu: connectionItems,
+      template.push({
+        label: tag,
+        icon: nativeImage.createFromPath(path.join(menuIconPath, 'folder.png')),
+        submenu: conns,
+      });
     });
 
     template.push({
@@ -210,14 +143,13 @@ export default class Helper {
     return template;
   };
 
-  createContextMenu = (connections: ConnectionStatuses): Menu => {
-    this.setConnections(connections);
+  createContextMenu = (): Menu => {
     return Menu.buildFromTemplate(this.buildMenuTemplate());
   };
 
   createTray = (): Tray => {
     const tray = new Tray(getAssetPath('icons', '24x24.png'));
-    tray.setContextMenu(this.createContextMenu(this.connections));
+    tray.setContextMenu(this.createContextMenu());
     return tray;
   };
 }

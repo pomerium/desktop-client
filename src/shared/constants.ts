@@ -24,8 +24,6 @@ export const DUPLICATE = 'duplicate';
 export const EXPORT = 'export';
 export const EXPORT_ALL = 'export-all';
 export const IMPORT = 'import';
-export const CONNECTION_SAVED = 'connection-saved';
-
 export interface QueryParams {
   connectionID: string;
 }
