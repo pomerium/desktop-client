@@ -10,11 +10,13 @@ import {
 import { Menubar } from 'menubar';
 import path from 'path';
 import { getAssetPath, menuIconPath } from '../main/binaries';
-import { CONNECT_ALL, DISCONNECT, DISCONNECT_ALL } from '../shared/constants';
-import { Record } from '../shared/pb/api';
+import { UPDATE_LISTENERS } from '../shared/constants';
+import { ListenerStatus, Record } from '../shared/pb/api';
 
 export default class Helper {
   records: Record[];
+
+  statuses: { [key: string]: ListenerStatus };
 
   tags: string[];
 
@@ -24,11 +26,13 @@ export default class Helper {
 
   constructor(
     records: Record[],
+    statuses: { [key: string]: ListenerStatus },
     tags: string[],
     appWindow: BrowserWindow | null,
     menu: Menubar | null
   ) {
     this.records = records;
+    this.statuses = statuses;
     this.appWindow = appWindow;
     this.menu = menu;
     this.tags = tags;
@@ -42,15 +46,15 @@ export default class Helper {
     this.appWindow = appWindow;
   };
 
-  updateTags = (tags: string[]) => {
+  setTags = (tags: string[]) => {
     this.tags = tags;
   };
 
-  updateRecords = (records: Record[]) => {
+  setRecords = (records: Record[]) => {
     this.records = records;
   };
 
-  updateRecord = (record: Record) => {
+  setRecord = (record: Record) => {
     const index = this.records.findIndex((rec) => rec.id === record.id);
     if (index > -1) {
       this.records[index] = record;
@@ -59,23 +63,41 @@ export default class Helper {
     }
   };
 
-  buildFolderSubmenu = (
-    folderName: string,
-    filtered: Record[]
-  ): MenuItemConstructorOptions[] => {
+  setStatuses = (newStatuses: { [key: string]: ListenerStatus }) => {
+    this.statuses = {
+      ...this.statuses,
+      ...newStatuses,
+    };
+  };
+
+  buildFolderSubmenu = (filtered: Record[]): MenuItemConstructorOptions[] => {
     const connectionItems: MenuItemConstructorOptions[] = [];
 
     connectionItems.push({
       label: 'Connect All',
       click() {
-        ipcMain.emit(CONNECT_ALL, {}, folderName);
+        ipcMain.emit(
+          UPDATE_LISTENERS,
+          {},
+          {
+            connectionIds: filtered.map((rec) => rec.id),
+            connected: true,
+          }
+        );
       },
     });
 
     connectionItems.push({
       label: 'Disconnect All',
       click() {
-        ipcMain.emit(DISCONNECT_ALL, {}, folderName);
+        ipcMain.emit(
+          UPDATE_LISTENERS,
+          {},
+          {
+            connectionIds: filtered.map((rec) => rec.id),
+            connected: false,
+          }
+        );
       },
     });
 
@@ -84,13 +106,24 @@ export default class Helper {
     });
 
     filtered.forEach((rec) => {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const that = this;
+      const iconName = this.statuses[rec.id as string]?.listening
+        ? 'connected.png'
+        : 'disconnected.png';
+
       connectionItems.push({
         label: rec?.conn?.name as string,
-        icon: nativeImage.createFromPath(
-          path.join(menuIconPath, 'connected.png')
-        ),
+        icon: nativeImage.createFromPath(path.join(menuIconPath, iconName)),
         click() {
-          ipcMain.emit(DISCONNECT, {}, { connectionID: rec.id });
+          ipcMain.emit(
+            UPDATE_LISTENERS,
+            {},
+            {
+              connectionIds: [rec.id],
+              connected: !that.statuses[rec.id as string]?.listening,
+            }
+          );
         },
       });
     });
@@ -111,7 +144,6 @@ export default class Helper {
 
     this.tags.forEach((tag) => {
       const conns = this.buildFolderSubmenu(
-        tag,
         this.records.filter((rec) => rec.tags.includes(tag))
       );
 

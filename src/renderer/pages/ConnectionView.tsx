@@ -80,7 +80,7 @@ const ConnectionView = (): JSX.Element => {
       if (args.err) {
         setError(args.err);
       } else {
-        setConnected(Object.keys(args?.res?.active).indexOf(connectionID) > -1);
+        setConnected(!!args?.res?.listeners[connectionID]?.listening);
       }
     });
     if (connectionID) {

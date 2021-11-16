@@ -28,7 +28,7 @@ import {
 import TextField from '../components/TextField';
 import { Theme } from '../../shared/theme';
 import Card from '../components/Card';
-import { formatTag } from '../../shared/connections';
+import { formatTag } from '../../shared/validators';
 import { Connection, Record, Selector } from '../../shared/pb/api';
 
 const useStyles = makeStyles((theme: Theme) => ({

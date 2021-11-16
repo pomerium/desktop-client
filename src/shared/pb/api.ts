@@ -130,20 +130,18 @@ export interface ListenerUpdateRequest {
 }
 
 export interface ListenerStatus {
-  /** active listeners with their current ports */
-  active: { [key: string]: string };
-  /** if some listeners were unable to start up */
-  errors: { [key: string]: string };
+  listening: boolean;
+  listenAddr?: string | undefined;
+  lastError?: string | undefined;
 }
 
-export interface ListenerStatus_ActiveEntry {
-  key: string;
-  value: string;
+export interface ListenerStatusResponse {
+  listeners: { [key: string]: ListenerStatus };
 }
 
-export interface ListenerStatus_ErrorsEntry {
+export interface ListenerStatusResponse_ListenersEntry {
   key: string;
-  value: string;
+  value: ListenerStatus | undefined;
 }
 
 export interface StatusUpdatesRequest {
@@ -992,25 +990,22 @@ export const ListenerUpdateRequest = {
   },
 };
 
-const baseListenerStatus: object = {};
+const baseListenerStatus: object = { listening: false };
 
 export const ListenerStatus = {
   encode(
     message: ListenerStatus,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    Object.entries(message.active).forEach(([key, value]) => {
-      ListenerStatus_ActiveEntry.encode(
-        { key: key as any, value },
-        writer.uint32(10).fork()
-      ).ldelim();
-    });
-    Object.entries(message.errors).forEach(([key, value]) => {
-      ListenerStatus_ErrorsEntry.encode(
-        { key: key as any, value },
-        writer.uint32(18).fork()
-      ).ldelim();
-    });
+    if (message.listening === true) {
+      writer.uint32(8).bool(message.listening);
+    }
+    if (message.listenAddr !== undefined) {
+      writer.uint32(18).string(message.listenAddr);
+    }
+    if (message.lastError !== undefined) {
+      writer.uint32(26).string(message.lastError);
+    }
     return writer;
   },
 
@@ -1018,28 +1013,17 @@ export const ListenerStatus = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseListenerStatus } as ListenerStatus;
-    message.active = {};
-    message.errors = {};
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          const entry1 = ListenerStatus_ActiveEntry.decode(
-            reader,
-            reader.uint32()
-          );
-          if (entry1.value !== undefined) {
-            message.active[entry1.key] = entry1.value;
-          }
+          message.listening = reader.bool();
           break;
         case 2:
-          const entry2 = ListenerStatus_ErrorsEntry.decode(
-            reader,
-            reader.uint32()
-          );
-          if (entry2.value !== undefined) {
-            message.errors[entry2.key] = entry2.value;
-          }
+          message.listenAddr = reader.string();
+          break;
+        case 3:
+          message.lastError = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1051,93 +1035,76 @@ export const ListenerStatus = {
 
   fromJSON(object: any): ListenerStatus {
     const message = { ...baseListenerStatus } as ListenerStatus;
-    message.active = {};
-    message.errors = {};
-    if (object.active !== undefined && object.active !== null) {
-      Object.entries(object.active).forEach(([key, value]) => {
-        message.active[key] = String(value);
-      });
+    if (object.listening !== undefined && object.listening !== null) {
+      message.listening = Boolean(object.listening);
+    } else {
+      message.listening = false;
     }
-    if (object.errors !== undefined && object.errors !== null) {
-      Object.entries(object.errors).forEach(([key, value]) => {
-        message.errors[key] = String(value);
-      });
+    if (object.listenAddr !== undefined && object.listenAddr !== null) {
+      message.listenAddr = String(object.listenAddr);
+    } else {
+      message.listenAddr = undefined;
+    }
+    if (object.lastError !== undefined && object.lastError !== null) {
+      message.lastError = String(object.lastError);
+    } else {
+      message.lastError = undefined;
     }
     return message;
   },
 
   toJSON(message: ListenerStatus): unknown {
     const obj: any = {};
-    obj.active = {};
-    if (message.active) {
-      Object.entries(message.active).forEach(([k, v]) => {
-        obj.active[k] = v;
-      });
-    }
-    obj.errors = {};
-    if (message.errors) {
-      Object.entries(message.errors).forEach(([k, v]) => {
-        obj.errors[k] = v;
-      });
-    }
+    message.listening !== undefined && (obj.listening = message.listening);
+    message.listenAddr !== undefined && (obj.listenAddr = message.listenAddr);
+    message.lastError !== undefined && (obj.lastError = message.lastError);
     return obj;
   },
 
   fromPartial(object: DeepPartial<ListenerStatus>): ListenerStatus {
     const message = { ...baseListenerStatus } as ListenerStatus;
-    message.active = {};
-    if (object.active !== undefined && object.active !== null) {
-      Object.entries(object.active).forEach(([key, value]) => {
-        if (value !== undefined) {
-          message.active[key] = String(value);
-        }
-      });
-    }
-    message.errors = {};
-    if (object.errors !== undefined && object.errors !== null) {
-      Object.entries(object.errors).forEach(([key, value]) => {
-        if (value !== undefined) {
-          message.errors[key] = String(value);
-        }
-      });
-    }
+    message.listening = object.listening ?? false;
+    message.listenAddr = object.listenAddr ?? undefined;
+    message.lastError = object.lastError ?? undefined;
     return message;
   },
 };
 
-const baseListenerStatus_ActiveEntry: object = { key: '', value: '' };
+const baseListenerStatusResponse: object = {};
 
-export const ListenerStatus_ActiveEntry = {
+export const ListenerStatusResponse = {
   encode(
-    message: ListenerStatus_ActiveEntry,
+    message: ListenerStatusResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.key !== '') {
-      writer.uint32(10).string(message.key);
-    }
-    if (message.value !== '') {
-      writer.uint32(18).string(message.value);
-    }
+    Object.entries(message.listeners).forEach(([key, value]) => {
+      ListenerStatusResponse_ListenersEntry.encode(
+        { key: key as any, value },
+        writer.uint32(10).fork()
+      ).ldelim();
+    });
     return writer;
   },
 
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): ListenerStatus_ActiveEntry {
+  ): ListenerStatusResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseListenerStatus_ActiveEntry,
-    } as ListenerStatus_ActiveEntry;
+    const message = { ...baseListenerStatusResponse } as ListenerStatusResponse;
+    message.listeners = {};
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.key = reader.string();
-          break;
-        case 2:
-          message.value = reader.string();
+          const entry1 = ListenerStatusResponse_ListenersEntry.decode(
+            reader,
+            reader.uint32()
+          );
+          if (entry1.value !== undefined) {
+            message.listeners[entry1.key] = entry1.value;
+          }
           break;
         default:
           reader.skipType(tag & 7);
@@ -1147,54 +1114,56 @@ export const ListenerStatus_ActiveEntry = {
     return message;
   },
 
-  fromJSON(object: any): ListenerStatus_ActiveEntry {
-    const message = {
-      ...baseListenerStatus_ActiveEntry,
-    } as ListenerStatus_ActiveEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = String(object.key);
-    } else {
-      message.key = '';
-    }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = String(object.value);
-    } else {
-      message.value = '';
+  fromJSON(object: any): ListenerStatusResponse {
+    const message = { ...baseListenerStatusResponse } as ListenerStatusResponse;
+    message.listeners = {};
+    if (object.listeners !== undefined && object.listeners !== null) {
+      Object.entries(object.listeners).forEach(([key, value]) => {
+        message.listeners[key] = ListenerStatus.fromJSON(value);
+      });
     }
     return message;
   },
 
-  toJSON(message: ListenerStatus_ActiveEntry): unknown {
+  toJSON(message: ListenerStatusResponse): unknown {
     const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
+    obj.listeners = {};
+    if (message.listeners) {
+      Object.entries(message.listeners).forEach(([k, v]) => {
+        obj.listeners[k] = ListenerStatus.toJSON(v);
+      });
+    }
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<ListenerStatus_ActiveEntry>
-  ): ListenerStatus_ActiveEntry {
-    const message = {
-      ...baseListenerStatus_ActiveEntry,
-    } as ListenerStatus_ActiveEntry;
-    message.key = object.key ?? '';
-    message.value = object.value ?? '';
+    object: DeepPartial<ListenerStatusResponse>
+  ): ListenerStatusResponse {
+    const message = { ...baseListenerStatusResponse } as ListenerStatusResponse;
+    message.listeners = {};
+    if (object.listeners !== undefined && object.listeners !== null) {
+      Object.entries(object.listeners).forEach(([key, value]) => {
+        if (value !== undefined) {
+          message.listeners[key] = ListenerStatus.fromPartial(value);
+        }
+      });
+    }
     return message;
   },
 };
 
-const baseListenerStatus_ErrorsEntry: object = { key: '', value: '' };
+const baseListenerStatusResponse_ListenersEntry: object = { key: '' };
 
-export const ListenerStatus_ErrorsEntry = {
+export const ListenerStatusResponse_ListenersEntry = {
   encode(
-    message: ListenerStatus_ErrorsEntry,
+    message: ListenerStatusResponse_ListenersEntry,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.key !== '') {
       writer.uint32(10).string(message.key);
     }
-    if (message.value !== '') {
-      writer.uint32(18).string(message.value);
+    if (message.value !== undefined) {
+      ListenerStatus.encode(message.value, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -1202,12 +1171,12 @@ export const ListenerStatus_ErrorsEntry = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): ListenerStatus_ErrorsEntry {
+  ): ListenerStatusResponse_ListenersEntry {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseListenerStatus_ErrorsEntry,
-    } as ListenerStatus_ErrorsEntry;
+      ...baseListenerStatusResponse_ListenersEntry,
+    } as ListenerStatusResponse_ListenersEntry;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1215,7 +1184,7 @@ export const ListenerStatus_ErrorsEntry = {
           message.key = reader.string();
           break;
         case 2:
-          message.value = reader.string();
+          message.value = ListenerStatus.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1225,38 +1194,45 @@ export const ListenerStatus_ErrorsEntry = {
     return message;
   },
 
-  fromJSON(object: any): ListenerStatus_ErrorsEntry {
+  fromJSON(object: any): ListenerStatusResponse_ListenersEntry {
     const message = {
-      ...baseListenerStatus_ErrorsEntry,
-    } as ListenerStatus_ErrorsEntry;
+      ...baseListenerStatusResponse_ListenersEntry,
+    } as ListenerStatusResponse_ListenersEntry;
     if (object.key !== undefined && object.key !== null) {
       message.key = String(object.key);
     } else {
       message.key = '';
     }
     if (object.value !== undefined && object.value !== null) {
-      message.value = String(object.value);
+      message.value = ListenerStatus.fromJSON(object.value);
     } else {
-      message.value = '';
+      message.value = undefined;
     }
     return message;
   },
 
-  toJSON(message: ListenerStatus_ErrorsEntry): unknown {
+  toJSON(message: ListenerStatusResponse_ListenersEntry): unknown {
     const obj: any = {};
     message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined && (obj.value = message.value);
+    message.value !== undefined &&
+      (obj.value = message.value
+        ? ListenerStatus.toJSON(message.value)
+        : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<ListenerStatus_ErrorsEntry>
-  ): ListenerStatus_ErrorsEntry {
+    object: DeepPartial<ListenerStatusResponse_ListenersEntry>
+  ): ListenerStatusResponse_ListenersEntry {
     const message = {
-      ...baseListenerStatus_ErrorsEntry,
-    } as ListenerStatus_ErrorsEntry;
+      ...baseListenerStatusResponse_ListenersEntry,
+    } as ListenerStatusResponse_ListenersEntry;
     message.key = object.key ?? '';
-    message.value = object.value ?? '';
+    if (object.value !== undefined && object.value !== null) {
+      message.value = ListenerStatus.fromPartial(object.value);
+    } else {
+      message.value = undefined;
+    }
     return message;
   },
 };
@@ -1754,7 +1730,7 @@ export const ConfigClient = makeGenericClientConstructor(
 
 /** Listener service controls listeners */
 export const ListenerService = {
-  /** Listen starts connection listener */
+  /** Update alters connection status. */
   update: {
     path: '/pomerium.cli.Listener/Update',
     requestStream: false,
@@ -1762,9 +1738,10 @@ export const ListenerService = {
     requestSerialize: (value: ListenerUpdateRequest) =>
       Buffer.from(ListenerUpdateRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => ListenerUpdateRequest.decode(value),
-    responseSerialize: (value: ListenerStatus) =>
-      Buffer.from(ListenerStatus.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => ListenerStatus.decode(value),
+    responseSerialize: (value: ListenerStatusResponse) =>
+      Buffer.from(ListenerStatusResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) =>
+      ListenerStatusResponse.decode(value),
   },
   /** GetStatus returns current listener status for active tunnels */
   getStatus: {
@@ -1774,9 +1751,10 @@ export const ListenerService = {
     requestSerialize: (value: Selector) =>
       Buffer.from(Selector.encode(value).finish()),
     requestDeserialize: (value: Buffer) => Selector.decode(value),
-    responseSerialize: (value: ListenerStatus) =>
-      Buffer.from(ListenerStatus.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => ListenerStatus.decode(value),
+    responseSerialize: (value: ListenerStatusResponse) =>
+      Buffer.from(ListenerStatusResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) =>
+      ListenerStatusResponse.decode(value),
   },
   /**
    * StatusUpdates opens a stream to listen to connection status updates
@@ -1798,10 +1776,10 @@ export const ListenerService = {
 } as const;
 
 export interface ListenerServer extends UntypedServiceImplementation {
-  /** Listen starts connection listener */
-  update: handleUnaryCall<ListenerUpdateRequest, ListenerStatus>;
+  /** Update alters connection status. */
+  update: handleUnaryCall<ListenerUpdateRequest, ListenerStatusResponse>;
   /** GetStatus returns current listener status for active tunnels */
-  getStatus: handleUnaryCall<Selector, ListenerStatus>;
+  getStatus: handleUnaryCall<Selector, ListenerStatusResponse>;
   /**
    * StatusUpdates opens a stream to listen to connection status updates
    * a client has to subscribe and continuously
@@ -1814,37 +1792,55 @@ export interface ListenerServer extends UntypedServiceImplementation {
 }
 
 export interface ListenerClient extends Client {
-  /** Listen starts connection listener */
+  /** Update alters connection status. */
   update(
     request: ListenerUpdateRequest,
-    callback: (error: ServiceError | null, response: ListenerStatus) => void
+    callback: (
+      error: ServiceError | null,
+      response: ListenerStatusResponse
+    ) => void
   ): ClientUnaryCall;
   update(
     request: ListenerUpdateRequest,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: ListenerStatus) => void
+    callback: (
+      error: ServiceError | null,
+      response: ListenerStatusResponse
+    ) => void
   ): ClientUnaryCall;
   update(
     request: ListenerUpdateRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: ListenerStatus) => void
+    callback: (
+      error: ServiceError | null,
+      response: ListenerStatusResponse
+    ) => void
   ): ClientUnaryCall;
   /** GetStatus returns current listener status for active tunnels */
   getStatus(
     request: Selector,
-    callback: (error: ServiceError | null, response: ListenerStatus) => void
+    callback: (
+      error: ServiceError | null,
+      response: ListenerStatusResponse
+    ) => void
   ): ClientUnaryCall;
   getStatus(
     request: Selector,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: ListenerStatus) => void
+    callback: (
+      error: ServiceError | null,
+      response: ListenerStatusResponse
+    ) => void
   ): ClientUnaryCall;
   getStatus(
     request: Selector,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: ListenerStatus) => void
+    callback: (
+      error: ServiceError | null,
+      response: ListenerStatusResponse
+    ) => void
   ): ClientUnaryCall;
   /**
    * StatusUpdates opens a stream to listen to connection status updates

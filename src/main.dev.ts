@@ -39,13 +39,12 @@ import {
   LISTENER_STATUS,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
-import ConnectionStatuses from './main/connectionStatuses';
 import {
   ConfigClient,
   GetTagsRequest,
   ListenerClient,
   ListenerUpdateRequest,
-  Record,
+  Record as ListenerRecord,
   Selector,
 } from './shared/pb/api';
 
@@ -117,8 +116,7 @@ app.on('ready', async () => {
     })
   );
 
-  const connections = new ConnectionStatuses();
-  const trayMenuHelper = new Helper([], [], mainWindow, null);
+  const trayMenuHelper = new Helper([], {}, [], mainWindow, null);
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
     preloadWindow: true,
@@ -134,13 +132,13 @@ app.on('ready', async () => {
     menu.tray.on('click', () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu());
     });
-    ipcMain.on(SAVE_RECORD, (evt, args: Record) => {
+    ipcMain.on(SAVE_RECORD, (evt, args: ListenerRecord) => {
       configClient.upsert(args, (err, res) => {
         evt?.sender.send(SAVE_RECORD, {
           err,
           res,
         });
-        trayMenuHelper.updateRecord(res);
+        trayMenuHelper.setRecord(res);
         menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
@@ -152,10 +150,10 @@ app.on('ready', async () => {
           res,
         });
         if (selector.all) {
-          trayMenuHelper.updateRecords(res.records);
+          trayMenuHelper.setRecords(res.records);
         } else {
           res.records.forEach((rec) => {
-            trayMenuHelper.updateRecord(rec);
+            trayMenuHelper.setRecord(rec);
           });
         }
         menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
@@ -168,7 +166,7 @@ app.on('ready', async () => {
           err,
           tags: res?.tags || [],
         });
-        trayMenuHelper.updateTags(res.tags);
+        trayMenuHelper.setTags(res.tags);
         menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
@@ -218,19 +216,25 @@ app.on('ready', async () => {
       console.log(DUPLICATE + ' ' + args.connectionID + ' action was called.');
     });
     ipcMain.on(UPDATE_LISTENERS, (evt, args: ListenerUpdateRequest) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
       listenerClient.update(args, (err, res) => {
-        evt?.sender.send(LISTENER_STATUS, {
+        sendTo?.send(LISTENER_STATUS, {
           err,
           res,
         });
+        trayMenuHelper.setStatuses(res.listeners);
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
     ipcMain.on(LISTENER_STATUS, (evt, args: Selector) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
       listenerClient.getStatus(args, (err, res) => {
-        evt?.sender.send(LISTENER_STATUS, {
+        sendTo?.send(LISTENER_STATUS, {
           err,
           res,
         });
+        trayMenuHelper.setStatuses(res.listeners);
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
     ipcMain.on(EXPORT_ALL, (_, tag: string) => {
@@ -238,9 +242,6 @@ app.on('ready', async () => {
     });
 
     app.on('before-quit', () => {
-      Object.values(connections.getMenuConnections()).forEach((conn) => {
-        connections.disconnect(conn.connectionID);
-      });
       mainWindow?.removeAllListeners('close');
       mainWindow?.close();
     });
@@ -251,5 +252,10 @@ app.on('ready', async () => {
       tags: [],
     } as Selector);
     ipcMain.emit(GET_UNIQUE_TAGS);
+    ipcMain.emit(LISTENER_STATUS, {}, {
+      all: true,
+      ids: [],
+      tags: [],
+    } as Selector);
   });
 });

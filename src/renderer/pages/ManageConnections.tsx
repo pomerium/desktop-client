@@ -16,7 +16,11 @@ import { Theme } from '../../shared/theme';
 import TagFolderRow from '../components/TagFolderRow';
 import ConnectionRow from '../components/ConnectionRow';
 import VirtualFolderRow from '../components/VirtualFolderRow';
-import { ListenerStatus, Record, Selector } from '../../shared/pb/api';
+import {
+  ListenerStatus,
+  Record as ListenerRecord,
+  Selector,
+} from '../../shared/pb/api';
 import {
   DELETE,
   GET_RECORDS,
@@ -43,18 +47,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 const ManageConnections = (): JSX.Element => {
   const classes = useStyles();
   const [folderNames, setFolderNames] = useState([] as string[]);
-  const [connections, setConnections] = useState([] as Record[]);
-  const [listeners, setListeners] = useState({
-    active: {},
-    errors: {},
-  } as ListenerStatus);
+  const [connections, setConnections] = useState([] as ListenerRecord[]);
+  const [statuses, setStatuses] = useState(
+    {} as { [key: string]: ListenerStatus }
+  );
   const [error, setError] = useState(null as ServiceError | null);
 
-  const getConnectedCount = (conns: Record[]) => {
+  const getConnectedCount = (conns: ListenerRecord[]) => {
     return (
       conns
         .map((rec) => rec.id as string)
-        .filter((id) => Object.keys(listeners.active).includes(id)).length || 0
+        .filter((id) => statuses[id]?.listening).length || 0
     );
   };
 
@@ -75,7 +78,12 @@ const ManageConnections = (): JSX.Element => {
       if (args.err) {
         setError(args.err);
       } else {
-        setListeners(args.res);
+        setStatuses((prevState) => {
+          return {
+            ...prevState,
+            ...args.res.listeners,
+          };
+        });
       }
     });
     ipcRenderer.on(DELETE, (_, args) => {
@@ -145,10 +153,11 @@ const ManageConnections = (): JSX.Element => {
         </Grid>
 
         {error && <Alert severity="error">{error.message}</Alert>}
-        {!!Object.keys(listeners.errors).length &&
-          Object.values(listeners.errors).map((err) => (
+        {Object.values(statuses)
+          .filter((status) => !!status.lastError)
+          .map((status) => (
             <Alert key={'err' + Math.random()} severity="error">
-              {err}
+              {status.lastError}
             </Alert>
           ))}
 
@@ -172,9 +181,9 @@ const ManageConnections = (): JSX.Element => {
                       folderName={folderName}
                       connectionID={record?.id || ''}
                       connectionName={record?.conn?.name || ''}
-                      connected={Object.keys(listeners.active).includes(
-                        record?.id as string
-                      )}
+                      connected={
+                        !!record?.id && statuses[record.id as string]?.listening
+                      }
                     />
                   );
                 })}
@@ -193,9 +202,9 @@ const ManageConnections = (): JSX.Element => {
                   folderName="All Connections"
                   connectionID={record?.id || ''}
                   connectionName={record?.conn?.name || ''}
-                  connected={Object.keys(listeners.active).includes(
-                    record?.id as string
-                  )}
+                  connected={
+                    !!record?.id && statuses[record.id as string]?.listening
+                  }
                 />
               );
             })}
@@ -212,9 +221,9 @@ const ManageConnections = (): JSX.Element => {
                   folderName="Untagged"
                   connectionID={record?.id || ''}
                   connectionName={record?.conn?.name || ''}
-                  connected={Object.keys(listeners.active).includes(
-                    record?.id as string
-                  )}
+                  connected={
+                    !!record?.id && statuses[record.id as string]?.listening
+                  }
                 />
               );
             })}
