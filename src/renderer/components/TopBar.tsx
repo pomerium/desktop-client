@@ -1,22 +1,127 @@
-import { AppBar, Grid, IconButton, Toolbar } from '@material-ui/core';
+/* eslint-disable react/jsx-props-no-spreading */
+import {
+  AppBar,
+  Grid,
+  makeStyles,
+  TextField,
+  Toolbar,
+} from '@material-ui/core';
 
-import React, { FC, PropsWithChildren } from 'react';
+import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import { Search } from 'react-feather';
+import { ipcRenderer } from 'electron';
+import { Autocomplete } from '@material-ui/lab';
 import Logo from '../icons/Logo';
+import { GET_RECORDS, VIEW } from '../../shared/constants';
+import { Record as ListenerRecord, Selector } from '../../shared/pb/api';
+
+const useStyles = makeStyles(() => ({
+  autocomplete: {
+    '& .MuiAutocomplete-popupIndicatorOpen': {
+      transform: 'none',
+    },
+  },
+}));
 
 const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
+  const [connections, setConnections] = useState([] as ListenerRecord[]);
+  const [filtered, setFiltered] = useState([] as ListenerRecord[]);
+  const [filter, setFilter] = useState('');
+
+  const classes = useStyles();
+
+  const handleChange = (_e, conn) => {
+    if (conn?.id) {
+      ipcRenderer.send(VIEW, conn.id);
+    }
+  };
+
+  const fetch = () => {
+    ipcRenderer.once(GET_RECORDS, (_e, args) => {
+      if (!args.err) {
+        setConnections(args.res.records);
+      }
+    });
+
+    ipcRenderer.send(GET_RECORDS, {
+      all: true,
+      ids: [],
+      tags: [],
+    } as Selector);
+  };
+
+  const applyFilter = (conns: ListenerRecord[], filt: string) => {
+    setFiltered(
+      conns.filter((rec) => {
+        const tagString = rec.tags.join(' ');
+        const name = rec?.conn?.name || '';
+        const dest = rec?.conn?.remoteAddr || '';
+        return (
+          tagString.search(filt) > -1 ||
+          name.search(filt) > -1 ||
+          dest.search(filt) > -1
+        );
+      })
+    );
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  useEffect(() => {
+    applyFilter(connections, filter);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(connections)]);
+
+  useEffect(() => {
+    applyFilter(connections, filter);
+  }, [filter]);
+
   return (
     <AppBar position="sticky">
       <Toolbar>
         <Grid container alignItems="center">
-          <Grid item xs={11}>
+          <Grid item xs={9}>
             <Logo />
           </Grid>
-          <Grid item xs={1}>
-            <IconButton>
-              <Search color="white" />
-            </IconButton>
+          <Grid item xs={3}>
+            <Autocomplete
+              id="search"
+              className={classes.autocomplete}
+              options={filtered}
+              getOptionLabel={(option: ListenerRecord) =>
+                option?.conn?.name || ''
+              }
+              getOptionSelected={(
+                option: ListenerRecord,
+                value: ListenerRecord
+              ) => {
+                return option.id === value.id;
+              }}
+              inputValue={filter}
+              clearOnBlur
+              onOpen={fetch}
+              onInputChange={(_e, newInputValue, reason) => {
+                if (reason === 'reset') {
+                  setFilter('');
+                } else {
+                  setFilter(newInputValue);
+                }
+              }}
+              onChange={handleChange}
+              popupIcon={<Search color="white" />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  autoFocus={false}
+                  variant="outlined"
+                  margin="dense"
+                  fullWidth
+                />
+              )}
+            />
           </Grid>
         </Grid>
       </Toolbar>
