@@ -17,6 +17,7 @@ import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
 import * as url from 'url';
 import path from 'path';
+import fs from 'fs';
 import createWindow from './renderer/window';
 import 'regenerator-runtime/runtime';
 import {
@@ -50,7 +51,6 @@ import {
   Record as ListenerRecord,
   Selector,
 } from './shared/pb/api';
-import fs from 'fs';
 
 let mainWindow: BrowserWindow | null;
 
