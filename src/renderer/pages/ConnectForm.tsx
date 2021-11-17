@@ -197,7 +197,13 @@ const ConnectForm: FC<Props> = () => {
           </Grid>
         </Grid>
 
-        {error && <Alert severity="error">{error.details}</Alert>}
+        {error && (
+          <Grid container spacing={2} justifyContent="center">
+            <Grid item>
+              <Alert severity="error">{error.details}</Alert>
+            </Grid>
+          </Grid>
+        )}
 
         <Card>
           <Grid container spacing={2}>

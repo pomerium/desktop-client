@@ -1,4 +1,4 @@
-import child_process from 'child_process';
+import { Selector } from './pb/api';
 
 export const isProd = process.env.NODE_ENV === 'production';
 export const isDev = process.env.NODE_ENV === 'development';
@@ -28,6 +28,11 @@ export interface QueryParams {
   connectionID: string;
 }
 
+export interface ExportFile {
+  selector: Selector;
+  filename: string;
+}
+
 export interface ConnectionData {
   name: string;
   destinationUrl: string;
@@ -37,16 +42,6 @@ export interface ConnectionData {
   disableTLS?: boolean;
   caFilePath?: string;
   caFileText?: string;
-  tags: string[];
-}
-
-export interface MenuConnection {
-  name: string;
-  url: string;
-  port: string;
-  child: child_process.ChildProcessWithoutNullStreams | null;
-  connectionID: string;
-  output: string[];
   tags: string[];
 }
 

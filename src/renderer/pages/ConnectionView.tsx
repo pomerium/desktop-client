@@ -14,13 +14,14 @@ import {
 import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { ChevronDown } from 'react-feather';
-import { ServiceError } from '@grpc/grpc-js';
 import { Alert } from '@material-ui/lab';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
 import {
   DELETE,
   EDIT,
+  EXPORT,
+  ExportFile,
   GET_RECORDS,
   LISTENER_STATUS,
   QueryParams,
@@ -59,7 +60,7 @@ const ConnectionView = (): JSX.Element => {
   const classes = useStyles();
   const [tags, setTags] = useState([] as Record['tags']);
   const [connection, setConnection] = useState({} as Connection);
-  const [error, setError] = useState(null as ServiceError | null);
+  const [error, setError] = useState('');
   const [connected, setConnected] = useState(false);
   const { connectionID }: QueryParams = useParams();
 
@@ -78,9 +79,23 @@ const ConnectionView = (): JSX.Element => {
   useEffect(() => {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        setError(args.err.message);
       } else {
         setConnected(!!args?.res?.listeners[connectionID]?.listening);
+        if (args?.res?.listeners[connectionID]?.lastError) {
+          setError(args?.res?.listeners[connectionID]?.lastError);
+        }
+      }
+    });
+    ipcRenderer.on(EXPORT, (_, args) => {
+      if (args.err) {
+        setError(args.err.message);
+      } else {
+        const blob = new Blob([args.data], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = args.filename.replace(/\s+/g, '_') + '.json';
+        link.click();
       }
     });
     if (connectionID) {
@@ -104,6 +119,7 @@ const ConnectionView = (): JSX.Element => {
     return function cleanup() {
       ipcRenderer.removeAllListeners(GET_RECORDS);
       ipcRenderer.removeAllListeners(LISTENER_STATUS);
+      ipcRenderer.removeAllListeners(EXPORT);
     };
   }, [connectionID]);
 
@@ -134,7 +150,16 @@ const ConnectionView = (): JSX.Element => {
                   size="small"
                   type="button"
                   color="primary"
-                  onClick={() => console.log('export')}
+                  onClick={() =>
+                    ipcRenderer.send(EXPORT, {
+                      filename: connection?.name || 'download',
+                      selector: {
+                        all: false,
+                        ids: [connectionID],
+                        tags: [],
+                      } as Selector,
+                    } as ExportFile)
+                  }
                   endIcon={<Export />}
                 >
                   Export
@@ -178,6 +203,14 @@ const ConnectionView = (): JSX.Element => {
             </Grid>
           </Grid>
         </Grid>
+
+        {error && (
+          <Grid container spacing={2} justifyContent="center">
+            <Grid item>
+              <Alert severity="error">{error}</Alert>
+            </Grid>
+          </Grid>
+        )}
 
         <Card>
           <Grid container spacing={2}>
@@ -268,7 +301,6 @@ const ConnectionView = (): JSX.Element => {
             </Grid>
           </AccordionDetails>
         </Accordion>
-        {error && <Alert severity="error">{error.message}</Alert>}
         <Box minHeight="20px" />
       </Container>
     );

@@ -14,12 +14,13 @@ import {
   CONNECT_ALL,
   DELETE_ALL,
   DISCONNECT_ALL,
-  EXPORT_ALL,
+  EXPORT,
+  ExportFile,
   UPDATE_LISTENERS,
 } from '../../shared/constants';
 import ClosedFolder from '../icons/ClosedFolder';
 import OpenFolder from '../icons/OpenFolder';
-import { ListenerUpdateRequest } from '../../shared/pb/api';
+import { ListenerUpdateRequest, Selector } from '../../shared/pb/api';
 
 type FolderProps = {
   folderName: string;
@@ -58,6 +59,16 @@ const TagFolderRow: React.FC<FolderProps> = ({
           connectionIds,
           connected: action === CONNECT_ALL,
         } as ListenerUpdateRequest);
+        break;
+      case EXPORT:
+        ipcRenderer.send(EXPORT, {
+          filename: folderName,
+          selector: {
+            all: false,
+            ids: [],
+            tags: [folderName],
+          } as Selector,
+        } as ExportFile);
         break;
       default:
         ipcRenderer.send(action, folderName);
@@ -114,10 +125,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
             >
               Disconnect All
             </MenuItem>
-            <MenuItem
-              key={EXPORT_ALL}
-              onClick={() => handleMenuClick(EXPORT_ALL)}
-            >
+            <MenuItem key={EXPORT} onClick={() => handleMenuClick(EXPORT)}>
               Export
             </MenuItem>
             <MenuItem

@@ -18,12 +18,13 @@ import {
   DUPLICATE,
   EDIT,
   EXPORT,
+  ExportFile,
   UPDATE_LISTENERS,
   VIEW,
 } from '../../shared/constants';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
-import { ListenerUpdateRequest } from '../../shared/pb/api';
+import { ListenerUpdateRequest, Selector } from '../../shared/pb/api';
 
 type ConnectionRowProps = {
   folderName: string;
@@ -49,7 +50,20 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
 
   const handleMenuClick = (action: string) => {
     setMenuAnchor(null);
-    ipcRenderer.send(action, connectionID);
+    switch (action) {
+      case EXPORT:
+        ipcRenderer.send(EXPORT, {
+          filename: connectionName,
+          selector: {
+            all: false,
+            ids: [connectionID],
+            tags: [],
+          } as Selector,
+        } as ExportFile);
+        break;
+      default:
+        ipcRenderer.send(action, connectionID);
+    }
   };
 
   const toggleConnected = () => {

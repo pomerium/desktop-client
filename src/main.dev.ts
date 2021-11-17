@@ -25,7 +25,6 @@ import {
   prodDebug,
   ConnectionData,
   DELETE_ALL,
-  EXPORT_ALL,
   DELETE,
   EXPORT,
   DUPLICATE,
@@ -37,16 +36,21 @@ import {
   GET_UNIQUE_TAGS,
   UPDATE_LISTENERS,
   LISTENER_STATUS,
+  IMPORT,
+  ExportFile,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import {
   ConfigClient,
+  ExportRequest,
   GetTagsRequest,
+  ImportRequest,
   ListenerClient,
   ListenerUpdateRequest,
   Record as ListenerRecord,
   Selector,
 } from './shared/pb/api';
+import fs from 'fs';
 
 let mainWindow: BrowserWindow | null;
 
@@ -209,8 +213,40 @@ app.on('ready', async () => {
     ipcMain.on(VIEW_CONNECTION_LIST, () => {
       mainWindow?.webContents.send('redirectTo', `/manage`);
     });
-    ipcMain.on(EXPORT, (_evt, args: ConnectionData) => {
-      console.log(EXPORT + ' ' + args.connectionID + ' action was called.');
+    ipcMain.on(EXPORT, (evt, args: ExportFile) => {
+      configClient.export(
+        {
+          selector: args.selector,
+          removeTags: true,
+          format: 2,
+        } as ExportRequest,
+        (err, res) => {
+          evt?.sender?.send(EXPORT, {
+            err,
+            data: res.data,
+            filename: args.filename,
+          });
+        }
+      );
+    });
+    ipcMain.on(IMPORT, (evt) => {
+      dialog
+        .showOpenDialog({ properties: ['openFile'] })
+        .then((response) => {
+          if (!response.canceled) {
+            const bytes = fs.readFileSync(response.filePaths[0], null);
+            configClient.import(
+              {
+                data: bytes,
+              } as ImportRequest,
+              (err, res) => {
+                evt?.sender?.send(IMPORT, { err, res });
+              }
+            );
+          }
+          return null;
+        })
+        .catch((err) => console.log(err));
     });
     ipcMain.on(DUPLICATE, (_evt, args: ConnectionData) => {
       console.log(DUPLICATE + ' ' + args.connectionID + ' action was called.');
@@ -237,10 +273,6 @@ app.on('ready', async () => {
         menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
-    ipcMain.on(EXPORT_ALL, (_, tag: string) => {
-      console.log(EXPORT_ALL + ' ' + tag + ' action was called.');
-    });
-
     app.on('before-quit', () => {
       mainWindow?.removeAllListeners('close');
       mainWindow?.close();

@@ -23,8 +23,10 @@ import {
 } from '../../shared/pb/api';
 import {
   DELETE,
+  EXPORT,
   GET_RECORDS,
   GET_UNIQUE_TAGS,
+  IMPORT,
   LISTENER_STATUS,
 } from '../../shared/constants';
 
@@ -52,6 +54,7 @@ const ManageConnections = (): JSX.Element => {
     {} as { [key: string]: ListenerStatus }
   );
   const [error, setError] = useState(null as ServiceError | null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const getConnectedCount = (conns: ListenerRecord[]) => {
     return (
@@ -60,6 +63,12 @@ const ManageConnections = (): JSX.Element => {
         .filter((id) => statuses[id]?.listening).length || 0
     );
   };
+
+  useEffect(() => {
+    if (uploadSuccess) {
+      setTimeout(() => setUploadSuccess(false), 1000);
+    }
+  }, [uploadSuccess]);
 
   useEffect(() => {
     ipcRenderer.on(GET_UNIQUE_TAGS, (_, args) => {
@@ -91,6 +100,29 @@ const ManageConnections = (): JSX.Element => {
         setError(args.err);
       }
     });
+    ipcRenderer.on(EXPORT, (_, args) => {
+      if (args.err) {
+        setError(args.err);
+      } else {
+        const blob = new Blob([args.data], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = args.filename.replace(/\s+/g, '_') + '.json';
+        link.click();
+      }
+    });
+    ipcRenderer.on(IMPORT, (_, args) => {
+      if (args.err) {
+        setError(args.err);
+      } else {
+        setUploadSuccess(true);
+        ipcRenderer.send(GET_RECORDS, {
+          all: true,
+          ids: [],
+          tags: [],
+        } as Selector);
+      }
+    });
     ipcRenderer.send(LISTENER_STATUS, {
       all: true,
       ids: [],
@@ -108,6 +140,8 @@ const ManageConnections = (): JSX.Element => {
       ipcRenderer.removeAllListeners(GET_RECORDS);
       ipcRenderer.removeAllListeners(LISTENER_STATUS);
       ipcRenderer.removeAllListeners(DELETE);
+      ipcRenderer.removeAllListeners(EXPORT);
+      ipcRenderer.removeAllListeners(IMPORT);
     };
   }, []);
 
@@ -129,7 +163,7 @@ const ManageConnections = (): JSX.Element => {
                 <Button
                   type="button"
                   color="primary"
-                  onClick={() => alert('todo')}
+                  onClick={() => ipcRenderer.send(IMPORT)}
                   endIcon={<Download />}
                 >
                   Import
@@ -152,13 +186,33 @@ const ManageConnections = (): JSX.Element => {
           </Grid>
         </Grid>
 
-        {error && <Alert severity="error">{error.message}</Alert>}
+        {error && (
+          <Grid container spacing={2} justifyContent="center">
+            <Grid item>
+              <Alert severity="error">{error.message}</Alert>
+            </Grid>
+          </Grid>
+        )}
+        {uploadSuccess && (
+          <Grid container spacing={2} justifyContent="center">
+            <Grid item>
+              <Alert severity="info">Upload Successful!</Alert>
+            </Grid>
+          </Grid>
+        )}
         {Object.values(statuses)
           .filter((status) => !!status.lastError)
           .map((status) => (
-            <Alert key={'err' + Math.random()} severity="error">
-              {status.lastError}
-            </Alert>
+            <Grid
+              key={'err' + Math.random()}
+              container
+              spacing={2}
+              justifyContent="center"
+            >
+              <Grid item>
+                <Alert severity="error">{status.lastError}</Alert>
+              </Grid>
+            </Grid>
           ))}
 
         <Card>
