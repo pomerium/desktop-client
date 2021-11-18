@@ -11,7 +11,7 @@ import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import { Search } from 'react-feather';
 import { ipcRenderer } from 'electron';
-import { Autocomplete } from '@material-ui/lab';
+import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import Logo from '../icons/Logo';
 import { GET_RECORDS, VIEW } from '../../shared/constants';
 import { Record as ListenerRecord, Selector } from '../../shared/pb/api';
@@ -26,7 +26,6 @@ const useStyles = makeStyles(() => ({
 
 const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
   const [connections, setConnections] = useState([] as ListenerRecord[]);
-  const [filtered, setFiltered] = useState([] as ListenerRecord[]);
   const [filter, setFilter] = useState('');
 
   const classes = useStyles();
@@ -51,33 +50,16 @@ const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
     } as Selector);
   };
 
-  const applyFilter = (conns: ListenerRecord[], filt: string) => {
-    setFiltered(
-      conns.filter((rec) => {
-        const tagString = rec.tags.join(' ');
-        const name = rec?.conn?.name || '';
-        const dest = rec?.conn?.remoteAddr || '';
-        return (
-          tagString.search(filt) > -1 ||
-          name.search(filt) > -1 ||
-          dest.search(filt) > -1
-        );
-      })
-    );
-  };
+  const filterOptions = createFilterOptions({
+    stringify: (option: ListenerRecord) =>
+      option.tags.join(' ') +
+      (option?.conn?.name || '') +
+      (option?.conn?.remoteAddr || ''),
+  });
 
   useEffect(() => {
     fetch();
   }, []);
-
-  useEffect(() => {
-    applyFilter(connections, filter);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(connections)]);
-
-  useEffect(() => {
-    applyFilter(connections, filter);
-  }, [filter]);
 
   return (
     <AppBar position="sticky">
@@ -90,7 +72,8 @@ const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
             <Autocomplete
               id="search"
               className={classes.autocomplete}
-              options={filtered}
+              options={connections}
+              filterOptions={filterOptions}
               getOptionLabel={(option: ListenerRecord) =>
                 option?.conn?.name || ''
               }
