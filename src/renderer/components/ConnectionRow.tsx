@@ -19,24 +19,28 @@ import {
   EDIT,
   EXPORT,
   ExportFile,
+  SAVE_RECORD,
   UPDATE_LISTENERS,
   VIEW,
 } from '../../shared/constants';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
-import { ListenerUpdateRequest, Selector } from '../../shared/pb/api';
+import {
+  ListenerUpdateRequest,
+  Selector,
+  Record as ListenerRecord,
+  Connection,
+} from '../../shared/pb/api';
 
 type ConnectionRowProps = {
   folderName: string;
-  connectionName: string;
-  connectionID: string;
+  connection: ListenerRecord;
   connected: boolean;
 };
 
 const ConnectionRow: React.FC<ConnectionRowProps> = ({
   folderName,
-  connectionName,
-  connectionID,
+  connection,
   connected,
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
@@ -53,22 +57,32 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
     switch (action) {
       case EXPORT:
         ipcRenderer.send(EXPORT, {
-          filename: connectionName,
+          filename: connection?.conn?.name || '',
           selector: {
             all: false,
-            ids: [connectionID],
+            ids: [connection?.id || ''],
             tags: [],
           } as Selector,
         } as ExportFile);
         break;
+      case DUPLICATE:
+        // eslint-disable-next-line no-case-declarations
+        const dupe: {
+          conn?: Connection | undefined;
+          id?: string | undefined;
+          tags: string[];
+        } = { ...connection };
+        delete dupe.id;
+        ipcRenderer.send(SAVE_RECORD, dupe);
+        break;
       default:
-        ipcRenderer.send(action, connectionID);
+        ipcRenderer.send(action, connection?.id || '');
     }
   };
 
   const toggleConnected = () => {
     ipcRenderer.send(UPDATE_LISTENERS, {
-      connectionIds: [connectionID],
+      connectionIds: [connection?.id || ''],
       connected: !connected,
     } as ListenerUpdateRequest);
   };
@@ -80,7 +94,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           <IconButton
             key={'menuButton' + folderName}
             aria-label={
-              'toggle connected for ' + folderName + ' ' + connectionID
+              'toggle connected for ' + folderName + ' ' + connection?.id || ''
             }
             component="span"
             onClick={toggleConnected}
@@ -89,10 +103,12 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           </IconButton>
         </Grid>
         <Grid item xs={3}>
-          <Typography variant="h6">{capitalize(connectionName)}</Typography>
+          <Typography variant="h6">
+            {capitalize(connection?.conn?.name || '')}
+          </Typography>
         </Grid>
         <Grid item xs={5}>
-          <Link to={'/view_connection/' + connectionID} />
+          <Link to={'/view_connection/' + connection?.id || ''} />
         </Grid>
         <Grid container item xs={2} justifyContent="flex-end">
           <Typography variant="subtitle2">
@@ -105,13 +121,16 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             aria-haspopup="true"
             onClick={toggleMenu}
             aria-label={
-              'Menu for connection: ' + folderName + '-' + connectionName
+              'Menu for connection: ' +
+                folderName +
+                '-' +
+                connection?.conn?.name || ''
             }
           >
             <MoreVertical />
           </IconButton>
           <Menu
-            id={'connection-menu' + folderName + connectionID}
+            id={'connection-menu' + folderName + connection?.id || ''}
             anchorEl={menuAnchor}
             keepMounted
             open={Boolean(menuAnchor)}

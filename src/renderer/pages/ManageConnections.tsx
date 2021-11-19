@@ -27,6 +27,8 @@ import {
   GET_UNIQUE_TAGS,
   IMPORT,
   LISTENER_STATUS,
+  SAVE_RECORD,
+  VIEW,
 } from '../../shared/constants';
 import Toast from '../components/Toast';
 
@@ -80,6 +82,7 @@ const ManageConnections = (): JSX.Element => {
       if (args.err) {
         setError(args.err);
       } else {
+        setError(null);
         setConnections(args.res.records);
       }
     });
@@ -87,7 +90,14 @@ const ManageConnections = (): JSX.Element => {
       if (args.err) {
         setError(args.err);
       } else {
+        setError(null);
         setStatuses((prevState) => {
+          Object.keys(prevState).forEach((key) => {
+            if (prevState[key].lastError) {
+              // don't want to show stale errors again but need to keep connected status
+              delete prevState[key].lastError;
+            }
+          });
           return {
             ...prevState,
             ...args.res.listeners,
@@ -104,6 +114,7 @@ const ManageConnections = (): JSX.Element => {
       if (args.err) {
         setError(args.err);
       } else {
+        setError(null);
         const blob = new Blob([args.data], { type: 'application/json' });
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
@@ -115,12 +126,20 @@ const ManageConnections = (): JSX.Element => {
       if (args.err) {
         setError(args.err);
       } else {
+        setError(null);
         setUploadSuccess(true);
         ipcRenderer.send(GET_RECORDS, {
           all: true,
           ids: [],
           tags: [],
         } as Selector);
+      }
+    });
+    ipcRenderer.on(SAVE_RECORD, (_, args) => {
+      if (args.err) {
+        setError(args.err);
+      } else {
+        ipcRenderer.send(VIEW, args.res.id);
       }
     });
     ipcRenderer.send(LISTENER_STATUS, {
@@ -142,6 +161,7 @@ const ManageConnections = (): JSX.Element => {
       ipcRenderer.removeAllListeners(DELETE);
       ipcRenderer.removeAllListeners(EXPORT);
       ipcRenderer.removeAllListeners(IMPORT);
+      ipcRenderer.removeAllListeners(SAVE_RECORD);
     };
   }, []);
 
@@ -216,8 +236,7 @@ const ManageConnections = (): JSX.Element => {
                     <ConnectionRow
                       key={'connectionRow' + folderName + record.id}
                       folderName={folderName}
-                      connectionID={record?.id || ''}
-                      connectionName={record?.conn?.name || ''}
+                      connection={record}
                       connected={
                         !!record?.id && statuses[record.id as string]?.listening
                       }
@@ -237,8 +256,7 @@ const ManageConnections = (): JSX.Element => {
                 <ConnectionRow
                   key={'connectionRowAllConnections' + record.id}
                   folderName="All Connections"
-                  connectionID={record?.id || ''}
-                  connectionName={record?.conn?.name || ''}
+                  connection={record}
                   connected={
                     !!record?.id && statuses[record.id as string]?.listening
                   }
@@ -256,8 +274,7 @@ const ManageConnections = (): JSX.Element => {
                 <ConnectionRow
                   key={'connectionRowUntagged' + record.id}
                   folderName="Untagged"
-                  connectionID={record?.id || ''}
-                  connectionName={record?.conn?.name || ''}
+                  connection={record}
                   connected={
                     !!record?.id && statuses[record.id as string]?.listening
                   }
