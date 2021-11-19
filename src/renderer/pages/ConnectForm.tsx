@@ -15,7 +15,7 @@ import {
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CheckCircle, ChevronDown } from 'react-feather';
-import { Alert, Autocomplete } from '@material-ui/lab';
+import { Autocomplete } from '@material-ui/lab';
 import { ipcRenderer } from 'electron';
 import { ServiceError } from '@grpc/grpc-js';
 import {
@@ -30,6 +30,7 @@ import { Theme } from '../../shared/theme';
 import Card from '../components/Card';
 import { formatTag } from '../../shared/validators';
 import { Connection, Record, Selector } from '../../shared/pb/api';
+import Toast from '../components/Toast';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -197,13 +198,7 @@ const ConnectForm: FC<Props> = () => {
           </Grid>
         </Grid>
 
-        {error && (
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item>
-              <Alert severity="error">{error.details}</Alert>
-            </Grid>
-          </Grid>
-        )}
+        {error && <Toast msg={error.details} alertType="error" />}
 
         <Card>
           <Grid container spacing={2}>

@@ -9,7 +9,6 @@ import {
 import { Download, Plus } from 'react-feather';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { Alert } from '@material-ui/lab';
 import { ServiceError } from '@grpc/grpc-js';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
@@ -29,6 +28,7 @@ import {
   IMPORT,
   LISTENER_STATUS,
 } from '../../shared/constants';
+import Toast from '../components/Toast';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -66,7 +66,7 @@ const ManageConnections = (): JSX.Element => {
 
   useEffect(() => {
     if (uploadSuccess) {
-      setTimeout(() => setUploadSuccess(false), 1000);
+      setTimeout(() => setUploadSuccess(false), 1100);
     }
   }, [uploadSuccess]);
 
@@ -186,33 +186,16 @@ const ManageConnections = (): JSX.Element => {
           </Grid>
         </Grid>
 
-        {error && (
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item>
-              <Alert severity="error">{error.message}</Alert>
-            </Grid>
-          </Grid>
-        )}
-        {uploadSuccess && (
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item>
-              <Alert severity="info">Upload Successful!</Alert>
-            </Grid>
-          </Grid>
-        )}
+        {error && <Toast msg={error.message} alertType="error" />}
+        {uploadSuccess && <Toast msg="Upload Successful" alertType="success" />}
         {Object.values(statuses)
           .filter((status) => !!status.lastError)
           .map((status) => (
-            <Grid
-              key={'err' + Math.random()}
-              container
-              spacing={2}
-              justifyContent="center"
-            >
-              <Grid item>
-                <Alert severity="error">{status.lastError}</Alert>
-              </Grid>
-            </Grid>
+            <Toast
+              key={'error' + Math.random()}
+              msg={status.lastError || ''}
+              alertType="error"
+            />
           ))}
 
         <Card>

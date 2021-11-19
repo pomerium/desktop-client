@@ -14,7 +14,6 @@ import {
 import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { ChevronDown } from 'react-feather';
-import { Alert } from '@material-ui/lab';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
 import {
@@ -39,6 +38,7 @@ import {
   Record,
   Selector,
 } from '../../shared/pb/api';
+import Toast from '../components/Toast';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -204,13 +204,7 @@ const ConnectionView = (): JSX.Element => {
           </Grid>
         </Grid>
 
-        {error && (
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item>
-              <Alert severity="error">{error}</Alert>
-            </Grid>
-          </Grid>
-        )}
+        {error && <Toast msg={error} alertType="error" />}
 
         <Card>
           <Grid container spacing={2}>
