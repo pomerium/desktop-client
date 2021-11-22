@@ -173,7 +173,7 @@ export default class MenuBuilder {
   }
 
   buildDefaultTemplate() {
-    const templateDefault = [
+    const templateDefault: MenuItemConstructorOptions[] = [
       {
         label: '&File',
         submenu: [
@@ -183,6 +183,29 @@ export default class MenuBuilder {
             click: () => {
               this.mainWindow.hide();
             },
+          },
+        ],
+      },
+      {
+        label: 'Edit',
+        submenu: [
+          {
+            role: 'undo',
+          },
+          {
+            role: 'redo',
+          },
+          {
+            type: 'separator',
+          },
+          {
+            role: 'cut',
+          },
+          {
+            role: 'copy',
+          },
+          {
+            role: 'paste',
           },
         ],
       },

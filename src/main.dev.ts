@@ -18,6 +18,7 @@ import { menubar } from 'menubar';
 import * as url from 'url';
 import path from 'path';
 import fs from 'fs';
+import contextMenu from 'electron-context-menu';
 import createWindow from './renderer/window';
 import 'regenerator-runtime/runtime';
 import {
@@ -272,6 +273,9 @@ app.on('ready', async () => {
         trayMenuHelper.setStatuses(res.listeners);
         menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
+    });
+    menu.app.on('web-contents-created', () => {
+      contextMenu();
     });
     app.on('before-quit', () => {
       mainWindow?.removeAllListeners('close');
