@@ -10,6 +10,7 @@ export const DISCONNECT_ALL = 'disconnect-all';
 export const DISCONNECT = 'disconnect';
 export const UPDATE_LISTENERS = 'update_listeners';
 export const LISTENER_STATUS = 'listener_status';
+export const LISTENER_LOG = 'listener_log';
 export const CONNECT_ALL = 'connect-all';
 export const CONNECT = 'connect';
 export const SAVE_RECORD = 'save_record';

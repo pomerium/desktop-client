@@ -26,6 +26,7 @@ import {
   QueryParams,
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
+  LISTENER_LOG,
 } from '../../shared/constants';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
@@ -87,6 +88,9 @@ const ConnectionView = (): JSX.Element => {
         }
       }
     });
+    ipcRenderer.on(LISTENER_LOG, (_, args) => {
+      console.log(args.msg);
+    });
     ipcRenderer.on(EXPORT, (_, args) => {
       if (args.err) {
         setError(args.err.message);
@@ -115,11 +119,13 @@ const ConnectionView = (): JSX.Element => {
         ids: [connectionID],
         tags: [],
       } as Selector);
+      ipcRenderer.send(LISTENER_LOG, connectionID);
     }
     return function cleanup() {
       ipcRenderer.removeAllListeners(GET_RECORDS);
       ipcRenderer.removeAllListeners(LISTENER_STATUS);
       ipcRenderer.removeAllListeners(EXPORT);
+      ipcRenderer.removeAllListeners(LISTENER_LOG);
     };
   }, [connectionID]);
 

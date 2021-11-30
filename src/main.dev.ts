@@ -40,6 +40,7 @@ import {
   LISTENER_STATUS,
   IMPORT,
   ExportFile,
+  LISTENER_LOG,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import {
@@ -51,6 +52,7 @@ import {
   ListenerUpdateRequest,
   Record as ListenerRecord,
   Selector,
+  StatusUpdatesRequest,
 } from './shared/pb/api';
 
 let mainWindow: BrowserWindow | null;
@@ -272,6 +274,17 @@ app.on('ready', async () => {
         });
         trayMenuHelper.setStatuses(res.listeners);
         menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+      });
+    });
+    ipcMain.on(LISTENER_LOG, (evt, id: string) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      const stream = listenerClient.statusUpdates({
+        connectionId: id,
+      } as StatusUpdatesRequest);
+      stream.on('data', (response) => {
+        sendTo?.send(LISTENER_LOG, {
+          msg: response.message,
+        });
       });
     });
     menu.app.on('web-contents-created', () => {

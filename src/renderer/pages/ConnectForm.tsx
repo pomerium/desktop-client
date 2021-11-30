@@ -86,15 +86,22 @@ const ConnectForm: FC<Props> = () => {
   const { connectionID }: QueryParams = useParams();
 
   useEffect(() => {
+    ipcRenderer.on(GET_RECORDS, (_, args) => {
+      if (args.err) {
+        setError(args.err);
+      } else if (args.res.records.length === 1) {
+        setTags(args.res.records[0].tags || []);
+        setConnection(args.res.records[0].conn || initialConnData);
+      }
+    });
+    ipcRenderer.once(GET_UNIQUE_TAGS, (_, args) => {
+      if (args.tags && !args.err) {
+        setTagOptions(args.tags);
+      }
+    });
+    ipcRenderer.send(GET_UNIQUE_TAGS);
+
     if (connectionID) {
-      ipcRenderer.on(GET_RECORDS, (_, args) => {
-        if (args.err) {
-          setError(args.err);
-        } else if (args.res.records.length === 1) {
-          setTags(args.res.records[0].tags || []);
-          setConnection(args.res.records[0].conn || initialConnData);
-        }
-      });
       ipcRenderer.send(GET_RECORDS, {
         all: false,
         ids: [connectionID],
@@ -104,24 +111,24 @@ const ConnectForm: FC<Props> = () => {
 
     return function cleanup() {
       ipcRenderer.removeAllListeners(GET_RECORDS);
+      ipcRenderer.removeAllListeners(GET_UNIQUE_TAGS);
     };
-  }, [connectionID]);
+  }, []);
 
   useEffect(() => {
     if (refresh) {
-      setRefresh('');
-      // reset data here for id or intialdata
-    }
-  }, [refresh]);
-
-  useEffect(() => {
-    ipcRenderer.once(GET_UNIQUE_TAGS, (_, args) => {
-      if (args.tags && !args.err) {
-        setTagOptions(args.tags);
+      if (connectionID) {
+        ipcRenderer.send(GET_RECORDS, {
+          all: false,
+          ids: [connectionID],
+          tags: [],
+        } as Selector);
+      } else {
+        setConnection(initialConnData);
       }
-    });
-    ipcRenderer.send(GET_UNIQUE_TAGS);
-  }, []);
+      setRefresh('');
+    }
+  }, [connectionID, refresh]);
 
   const saveName = (value: string): void => {
     setConnection({
@@ -222,7 +229,6 @@ const ConnectForm: FC<Props> = () => {
                 value={connection?.remoteAddr}
                 onChange={(evt): void => saveDestination(evt.target.value)}
                 variant="outlined"
-                autoFocus
                 helperText="The remote address to connect to. The FROM field in a pomerium route."
               />
             </Grid>
