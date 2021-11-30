@@ -15,7 +15,7 @@ const Toast = ({ msg, alertType }: ToastProps) => {
   useEffect(() => {
     setTimeout(() => {
       setOpen(false);
-    }, 2000);
+    }, 6000);
   }, []);
 
   return (
