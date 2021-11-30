@@ -15,20 +15,13 @@ about: Let us know about a bug!
 
 ## What's your environment like?
 
-- Pomerium version (retrieve with `pomerium --version`):
+- Pomerium Desktop version:
 - Server Operating System/Architecture/Cloud:
 
-## What's your config.yaml?
+## Config export
 
-```config.yaml
-# Paste your configs here
-# Be sure to scrub any sensitive values
-```
-
-## What did you see in the logs?
-
-```logs
-# Paste your logs here.
+```connection.json
+# Paste a copy of your exported connection definition
 # Be sure to scrub any sensitive values
 ```
 
