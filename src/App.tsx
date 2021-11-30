@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import React, { FC, PropsWithChildren } from 'react';
+import React, { FC, PropsWithChildren, useEffect } from 'react';
 import {
   useHistory,
   HashRouter,
@@ -29,9 +29,16 @@ const RouteListener: FC = ({
   children,
 }: PropsWithChildren<unknown>): JSX.Element => {
   const history = useHistory();
-  ipcRenderer?.on('redirectTo', (_, arg) => {
-    history.replace(arg);
-  });
+
+  useEffect(() => {
+    ipcRenderer?.on('redirectTo', (_, arg) => {
+      history.replace(arg);
+    });
+    return function cleanup() {
+      ipcRenderer.removeAllListeners('redirectTo');
+    };
+  }, []);
+
   // eslint-disable-next-line react/destructuring-assignment
   return <>{children}</>;
 };
