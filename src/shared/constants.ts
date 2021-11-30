@@ -15,6 +15,7 @@ export const CONNECT_ALL = 'connect-all';
 export const CONNECT = 'connect';
 export const SAVE_RECORD = 'save_record';
 export const GET_RECORDS = 'get_records';
+export const GET_ALL_RECORDS = 'get_all_records';
 export const GET_UNIQUE_TAGS = 'get_tags';
 export const EDIT = 'edit';
 export const VIEW = 'view';

@@ -13,8 +13,8 @@ import { Search } from 'react-feather';
 import { ipcRenderer } from 'electron';
 import { Autocomplete, createFilterOptions } from '@material-ui/lab';
 import Logo from '../icons/Logo';
-import { GET_RECORDS, VIEW } from '../../shared/constants';
-import { Record as ListenerRecord, Selector } from '../../shared/pb/api';
+import { GET_ALL_RECORDS, VIEW } from '../../shared/constants';
+import { Record as ListenerRecord } from '../../shared/pb/api';
 
 const useStyles = makeStyles(() => ({
   autocomplete: {
@@ -37,17 +37,7 @@ const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
   };
 
   const fetch = () => {
-    ipcRenderer.once(GET_RECORDS, (_e, args) => {
-      if (!args.err) {
-        setConnections(args.res.records);
-      }
-    });
-
-    ipcRenderer.send(GET_RECORDS, {
-      all: true,
-      ids: [],
-      tags: [],
-    } as Selector);
+    ipcRenderer.send(GET_ALL_RECORDS);
   };
 
   const filterOptions = createFilterOptions({
@@ -58,7 +48,16 @@ const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
   });
 
   useEffect(() => {
+    ipcRenderer.on(GET_ALL_RECORDS, (_e, args) => {
+      if (!args.err) {
+        setConnections(args.res.records);
+      }
+    });
     fetch();
+
+    return function cleanup() {
+      ipcRenderer.removeAllListeners(GET_ALL_RECORDS);
+    };
   }, []);
 
   return (

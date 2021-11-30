@@ -41,6 +41,7 @@ import {
   IMPORT,
   ExportFile,
   LISTENER_LOG,
+  GET_ALL_RECORDS,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import {
@@ -165,6 +166,24 @@ app.on('ready', async () => {
         }
         menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
+    });
+    ipcMain.on(GET_ALL_RECORDS, (evt) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      configClient.list(
+        {
+          all: true,
+          ids: [],
+          tags: [],
+        } as Selector,
+        (err, res) => {
+          sendTo?.send(GET_ALL_RECORDS, {
+            err,
+            res,
+          });
+          trayMenuHelper.setRecords(res.records);
+          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        }
+      );
     });
     ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
       const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;

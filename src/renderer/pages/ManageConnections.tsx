@@ -23,7 +23,7 @@ import {
 import {
   DELETE,
   EXPORT,
-  GET_RECORDS,
+  GET_ALL_RECORDS,
   GET_UNIQUE_TAGS,
   IMPORT,
   LISTENER_STATUS,
@@ -78,7 +78,7 @@ const ManageConnections = (): JSX.Element => {
         setFolderNames(args.tags);
       }
     });
-    ipcRenderer.on(GET_RECORDS, (_, args) => {
+    ipcRenderer.on(GET_ALL_RECORDS, (_, args) => {
       if (args.err) {
         setError(args.err);
       } else {
@@ -128,11 +128,7 @@ const ManageConnections = (): JSX.Element => {
       } else {
         setError(null);
         setUploadSuccess(true);
-        ipcRenderer.send(GET_RECORDS, {
-          all: true,
-          ids: [],
-          tags: [],
-        } as Selector);
+        ipcRenderer.send(GET_ALL_RECORDS);
       }
     });
     ipcRenderer.on(SAVE_RECORD, (_, args) => {
@@ -148,15 +144,11 @@ const ManageConnections = (): JSX.Element => {
       tags: [],
     } as Selector);
     ipcRenderer.send(GET_UNIQUE_TAGS);
-    ipcRenderer.send(GET_RECORDS, {
-      all: true,
-      ids: [],
-      tags: [],
-    } as Selector);
+    ipcRenderer.send(GET_ALL_RECORDS);
 
     return function cleanup() {
       ipcRenderer.removeAllListeners(GET_UNIQUE_TAGS);
-      ipcRenderer.removeAllListeners(GET_RECORDS);
+      ipcRenderer.removeAllListeners(GET_ALL_RECORDS);
       ipcRenderer.removeAllListeners(LISTENER_STATUS);
       ipcRenderer.removeAllListeners(DELETE);
       ipcRenderer.removeAllListeners(EXPORT);
