@@ -73,7 +73,7 @@ const ConnectionView = (): JSX.Element => {
   };
 
   const deleteAndRedirect = () => {
-    ipcRenderer.send(DELETE, connection);
+    ipcRenderer.send(DELETE, connectionID);
     ipcRenderer.send(VIEW_CONNECTION_LIST);
   };
 

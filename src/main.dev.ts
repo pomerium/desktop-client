@@ -202,11 +202,7 @@ app.on('ready', async () => {
           err,
         });
         if (!err) {
-          ipcMain.emit(GET_RECORDS, {}, {
-            all: true,
-            ids: [],
-            tags: [],
-          } as Selector);
+          ipcMain.emit(GET_ALL_RECORDS);
           ipcMain.emit(GET_UNIQUE_TAGS);
         }
       });
@@ -217,11 +213,7 @@ app.on('ready', async () => {
           err,
         });
         if (!err) {
-          ipcMain.emit(GET_RECORDS, {}, {
-            all: true,
-            ids: [],
-            tags: [],
-          } as Selector);
+          ipcMain.emit(GET_ALL_RECORDS);
           ipcMain.emit(GET_UNIQUE_TAGS);
         }
       });

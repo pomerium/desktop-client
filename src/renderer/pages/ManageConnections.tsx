@@ -23,6 +23,7 @@ import {
 import {
   DELETE,
   EXPORT,
+  ExportFile,
   GET_ALL_RECORDS,
   GET_UNIQUE_TAGS,
   IMPORT,
@@ -182,6 +183,28 @@ const ManageConnections = (): JSX.Element => {
               </Button>
             </Grid>
             <Grid item xs={1} />
+            {connections?.length > 0 && (
+              <Grid item>
+                <Button
+                  type="button"
+                  color="primary"
+                  onClick={() =>
+                    ipcRenderer.send(EXPORT, {
+                      filename: 'connections',
+                      selector: {
+                        all: true,
+                        ids: [],
+                        tags: [],
+                      } as Selector,
+                    } as ExportFile)
+                  }
+                  endIcon={<Download />}
+                >
+                  Export
+                </Button>
+              </Grid>
+            )}
+            {connections?.length > 0 && <Grid item xs={1} />}
             <Grid item>
               <Button
                 type="button"
