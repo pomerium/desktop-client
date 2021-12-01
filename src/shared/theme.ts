@@ -53,6 +53,11 @@ const baseOptions: ThemeOptions = {
         minWidth: 32,
       },
     },
+    MuiButton: {
+      root: {
+        borderRadius: 64,
+      },
+    },
     MuiChip: {
       root: {
         backgroundColor: 'rgba(0,0,0,0.075)',
@@ -85,7 +90,7 @@ const themesOptions: ThemeOptions[] = [
         active: colors.blueGrey[600],
       },
       background: {
-        default: colors.common.white,
+        default: '#E3E3E3',
         dark: '#f7f6fd',
         paper: colors.common.white,
       },
@@ -93,7 +98,8 @@ const themesOptions: ThemeOptions[] = [
         main: '#6E43E8',
       },
       secondary: {
-        main: '#E8436A',
+        main: colors.common.white,
+        contrastText: '#6E43E8',
       },
     },
     shadows: softShadows,
@@ -114,7 +120,7 @@ const themesOptions: ThemeOptions[] = [
         main: '#6e43e8',
       },
       secondary: {
-        main: '#E8436A',
+        main: colors.common.white,
       },
     },
     shadows: strongShadows,

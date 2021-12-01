@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren, useEffect } from 'react';
 import {
   useHistory,
   HashRouter,
@@ -10,23 +10,37 @@ import {
 
 import {
   createStyles,
+  CssBaseline,
   jssPreset,
   makeStyles,
   StylesProvider,
   ThemeProvider,
 } from '@material-ui/core';
 import { create } from 'jss';
-import { createMuiTheme } from './utils/theme';
-import ConnectForm from './pages/ConnectForm';
-import { THEMES } from './utils/constants';
+import { createMuiTheme } from './shared/theme';
+import ConnectForm from './renderer/pages/ConnectForm';
+import { THEMES } from './shared/constants';
+import TopBar from './renderer/components/TopBar';
+import ManageConnections from './renderer/pages/ManageConnections';
+import TopTabs from './renderer/components/TopTabs';
+import ConnectionView from './renderer/pages/ConnectionView';
 
-const RouteListener: FC = (x) => {
+const RouteListener: FC = ({
+  children,
+}: PropsWithChildren<unknown>): JSX.Element => {
   const history = useHistory();
-  ipcRenderer?.on('redirectTo', (_, arg) => {
-    history.replace(arg);
-  });
+
+  useEffect(() => {
+    ipcRenderer?.on('redirectTo', (_, arg) => {
+      history.replace(arg);
+    });
+    return function cleanup() {
+      ipcRenderer.removeAllListeners('redirectTo');
+    };
+  }, []);
+
   // eslint-disable-next-line react/destructuring-assignment
-  return <>{x.children}</>;
+  return <>{children}</>;
 };
 
 const jss = create({ plugins: [...jssPreset().plugins] });
@@ -74,18 +88,27 @@ const App: FC = () => {
   useStyles();
   return (
     <ThemeProvider theme={createMuiTheme(defaultSettings)}>
+      <CssBaseline />
       <StylesProvider jss={jss}>
         <HashRouter>
+          <TopBar>
+            <TopTabs />
+          </TopBar>
           <Switch>
             <RouteListener>
               <Route exact path="/">
-                <Redirect to="/connect" />
+                <Redirect to="/connectForm" />
               </Route>
-              <Route exact path="/connect" component={ConnectForm} />
+              <Route exact path="/connectForm" component={ConnectForm} />
               <Route
-                path="/edit_connect/:channelId/:editingConnected"
+                path="/edit_connect/:connectionID"
                 component={ConnectForm}
               />
+              <Route
+                path="/view_connection/:connectionID"
+                component={ConnectionView}
+              />
+              <Route exact path="/manage" component={ManageConnections} />
             </RouteListener>
           </Switch>
         </HashRouter>

@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import React, { FC, ReactFragment, ReactNode } from 'react';
 import { HelpCircle } from 'react-feather';
-import { Theme } from '../utils/theme';
+import { Theme } from '../../shared/theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {

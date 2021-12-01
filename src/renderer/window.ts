@@ -1,9 +1,9 @@
 import { BrowserWindow } from 'electron';
-import { getAssetPath } from './binaries';
-import MenuBuilder from './windowMenu';
+import { getAssetPath } from '../main/binaries';
+import MenuBuilder from './menu';
 
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
+  const appWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
@@ -13,27 +13,27 @@ const createWindow = () => {
     },
   });
 
-  mainWindow.webContents.on('did-finish-load', () => {
-    if (!mainWindow) {
+  appWindow.webContents.on('did-finish-load', () => {
+    if (!appWindow) {
       throw new Error('"mainWindow" is not defined');
     }
   });
 
-  mainWindow.on('minimize', (event: Event) => {
+  appWindow.on('minimize', (event: Event) => {
     event.preventDefault();
-    mainWindow?.hide();
+    appWindow?.hide();
   });
 
-  mainWindow.on('close', (event) => {
+  appWindow.on('close', (event) => {
     event.preventDefault();
-    mainWindow?.hide();
+    appWindow?.hide();
     return false;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
+  const menuBuilder = new MenuBuilder(appWindow);
   menuBuilder.buildMenu();
 
-  return mainWindow;
+  return appWindow;
 };
 
 export default createWindow;

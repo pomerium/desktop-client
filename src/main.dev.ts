@@ -9,25 +9,52 @@
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
 import 'core-js/stable';
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, globalShortcut, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
+import * as grpc from '@grpc/grpc-js';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
 import * as url from 'url';
 import path from 'path';
-import createWindow from './utils/mainWindow';
+import fs from 'fs';
+import contextMenu from 'electron-context-menu';
+import createWindow from './renderer/window';
 import 'regenerator-runtime/runtime';
 import {
-  DISCONNECT,
   isDev,
   isProd,
   prodDebug,
   ConnectionData,
-  CONNECT,
-} from './utils/constants';
-import Connections from './utils/connections';
-import TrayMenuHelper from './utils/trayMenuHelper';
+  DELETE_ALL,
+  DELETE,
+  EXPORT,
+  DUPLICATE,
+  VIEW,
+  EDIT,
+  VIEW_CONNECTION_LIST,
+  SAVE_RECORD,
+  GET_RECORDS,
+  GET_UNIQUE_TAGS,
+  UPDATE_LISTENERS,
+  LISTENER_STATUS,
+  IMPORT,
+  ExportFile,
+  LISTENER_LOG,
+  GET_ALL_RECORDS,
+} from './shared/constants';
+import Helper from './trayMenu/helper';
+import {
+  ConfigClient,
+  ExportRequest,
+  GetTagsRequest,
+  ImportRequest,
+  ListenerClient,
+  ListenerUpdateRequest,
+  Record as ListenerRecord,
+  Selector,
+  StatusUpdatesRequest,
+} from './shared/pb/api';
 
 let mainWindow: BrowserWindow | null;
 
@@ -47,6 +74,16 @@ if (isProd) {
 if (isDev || prodDebug) {
   require('electron-debug')();
 }
+
+const configClient = new ConfigClient(
+  '127.0.0.1:8800',
+  grpc.ChannelCredentials.createInsecure()
+);
+
+const listenerClient = new ListenerClient(
+  '127.0.0.1:8800',
+  grpc.ChannelCredentials.createInsecure()
+);
 
 process.on('uncaughtException', (err) => {
   const msg = {
@@ -86,8 +123,8 @@ app.on('ready', async () => {
       slashes: true,
     })
   );
-  const connections = new Connections();
-  const trayMenuHelper = new TrayMenuHelper(connections, mainWindow, null);
+
+  const trayMenuHelper = new Helper([], {}, [], mainWindow, null);
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
     preloadWindow: true,
@@ -96,25 +133,189 @@ app.on('ready', async () => {
   });
   trayMenuHelper.setMenu(menu);
   menu.on('ready', async () => {
+    globalShortcut.register('CommandOrControl+M', () => {
+      mainWindow?.webContents.send('redirectTo', '/manage');
+      mainWindow?.show();
+    });
     menu.tray.on('click', () => {
-      menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu(connections));
+      menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu());
     });
-    ipcMain.on(CONNECT, (evt, args: ConnectionData) => {
-      connections.saveConnection(args);
-      connections.createMenuConnectionFromData(args);
-      connections.connect(args.channelID, evt);
-      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    ipcMain.on(SAVE_RECORD, (evt, args: ListenerRecord) => {
+      configClient.upsert(args, (err, res) => {
+        evt?.sender.send(SAVE_RECORD, {
+          err,
+          res,
+        });
+        trayMenuHelper.setRecord(res);
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+      });
     });
-    ipcMain.on(DISCONNECT, (_evt, msg) => {
-      connections.disconnect(msg.channelID);
-      menu.tray.setContextMenu(trayMenuHelper.createContextMenu(connections));
+    ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      configClient.list(selector, (err, res) => {
+        sendTo?.send(GET_RECORDS, {
+          err,
+          res,
+        });
+        if (selector.all) {
+          trayMenuHelper.setRecords(res.records);
+        } else {
+          res.records.forEach((rec) => {
+            trayMenuHelper.setRecord(rec);
+          });
+        }
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+      });
+    });
+    ipcMain.on(GET_ALL_RECORDS, (evt) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      configClient.list(
+        {
+          all: true,
+          ids: [],
+          tags: [],
+        } as Selector,
+        (err, res) => {
+          sendTo?.send(GET_ALL_RECORDS, {
+            err,
+            res,
+          });
+          trayMenuHelper.setRecords(res.records);
+          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        }
+      );
+    });
+    ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      configClient.getTags(GetTagsRequest, (err, res) => {
+        sendTo?.send(GET_UNIQUE_TAGS, {
+          err,
+          tags: res?.tags || [],
+        });
+        trayMenuHelper.setTags(res.tags);
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+      });
+    });
+    ipcMain.on(DELETE, (evt, id: string) => {
+      configClient.delete({ ids: [id], tags: [], all: false }, (err) => {
+        evt?.sender.send(DELETE, {
+          err,
+        });
+        if (!err) {
+          ipcMain.emit(GET_ALL_RECORDS);
+          ipcMain.emit(GET_UNIQUE_TAGS);
+        }
+      });
+    });
+    ipcMain.on(DELETE_ALL, (evt, tag: string) => {
+      configClient.delete({ ids: [], tags: [tag], all: false }, (err) => {
+        evt?.sender.send(DELETE, {
+          err,
+        });
+        if (!err) {
+          ipcMain.emit(GET_ALL_RECORDS);
+          ipcMain.emit(GET_UNIQUE_TAGS);
+        }
+      });
+    });
+    ipcMain.on(EDIT, (_evt, id: string) => {
+      mainWindow?.webContents.send('redirectTo', `/edit_connect/${id}`);
+    });
+    ipcMain.on(VIEW, (_evt, id: string) => {
+      mainWindow?.webContents.send('redirectTo', `/view_connection/${id}`);
+    });
+    ipcMain.on(VIEW_CONNECTION_LIST, () => {
+      mainWindow?.webContents.send('redirectTo', `/manage`);
+    });
+    ipcMain.on(EXPORT, (evt, args: ExportFile) => {
+      configClient.export(
+        {
+          selector: args.selector,
+          removeTags: true,
+          format: 2,
+        } as ExportRequest,
+        (err, res) => {
+          evt?.sender?.send(EXPORT, {
+            err,
+            data: res.data,
+            filename: args.filename,
+          });
+        }
+      );
+    });
+    ipcMain.on(IMPORT, (evt) => {
+      dialog
+        .showOpenDialog({ properties: ['openFile'] })
+        .then((response) => {
+          if (!response.canceled) {
+            const bytes = fs.readFileSync(response.filePaths[0], null);
+            configClient.import(
+              {
+                data: bytes,
+              } as ImportRequest,
+              (err, res) => {
+                evt?.sender?.send(IMPORT, { err, res });
+              }
+            );
+          }
+          return null;
+        })
+        .catch((err) => console.log(err));
+    });
+    ipcMain.on(DUPLICATE, (_evt, args: ConnectionData) => {
+      console.log(DUPLICATE + ' ' + args.connectionID + ' action was called.');
+    });
+    ipcMain.on(UPDATE_LISTENERS, (evt, args: ListenerUpdateRequest) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      listenerClient.update(args, (err, res) => {
+        sendTo?.send(LISTENER_STATUS, {
+          err,
+          res,
+        });
+        trayMenuHelper.setStatuses(res.listeners);
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+      });
+    });
+    ipcMain.on(LISTENER_STATUS, (evt, args: Selector) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      listenerClient.getStatus(args, (err, res) => {
+        sendTo?.send(LISTENER_STATUS, {
+          err,
+          res,
+        });
+        trayMenuHelper.setStatuses(res.listeners);
+        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+      });
+    });
+    ipcMain.on(LISTENER_LOG, (evt, id: string) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      const stream = listenerClient.statusUpdates({
+        connectionId: id,
+      } as StatusUpdatesRequest);
+      stream.on('data', (response) => {
+        sendTo?.send(LISTENER_LOG, {
+          msg: response.message,
+        });
+      });
+    });
+    menu.app.on('web-contents-created', () => {
+      contextMenu();
     });
     app.on('before-quit', () => {
-      Object.values(connections.getMenuConnections()).forEach((conn) => {
-        connections.disconnect(conn.channelID);
-      });
       mainWindow?.removeAllListeners('close');
       mainWindow?.close();
     });
+
+    ipcMain.emit(GET_RECORDS, {}, {
+      all: true,
+      ids: [],
+      tags: [],
+    } as Selector);
+    ipcMain.emit(GET_UNIQUE_TAGS);
+    ipcMain.emit(LISTENER_STATUS, {}, {
+      all: true,
+      ids: [],
+      tags: [],
+    } as Selector);
   });
 });

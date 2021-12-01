@@ -5,7 +5,7 @@ import {
   BrowserWindow,
   MenuItemConstructorOptions,
 } from 'electron';
-import { isDev, prodDebug } from './constants';
+import { isDev, prodDebug } from '../shared/constants';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -68,27 +68,6 @@ export default class MenuBuilder {
         },
         { type: 'separator' },
         {
-          label: 'Edit',
-          submenu: [
-            { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
-            {
-              label: 'Redo',
-              accelerator: 'Shift+CmdOrCtrl+Z',
-              selector: 'redo:',
-            },
-            { type: 'separator' },
-            { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
-            { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
-            { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
-            {
-              label: 'Select All',
-              accelerator: 'CmdOrCtrl+A',
-              selector: 'selectAll:',
-            },
-          ],
-        },
-        { type: 'separator' },
-        {
           label: 'Quit',
           accelerator: 'Command+Q',
           click: () => {
@@ -148,6 +127,28 @@ export default class MenuBuilder {
         { label: 'Bring All to Front', selector: 'arrangeInFront:' },
       ],
     };
+
+    const subMenuEdit: DarwinMenuItemConstructorOptions = {
+      label: 'Edit',
+      submenu: [
+        { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+        {
+          label: 'Redo',
+          accelerator: 'Shift+CmdOrCtrl+Z',
+          selector: 'redo:',
+        },
+        { type: 'separator' },
+        { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+        { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+        { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+        {
+          label: 'Select All',
+          accelerator: 'CmdOrCtrl+A',
+          selector: 'selectAll:',
+        },
+      ],
+    };
+
     const subMenuHelp: MenuItemConstructorOptions = {
       label: 'Help',
       submenu: [
@@ -168,11 +169,11 @@ export default class MenuBuilder {
 
     const subMenuView = isDev || prodDebug ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
   buildDefaultTemplate() {
-    const templateDefault = [
+    const templateDefault: MenuItemConstructorOptions[] = [
       {
         label: '&File',
         submenu: [
@@ -182,6 +183,29 @@ export default class MenuBuilder {
             click: () => {
               this.mainWindow.hide();
             },
+          },
+        ],
+      },
+      {
+        label: 'Edit',
+        submenu: [
+          {
+            role: 'undo',
+          },
+          {
+            role: 'redo',
+          },
+          {
+            type: 'separator',
+          },
+          {
+            role: 'cut',
+          },
+          {
+            role: 'copy',
+          },
+          {
+            role: 'paste',
           },
         ],
       },
