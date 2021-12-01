@@ -42,6 +42,9 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_KEY_ISSUER: ${{ secrets.APPLE_ID_KEY_ISSUER }}
         run: |
-          yarn release -ml --arm64 --x64
+          yarn release -m --arm64
+          yarn release -m --x64
+          yarn release -l --arm64
+          yarn release -l --x64
           yarn release -w
 
