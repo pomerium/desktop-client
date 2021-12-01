@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { version } from '../../package.json';
+import { cliVersion, gitHash } from '../../meta.json';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -37,7 +37,7 @@ const TopTabs = (): JSX.Element => {
           </Grid>
           <Grid item xs={2}>
             <Typography align="center" variant="subtitle2">
-              Version: {version}
+              Version: {cliVersion + ' ' + gitHash}
             </Typography>
           </Grid>
         </Grid>
