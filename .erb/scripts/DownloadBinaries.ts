@@ -7,7 +7,7 @@ const { createGunzip } = require('gunzip-stream');
 const tar = require('tar-stream');
 const unzip = require('unzip-stream');
 
-const pomeriumVersion = 'v0.15.3';
+const { pomeriumCli } = require('../../package.json');
 const pomeriumBuilds: { [char: string]: string[] } = {
   linux: ['amd64', 'arm64'],
   windows: ['amd64'],
@@ -53,7 +53,7 @@ const fetchURL = async (platform: string, arch: string) => {
     'bin',
     saveDetails.binary
   );
-  const url = `https://github.com/pomerium/pomerium/releases/download/${pomeriumVersion}/pomerium-cli-${platform}-${arch}.${saveDetails.format}`;
+  const url = `https://github.com/pomerium/cli/releases/download/${pomeriumCli.version}/pomerium-cli-${platform}-${arch}.${saveDetails.format}`;
 
   console.log(`downloading '${url}' => '${savePath}'`);
 
