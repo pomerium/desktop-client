@@ -4,7 +4,7 @@ import MenuBuilder from './menu';
 
 const createWindow = () => {
   const appWindow = new BrowserWindow({
-    show: false,
+    show: true,
     width: 1024,
     height: 728,
     icon: getAssetPath('icon.png'),
