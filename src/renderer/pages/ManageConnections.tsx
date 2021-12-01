@@ -53,10 +53,8 @@ const ManageConnections = (): JSX.Element => {
   const classes = useStyles();
   const [folderNames, setFolderNames] = useState([] as string[]);
   const [connections, setConnections] = useState([] as ListenerRecord[]);
-  const [statuses, setStatuses] = useState(
-    {} as { [key: string]: ListenerStatus }
-  );
-  const [error, setError] = useState(null as ServiceError | null);
+  const [statuses, setStatuses] = useState<Record<string, ListenerStatus>>({});
+  const [error, setError] = useState<ServiceError | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const getConnectedCount = (conns: ListenerRecord[]) => {
