@@ -12,6 +12,7 @@ import 'core-js/stable';
 import { app, BrowserWindow, dialog, globalShortcut, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import * as grpc from '@grpc/grpc-js';
+import * as child_process from 'child_process';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
@@ -55,9 +56,10 @@ import {
   Selector,
   StatusUpdatesRequest,
 } from './shared/pb/api';
+import { pomeriumCli } from './main/binaries';
 
 let mainWindow: BrowserWindow | null;
-
+const cliProcess = child_process.spawn(pomeriumCli, ['api']);
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -303,19 +305,8 @@ app.on('ready', async () => {
     });
     app.on('before-quit', () => {
       mainWindow?.removeAllListeners('close');
+      cliProcess.kill();
       mainWindow?.close();
     });
-
-    ipcMain.emit(GET_RECORDS, {}, {
-      all: true,
-      ids: [],
-      tags: [],
-    } as Selector);
-    ipcMain.emit(GET_UNIQUE_TAGS);
-    ipcMain.emit(LISTENER_STATUS, {}, {
-      all: true,
-      ids: [],
-      tags: [],
-    } as Selector);
   });
 });
