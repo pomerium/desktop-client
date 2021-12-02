@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { version } from '../../package.json';
+import { desktopVersion, cliVersion, gitHash } from '../../meta.json';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -25,7 +25,7 @@ const TopTabs = (): JSX.Element => {
     <AppBar position="sticky" color="secondary" className={classes.root}>
       <Toolbar disableGutters>
         <Grid container alignItems="center">
-          <Grid item xs={10}>
+          <Grid item xs={8}>
             <Tabs value="/manage" indicatorColor="primary" textColor="primary">
               <Tab
                 label="MANAGE CONNECTIONS"
@@ -35,10 +35,18 @@ const TopTabs = (): JSX.Element => {
               />
             </Tabs>
           </Grid>
-          <Grid item xs={2}>
-            <Typography align="center" variant="subtitle2">
-              Version: {version}
-            </Typography>
+          <Grid item xs={4}>
+            <Grid container>
+              <Grid item xs={11}>
+                <Typography align="right" variant="subtitle2">
+                  Version: {desktopVersion}-{gitHash}
+                </Typography>
+                <Typography align="right" variant="subtitle2">
+                  CLI Version: {cliVersion}
+                </Typography>
+              </Grid>
+              <Grid item xs={11} />
+            </Grid>
           </Grid>
         </Grid>
       </Toolbar>
