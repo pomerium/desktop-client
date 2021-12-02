@@ -97,7 +97,7 @@ const App: FC = () => {
           <Switch>
             <RouteListener>
               <Route exact path="/">
-                <Redirect to="/connectForm" />
+                <Redirect to="/manage" />
               </Route>
               <Route exact path="/connectForm" component={ConnectForm} />
               <Route
