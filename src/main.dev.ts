@@ -47,6 +47,7 @@ import {
 import Helper from './trayMenu/helper';
 import {
   ConfigClient,
+  ConnectionStatusUpdate,
   ExportRequest,
   GetTagsRequest,
   ImportRequest,
@@ -59,6 +60,7 @@ import {
 import { pomeriumCli } from './main/binaries';
 
 let mainWindow: BrowserWindow | null;
+let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
 const cliProcess = child_process.spawn(pomeriumCli, ['api']);
 class AppUpdater {
   constructor() {
@@ -289,22 +291,27 @@ app.on('ready', async () => {
         menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
-    ipcMain.on(LISTENER_LOG, (evt, id: string) => {
+    ipcMain.on(LISTENER_LOG, (evt, args) => {
       const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
-      const stream = listenerClient.statusUpdates({
-        connectionId: id,
+      updateStream?.cancel();
+      updateStream = listenerClient.statusUpdates({
+        connectionId: args.id as string,
       } as StatusUpdatesRequest);
-      stream.on('data', (response) => {
+      updateStream.on('data', (response) => {
         sendTo?.send(LISTENER_LOG, {
-          msg: response.message,
+          msg: response as ConnectionStatusUpdate,
+          remoteAddr: args.remoteAddr,
         });
       });
+      // empty function otherwise causes fatal error on cancel !!!
+      updateStream.on('error', () => {});
     });
     menu.app.on('web-contents-created', () => {
       contextMenu();
     });
     app.on('before-quit', () => {
       mainWindow?.removeAllListeners('close');
+      updateStream?.cancel();
       cliProcess.kill();
       mainWindow?.close();
     });

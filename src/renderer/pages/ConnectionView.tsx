@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { ChevronDown } from 'react-feather';
+import { AlertTriangle, ChevronDown, Info } from 'react-feather';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
 import {
@@ -35,6 +35,7 @@ import Export from '../icons/Export';
 import Delete from '../icons/Delete';
 import {
   Connection,
+  ConnectionStatusUpdate,
   ListenerUpdateRequest,
   Record,
   Selector,
@@ -55,7 +56,16 @@ const useStyles = makeStyles((theme: Theme) => ({
       display: 'none',
     },
   },
+  logGrid: {
+    borderTop: '1px solid #E3E3E3',
+  },
 }));
+
+type SimplifiedLog = {
+  status: 'info' | 'error';
+  message: string;
+  date: string;
+};
 
 const ConnectionView = (): JSX.Element => {
   const classes = useStyles();
@@ -63,6 +73,7 @@ const ConnectionView = (): JSX.Element => {
   const [connection, setConnection] = useState({} as Connection);
   const [error, setError] = useState('');
   const [connected, setConnected] = useState(false);
+  const [logs, setLogs] = useState([] as SimplifiedLog[]);
   const { connectionID }: QueryParams = useParams();
 
   const toggleConnected = () => {
@@ -77,6 +88,48 @@ const ConnectionView = (): JSX.Element => {
     ipcRenderer.send(VIEW_CONNECTION_LIST);
   };
 
+  const formatLog = (
+    msg: ConnectionStatusUpdate,
+    remoteAddr: string
+  ): SimplifiedLog => {
+    const date = new Date().toISOString();
+    const status = msg.lastError ? 'error' : 'info';
+    let message = '';
+
+    switch (msg.status) {
+      case 1:
+        message = msg.peerAddr + ' opening connection to ' + remoteAddr;
+        break;
+      case 2:
+        message =
+          msg.peerAddr +
+          ' authentication with ' +
+          msg.authUrl +
+          ' required for ' +
+          connection.remoteAddr;
+        break;
+      case 3:
+        message = msg.peerAddr + ' connected to ' + remoteAddr;
+        break;
+      case 4:
+        message = msg.peerAddr + ' disconnected from ' + remoteAddr;
+        break;
+      default:
+        break;
+    }
+
+    if (msg.lastError) {
+      message =
+        msg.peerAddr +
+        'failed to connect to ' +
+        remoteAddr +
+        ':' +
+        msg.lastError;
+    }
+
+    return { message, status, date };
+  };
+
   useEffect(() => {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
       if (args.err) {
@@ -89,7 +142,7 @@ const ConnectionView = (): JSX.Element => {
       }
     });
     ipcRenderer.on(LISTENER_LOG, (_, args) => {
-      console.log(args.msg);
+      setLogs((oldLogs) => [...oldLogs, formatLog(args.msg, args.remoteAddr)]);
     });
     ipcRenderer.on(EXPORT, (_, args) => {
       if (args.err) {
@@ -107,6 +160,10 @@ const ConnectionView = (): JSX.Element => {
         if (args?.res?.records?.length === 1) {
           setTags(args.res.records[0].tags || []);
           setConnection(args.res.records[0].conn);
+          ipcRenderer.send(LISTENER_LOG, {
+            id: connectionID,
+            remoteAddr: args.res.records[0].conn.remoteAddr,
+          });
         }
       });
       ipcRenderer.send(GET_RECORDS, {
@@ -119,7 +176,6 @@ const ConnectionView = (): JSX.Element => {
         ids: [connectionID],
         tags: [],
       } as Selector);
-      ipcRenderer.send(LISTENER_LOG, connectionID);
     }
     return function cleanup() {
       ipcRenderer.removeAllListeners(GET_RECORDS);
@@ -297,7 +353,30 @@ const ConnectionView = (): JSX.Element => {
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>
-              <div> logs </div>
+              {logs.map((log) => (
+                <Grid
+                  item
+                  container
+                  alignItems="center"
+                  key={Math.random()}
+                  className={classes.logGrid}
+                >
+                  <Grid item xs={2}>
+                    {log.status === 'info' && (
+                      <Info style={{ color: 'blue' }} />
+                    )}
+                    {log.status === 'error' && (
+                      <AlertTriangle style={{ color: 'orange' }} />
+                    )}
+                  </Grid>
+                  <Grid item xs={4}>
+                    {log.date}
+                  </Grid>
+                  <Grid item xs={6}>
+                    {log.message}
+                  </Grid>
+                </Grid>
+              ))}
             </Grid>
           </AccordionDetails>
         </Accordion>
