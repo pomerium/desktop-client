@@ -5,10 +5,14 @@ import {
   AccordionSummary,
   Box,
   Button,
+  Checkbox,
   Container,
   Divider,
   Grid,
+  IconButton,
   makeStyles,
+  Menu,
+  MenuItem,
   Typography,
 } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
@@ -41,6 +45,7 @@ import {
   Selector,
 } from '../../shared/pb/api';
 import Toast from '../components/Toast';
+import ExportJSON from '../icons/ExportJSON';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -73,8 +78,19 @@ const ConnectionView = (): JSX.Element => {
   const [connection, setConnection] = useState({} as Connection);
   const [error, setError] = useState('');
   const [connected, setConnected] = useState(false);
+  const [errorFilter, setErrorFilter] = useState(false);
+  const [infoFilter, setInfoFilter] = useState(false);
+  const [filteredLogs, setFilteredLogs] = useState([] as SimplifiedLog[]);
   const [logs, setLogs] = useState([] as SimplifiedLog[]);
+  const [menuAnchor, setMenuAnchor] = React.useState(null);
   const { connectionID }: QueryParams = useParams();
+
+  const toggleMenu = (e) => {
+    setMenuAnchor(e.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
 
   const toggleConnected = () => {
     ipcRenderer.send(UPDATE_LISTENERS, {
@@ -86,6 +102,16 @@ const ConnectionView = (): JSX.Element => {
   const deleteAndRedirect = () => {
     ipcRenderer.send(DELETE, connectionID);
     ipcRenderer.send(VIEW_CONNECTION_LIST);
+  };
+
+  const exportLogs = () => {
+    const blob = new Blob([JSON.stringify(filteredLogs)], {
+      type: 'application/json',
+    });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'logs.json';
+    link.click();
   };
 
   const formatLog = (
@@ -184,6 +210,16 @@ const ConnectionView = (): JSX.Element => {
       ipcRenderer.removeAllListeners(LISTENER_LOG);
     };
   }, [connectionID]);
+
+  useEffect(() => {
+    if ((errorFilter && infoFilter) || (!errorFilter && !infoFilter)) {
+      setFilteredLogs(logs);
+    } else if (errorFilter) {
+      setFilteredLogs(logs.filter((log) => log.status === 'error'));
+    } else {
+      setFilteredLogs(logs.filter((log) => log.status === 'info'));
+    }
+  }, [logs, errorFilter, infoFilter]);
 
   if (Object.keys(connection).length) {
     return (
@@ -349,11 +385,101 @@ const ConnectionView = (): JSX.Element => {
             aria-controls="log-content"
             id="log-header"
           >
-            <Typography variant="h5">Logs</Typography>
+            <Grid container item alignItems="center">
+              <Grid item xs={9}>
+                <Typography variant="h5">Logs</Typography>
+              </Grid>
+              {!!logs?.length && (
+                <Grid item xs={3}>
+                  <Button
+                    size="small"
+                    type="button"
+                    color="primary"
+                    disabled={!filteredLogs?.length}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      exportLogs();
+                    }}
+                  >
+                    Export Logs
+                  </Button>
+                  <IconButton
+                    aria-controls="filter-menu"
+                    aria-haspopup="true"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMenu(e);
+                    }}
+                    aria-label="Menu for filters/export"
+                  >
+                    <ExportJSON />
+                  </IconButton>
+                  <Menu
+                    id="filter-menu"
+                    anchorEl={menuAnchor}
+                    keepMounted
+                    open={Boolean(menuAnchor)}
+                    onClose={handleMenuClose}
+                  >
+                    <MenuItem
+                      key="errorFilter"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setErrorFilter(!errorFilter);
+                      }}
+                    >
+                      <Checkbox
+                        color="primary"
+                        checked={errorFilter}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setErrorFilter(!errorFilter);
+                        }}
+                        value={errorFilter}
+                      />
+                      Error
+                    </MenuItem>
+                    <MenuItem
+                      key="infoFilter"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setInfoFilter(!infoFilter);
+                      }}
+                    >
+                      <Checkbox
+                        color="primary"
+                        checked={infoFilter}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setInfoFilter(!infoFilter);
+                        }}
+                        value={infoFilter}
+                      />
+                      Info
+                    </MenuItem>
+                    <MenuItem key="exportToJSON">
+                      <Button
+                        size="small"
+                        type="button"
+                        color="primary"
+                        variant="contained"
+                        disabled={!filteredLogs?.length}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          exportLogs();
+                        }}
+                      >
+                        Export Logs
+                      </Button>
+                    </MenuItem>
+                  </Menu>
+                </Grid>
+              )}
+            </Grid>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>
-              {logs.map((log) => (
+              {filteredLogs.map((log) => (
                 <Grid
                   item
                   container
@@ -370,10 +496,12 @@ const ConnectionView = (): JSX.Element => {
                     )}
                   </Grid>
                   <Grid item xs={4}>
-                    {log.date}
+                    <Typography>{log.date}</Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    {log.message}
+                    <Typography style={{ wordWrap: 'break-word' }}>
+                      {log.message}
+                    </Typography>
                   </Grid>
                 </Grid>
               ))}
