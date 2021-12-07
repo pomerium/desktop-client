@@ -80,6 +80,7 @@ const ConnectionView = (): JSX.Element => {
   const [connected, setConnected] = useState(false);
   const [errorFilter, setErrorFilter] = useState(false);
   const [infoFilter, setInfoFilter] = useState(false);
+  const [connectionPort, setConnectionPort] = useState('');
   const [filteredLogs, setFilteredLogs] = useState([] as SimplifiedLog[]);
   const [logs, setLogs] = useState([] as SimplifiedLog[]);
   const [menuAnchor, setMenuAnchor] = React.useState(null);
@@ -163,6 +164,8 @@ const ConnectionView = (): JSX.Element => {
         setError(args.err.message);
       } else {
         setConnected(!!args?.res?.listeners[connectionID]?.listening);
+        const listenAddr = args?.res?.listeners[connectionID]?.listenAddr;
+        setConnectionPort(listenAddr || '');
         if (args?.res?.listeners[connectionID]?.lastError) {
           setError(args?.res?.listeners[connectionID]?.lastError);
         }
@@ -327,7 +330,7 @@ const ConnectionView = (): JSX.Element => {
               </Grid>
               <Grid item xs={8}>
                 <Typography variant="subtitle2">
-                  {connection.listenAddr}
+                  {connectionPort || connection.listenAddr}
                 </Typography>
               </Grid>
             </Grid>
