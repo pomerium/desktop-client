@@ -158,6 +158,7 @@ const ConnectionView = (): JSX.Element => {
 
   useEffect(() => {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
+      setError('');
       if (args.err) {
         setError(args.err.message);
       } else {
@@ -171,6 +172,7 @@ const ConnectionView = (): JSX.Element => {
       setLogs((oldLogs) => [...oldLogs, formatLog(args.msg, args.remoteAddr)]);
     });
     ipcRenderer.on(EXPORT, (_, args) => {
+      setError('');
       if (args.err) {
         setError(args.err.message);
       } else {
