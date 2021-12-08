@@ -5,15 +5,19 @@ import {
   AccordionSummary,
   Box,
   Button,
+  Checkbox,
   Container,
   Divider,
   Grid,
+  IconButton,
   makeStyles,
+  Menu,
+  MenuItem,
   Typography,
 } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { ChevronDown } from 'react-feather';
+import { AlertTriangle, ChevronDown, Info } from 'react-feather';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
 import {
@@ -35,11 +39,13 @@ import Export from '../icons/Export';
 import Delete from '../icons/Delete';
 import {
   Connection,
+  ConnectionStatusUpdate,
   ListenerUpdateRequest,
   Record,
   Selector,
 } from '../../shared/pb/api';
 import Toast from '../components/Toast';
+import ExportJSON from '../icons/ExportJSON';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -55,7 +61,16 @@ const useStyles = makeStyles((theme: Theme) => ({
       display: 'none',
     },
   },
+  logGrid: {
+    borderTop: '1px solid #E3E3E3',
+  },
 }));
+
+type SimplifiedLog = {
+  status: 'info' | 'error';
+  message: string;
+  date: string;
+};
 
 const ConnectionView = (): JSX.Element => {
   const classes = useStyles();
@@ -63,7 +78,20 @@ const ConnectionView = (): JSX.Element => {
   const [connection, setConnection] = useState({} as Connection);
   const [error, setError] = useState('');
   const [connected, setConnected] = useState(false);
+  const [errorFilter, setErrorFilter] = useState(false);
+  const [infoFilter, setInfoFilter] = useState(false);
+  const [connectionPort, setConnectionPort] = useState('');
+  const [filteredLogs, setFilteredLogs] = useState([] as SimplifiedLog[]);
+  const [logs, setLogs] = useState([] as SimplifiedLog[]);
+  const [menuAnchor, setMenuAnchor] = React.useState(null);
   const { connectionID }: QueryParams = useParams();
+
+  const toggleMenu = (e) => {
+    setMenuAnchor(e.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
 
   const toggleConnected = () => {
     ipcRenderer.send(UPDATE_LISTENERS, {
@@ -77,21 +105,77 @@ const ConnectionView = (): JSX.Element => {
     ipcRenderer.send(VIEW_CONNECTION_LIST);
   };
 
+  const exportLogs = () => {
+    const blob = new Blob([JSON.stringify(filteredLogs)], {
+      type: 'application/json',
+    });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'logs.json';
+    link.click();
+  };
+
+  const formatLog = (
+    msg: ConnectionStatusUpdate,
+    remoteAddr: string
+  ): SimplifiedLog => {
+    const date = new Date().toISOString();
+    const status = msg.lastError ? 'error' : 'info';
+    let message = '';
+
+    switch (msg.status) {
+      case 1:
+        message = msg.peerAddr + ' opening connection to ' + remoteAddr;
+        break;
+      case 2:
+        message =
+          msg.peerAddr +
+          ' authentication with ' +
+          msg.authUrl +
+          ' required for ' +
+          remoteAddr;
+        break;
+      case 3:
+        message = msg.peerAddr + ' connected to ' + remoteAddr;
+        break;
+      case 4:
+        message = msg.peerAddr + ' disconnected from ' + remoteAddr;
+        break;
+      default:
+        break;
+    }
+
+    if (msg.lastError) {
+      message =
+        msg.peerAddr +
+        'failed to connect to ' +
+        remoteAddr +
+        ':' +
+        msg.lastError;
+    }
+
+    return { message, status, date };
+  };
+
   useEffect(() => {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
+      setError('');
       if (args.err) {
         setError(args.err.message);
       } else {
         setConnected(!!args?.res?.listeners[connectionID]?.listening);
+        const listenAddr = args?.res?.listeners[connectionID]?.listenAddr;
+        setConnectionPort(listenAddr || '');
         if (args?.res?.listeners[connectionID]?.lastError) {
           setError(args?.res?.listeners[connectionID]?.lastError);
         }
       }
     });
     ipcRenderer.on(LISTENER_LOG, (_, args) => {
-      console.log(args.msg);
+      setLogs((oldLogs) => [...oldLogs, formatLog(args.msg, args.remoteAddr)]);
     });
     ipcRenderer.on(EXPORT, (_, args) => {
+      setError('');
       if (args.err) {
         setError(args.err.message);
       } else {
@@ -107,6 +191,10 @@ const ConnectionView = (): JSX.Element => {
         if (args?.res?.records?.length === 1) {
           setTags(args.res.records[0].tags || []);
           setConnection(args.res.records[0].conn);
+          ipcRenderer.send(LISTENER_LOG, {
+            id: connectionID,
+            remoteAddr: args.res.records[0].conn.remoteAddr,
+          });
         }
       });
       ipcRenderer.send(GET_RECORDS, {
@@ -119,7 +207,6 @@ const ConnectionView = (): JSX.Element => {
         ids: [connectionID],
         tags: [],
       } as Selector);
-      ipcRenderer.send(LISTENER_LOG, connectionID);
     }
     return function cleanup() {
       ipcRenderer.removeAllListeners(GET_RECORDS);
@@ -128,6 +215,16 @@ const ConnectionView = (): JSX.Element => {
       ipcRenderer.removeAllListeners(LISTENER_LOG);
     };
   }, [connectionID]);
+
+  useEffect(() => {
+    if ((errorFilter && infoFilter) || (!errorFilter && !infoFilter)) {
+      setFilteredLogs(logs);
+    } else if (errorFilter) {
+      setFilteredLogs(logs.filter((log) => log.status === 'error'));
+    } else {
+      setFilteredLogs(logs.filter((log) => log.status === 'info'));
+    }
+  }, [logs, errorFilter, infoFilter]);
 
   if (Object.keys(connection).length) {
     return (
@@ -233,7 +330,7 @@ const ConnectionView = (): JSX.Element => {
               </Grid>
               <Grid item xs={8}>
                 <Typography variant="subtitle2">
-                  {connection.listenAddr}
+                  {connectionPort || connection.listenAddr}
                 </Typography>
               </Grid>
             </Grid>
@@ -293,11 +390,126 @@ const ConnectionView = (): JSX.Element => {
             aria-controls="log-content"
             id="log-header"
           >
-            <Typography variant="h5">Logs</Typography>
+            <Grid container item alignItems="center">
+              <Grid item xs={9}>
+                <Typography variant="h5">Logs</Typography>
+              </Grid>
+              {!!logs?.length && (
+                <Grid item xs={3}>
+                  <Button
+                    size="small"
+                    type="button"
+                    color="primary"
+                    disabled={!filteredLogs?.length}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      exportLogs();
+                    }}
+                  >
+                    Export Logs
+                  </Button>
+                  <IconButton
+                    aria-controls="filter-menu"
+                    aria-haspopup="true"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMenu(e);
+                    }}
+                    aria-label="Menu for filters/export"
+                  >
+                    <ExportJSON />
+                  </IconButton>
+                  <Menu
+                    id="filter-menu"
+                    anchorEl={menuAnchor}
+                    keepMounted
+                    open={Boolean(menuAnchor)}
+                    onClose={handleMenuClose}
+                  >
+                    <MenuItem
+                      key="errorFilter"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setErrorFilter(!errorFilter);
+                      }}
+                    >
+                      <Checkbox
+                        color="primary"
+                        checked={errorFilter}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setErrorFilter(!errorFilter);
+                        }}
+                        value={errorFilter}
+                      />
+                      Error
+                    </MenuItem>
+                    <MenuItem
+                      key="infoFilter"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setInfoFilter(!infoFilter);
+                      }}
+                    >
+                      <Checkbox
+                        color="primary"
+                        checked={infoFilter}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setInfoFilter(!infoFilter);
+                        }}
+                        value={infoFilter}
+                      />
+                      Info
+                    </MenuItem>
+                    <MenuItem key="exportToJSON">
+                      <Button
+                        size="small"
+                        type="button"
+                        color="primary"
+                        variant="contained"
+                        disabled={!filteredLogs?.length}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          exportLogs();
+                        }}
+                      >
+                        Export Logs
+                      </Button>
+                    </MenuItem>
+                  </Menu>
+                </Grid>
+              )}
+            </Grid>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>
-              <div> logs </div>
+              {filteredLogs.map((log) => (
+                <Grid
+                  item
+                  container
+                  alignItems="center"
+                  key={Math.random()}
+                  className={classes.logGrid}
+                >
+                  <Grid item xs={2}>
+                    {log.status === 'info' && (
+                      <Info style={{ color: 'blue' }} />
+                    )}
+                    {log.status === 'error' && (
+                      <AlertTriangle style={{ color: 'orange' }} />
+                    )}
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography>{log.date}</Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography style={{ wordWrap: 'break-word' }}>
+                      {log.message}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              ))}
             </Grid>
           </AccordionDetails>
         </Accordion>

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Box, Collapse, IconButton } from '@material-ui/core';
 import { Alert, Color } from '@material-ui/lab';
 import { X } from 'react-feather';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type ToastProps = {
   msg: string;
@@ -10,12 +10,21 @@ type ToastProps = {
 };
 
 const Toast = ({ msg, alertType }: ToastProps) => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
+  const mounted = useRef(false);
 
   useEffect(() => {
+    mounted.current = true;
+
     setTimeout(() => {
-      setOpen(false);
+      if (mounted.current) {
+        setOpen(false);
+      }
     }, 6000);
+
+    return () => {
+      mounted.current = false;
+    };
   }, []);
 
   return (
