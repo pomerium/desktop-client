@@ -253,6 +253,7 @@ const ManageConnections = (): JSX.Element => {
                     connected={
                       !!record?.id && statuses[record.id as string]?.listening
                     }
+                    port={statuses[record.id as string]?.listenAddr || ''}
                   />
                 );
               })}
@@ -273,6 +274,7 @@ const ManageConnections = (): JSX.Element => {
                 connected={
                   !!record?.id && statuses[record.id as string]?.listening
                 }
+                port={statuses[record.id as string]?.listenAddr || ''}
               />
             );
           })}
@@ -291,6 +293,7 @@ const ManageConnections = (): JSX.Element => {
                 connected={
                   !!record?.id && statuses[record.id as string]?.listening
                 }
+                port={statuses[record.id as string]?.listenAddr || ''}
               />
             );
           })}
