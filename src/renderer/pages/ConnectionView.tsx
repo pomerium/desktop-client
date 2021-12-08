@@ -133,7 +133,7 @@ const ConnectionView = (): JSX.Element => {
           ' authentication with ' +
           msg.authUrl +
           ' required for ' +
-          connection.remoteAddr;
+          remoteAddr;
         break;
       case 3:
         message = msg.peerAddr + ' connected to ' + remoteAddr;
