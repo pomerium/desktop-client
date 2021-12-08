@@ -15,9 +15,11 @@ import {
   ServiceError,
 } from '@grpc/grpc-js';
 import _m0 from 'protobufjs/minimal';
+import { Timestamp } from './google/protobuf/timestamp';
 
 export const protobufPackage = 'pomerium.cli';
 
+/** Record represents a single tunnel record in the configuration */
 export interface Record {
   /** if omitted, a new record would be created */
   id?: string | undefined;
@@ -156,12 +158,14 @@ export interface ConnectionStatusUpdate {
    * peer_addr represents connecting party remote address and may be used to
    * distinguish between individual TCP connections
    */
-  peerAddr: string;
+  peerAddr?: string | undefined;
   status: ConnectionStatusUpdate_ConnectionStatus;
   /** in case the connection failed or terminated, last error may be available */
   lastError?: string | undefined;
   /** provides an authentication URL when AUTH_REQUIRED status is set */
   authUrl?: string | undefined;
+  /** event timestamp */
+  ts: Date | undefined;
 }
 
 export enum ConnectionStatusUpdate_ConnectionStatus {
@@ -170,6 +174,10 @@ export enum ConnectionStatusUpdate_ConnectionStatus {
   CONNECTION_STATUS_AUTH_REQUIRED = 2,
   CONNECTION_STATUS_CONNECTED = 3,
   CONNECTION_STATUS_DISCONNECTED = 4,
+  /** CONNECTION_STATUS_LISTENING - listener is up; peer_addr would not be set */
+  CONNECTION_STATUS_LISTENING = 5,
+  /** CONNECTION_STATUS_CLOSED - listener is closed; peer_addr would not be set */
+  CONNECTION_STATUS_CLOSED = 6,
   UNRECOGNIZED = -1,
 }
 
@@ -192,6 +200,12 @@ export function connectionStatusUpdate_ConnectionStatusFromJSON(
     case 4:
     case 'CONNECTION_STATUS_DISCONNECTED':
       return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED;
+    case 5:
+    case 'CONNECTION_STATUS_LISTENING':
+      return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_LISTENING;
+    case 6:
+    case 'CONNECTION_STATUS_CLOSED':
+      return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CLOSED;
     case -1:
     case 'UNRECOGNIZED':
     default:
@@ -213,6 +227,10 @@ export function connectionStatusUpdate_ConnectionStatusToJSON(
       return 'CONNECTION_STATUS_CONNECTED';
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED:
       return 'CONNECTION_STATUS_DISCONNECTED';
+    case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_LISTENING:
+      return 'CONNECTION_STATUS_LISTENING';
+    case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CLOSED:
+      return 'CONNECTION_STATUS_CLOSED';
     default:
       return 'UNKNOWN';
   }
@@ -1295,7 +1313,7 @@ export const StatusUpdatesRequest = {
   },
 };
 
-const baseConnectionStatusUpdate: object = { id: '', peerAddr: '', status: 0 };
+const baseConnectionStatusUpdate: object = { id: '', status: 0 };
 
 export const ConnectionStatusUpdate = {
   encode(
@@ -1305,7 +1323,7 @@ export const ConnectionStatusUpdate = {
     if (message.id !== '') {
       writer.uint32(10).string(message.id);
     }
-    if (message.peerAddr !== '') {
+    if (message.peerAddr !== undefined) {
       writer.uint32(18).string(message.peerAddr);
     }
     if (message.status !== 0) {
@@ -1316,6 +1334,12 @@ export const ConnectionStatusUpdate = {
     }
     if (message.authUrl !== undefined) {
       writer.uint32(42).string(message.authUrl);
+    }
+    if (message.ts !== undefined) {
+      Timestamp.encode(
+        toTimestamp(message.ts),
+        writer.uint32(50).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -1345,6 +1369,9 @@ export const ConnectionStatusUpdate = {
         case 5:
           message.authUrl = reader.string();
           break;
+        case 6:
+          message.ts = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1363,7 +1390,7 @@ export const ConnectionStatusUpdate = {
     if (object.peerAddr !== undefined && object.peerAddr !== null) {
       message.peerAddr = String(object.peerAddr);
     } else {
-      message.peerAddr = '';
+      message.peerAddr = undefined;
     }
     if (object.status !== undefined && object.status !== null) {
       message.status = connectionStatusUpdate_ConnectionStatusFromJSON(
@@ -1382,6 +1409,11 @@ export const ConnectionStatusUpdate = {
     } else {
       message.authUrl = undefined;
     }
+    if (object.ts !== undefined && object.ts !== null) {
+      message.ts = fromJsonTimestamp(object.ts);
+    } else {
+      message.ts = undefined;
+    }
     return message;
   },
 
@@ -1395,6 +1427,7 @@ export const ConnectionStatusUpdate = {
       ));
     message.lastError !== undefined && (obj.lastError = message.lastError);
     message.authUrl !== undefined && (obj.authUrl = message.authUrl);
+    message.ts !== undefined && (obj.ts = message.ts.toISOString());
     return obj;
   },
 
@@ -1403,10 +1436,11 @@ export const ConnectionStatusUpdate = {
   ): ConnectionStatusUpdate {
     const message = { ...baseConnectionStatusUpdate } as ConnectionStatusUpdate;
     message.id = object.id ?? '';
-    message.peerAddr = object.peerAddr ?? '';
+    message.peerAddr = object.peerAddr ?? undefined;
     message.status = object.status ?? 0;
     message.lastError = object.lastError ?? undefined;
     message.authUrl = object.authUrl ?? undefined;
+    message.ts = object.ts ?? undefined;
     return message;
   },
 };
@@ -1537,7 +1571,9 @@ export const Connection = {
   },
 };
 
+/** Config represents desktop client configuration */
 export const ConfigService = {
+  /** List returns records that match Selector */
   list: {
     path: '/pomerium.cli.Config/List',
     requestStream: false,
@@ -1549,6 +1585,7 @@ export const ConfigService = {
       Buffer.from(Records.encode(value).finish()),
     responseDeserialize: (value: Buffer) => Records.decode(value),
   },
+  /** Delete deletes records that match Selector */
   delete: {
     path: '/pomerium.cli.Config/Delete',
     requestStream: false,
@@ -1560,6 +1597,10 @@ export const ConfigService = {
       Buffer.from(DeleteRecordsResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => DeleteRecordsResponse.decode(value),
   },
+  /**
+   * Upsert inserts (if no ID is provided) or updates records
+   * you may omit the Connection data to just manipulate tags
+   */
   upsert: {
     path: '/pomerium.cli.Config/Upsert',
     requestStream: false,
@@ -1571,6 +1612,7 @@ export const ConfigService = {
       Buffer.from(Record.encode(value).finish()),
     responseDeserialize: (value: Buffer) => Record.decode(value),
   },
+  /** GetTags returns all tags. Note that tags are case sensitive */
   getTags: {
     path: '/pomerium.cli.Config/GetTags',
     requestStream: false,
@@ -1582,6 +1624,7 @@ export const ConfigService = {
       Buffer.from(GetTagsResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => GetTagsResponse.decode(value),
   },
+  /** Export dumps config into serialized format */
   export: {
     path: '/pomerium.cli.Config/Export',
     requestStream: false,
@@ -1593,6 +1636,7 @@ export const ConfigService = {
       Buffer.from(ConfigData.encode(value).finish()),
     responseDeserialize: (value: Buffer) => ConfigData.decode(value),
   },
+  /** Import imports previously serialized records */
   import: {
     path: '/pomerium.cli.Config/Import',
     requestStream: false,
@@ -1607,15 +1651,25 @@ export const ConfigService = {
 } as const;
 
 export interface ConfigServer extends UntypedServiceImplementation {
+  /** List returns records that match Selector */
   list: handleUnaryCall<Selector, Records>;
+  /** Delete deletes records that match Selector */
   delete: handleUnaryCall<Selector, DeleteRecordsResponse>;
+  /**
+   * Upsert inserts (if no ID is provided) or updates records
+   * you may omit the Connection data to just manipulate tags
+   */
   upsert: handleUnaryCall<Record, Record>;
+  /** GetTags returns all tags. Note that tags are case sensitive */
   getTags: handleUnaryCall<GetTagsRequest, GetTagsResponse>;
+  /** Export dumps config into serialized format */
   export: handleUnaryCall<ExportRequest, ConfigData>;
+  /** Import imports previously serialized records */
   import: handleUnaryCall<ImportRequest, ImportResponse>;
 }
 
 export interface ConfigClient extends Client {
+  /** List returns records that match Selector */
   list(
     request: Selector,
     callback: (error: ServiceError | null, response: Records) => void
@@ -1631,6 +1685,7 @@ export interface ConfigClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: Records) => void
   ): ClientUnaryCall;
+  /** Delete deletes records that match Selector */
   delete(
     request: Selector,
     callback: (
@@ -1655,6 +1710,10 @@ export interface ConfigClient extends Client {
       response: DeleteRecordsResponse
     ) => void
   ): ClientUnaryCall;
+  /**
+   * Upsert inserts (if no ID is provided) or updates records
+   * you may omit the Connection data to just manipulate tags
+   */
   upsert(
     request: Record,
     callback: (error: ServiceError | null, response: Record) => void
@@ -1670,6 +1729,7 @@ export interface ConfigClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: Record) => void
   ): ClientUnaryCall;
+  /** GetTags returns all tags. Note that tags are case sensitive */
   getTags(
     request: GetTagsRequest,
     callback: (error: ServiceError | null, response: GetTagsResponse) => void
@@ -1685,6 +1745,7 @@ export interface ConfigClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: GetTagsResponse) => void
   ): ClientUnaryCall;
+  /** Export dumps config into serialized format */
   export(
     request: ExportRequest,
     callback: (error: ServiceError | null, response: ConfigData) => void
@@ -1700,6 +1761,7 @@ export interface ConfigClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: ConfigData) => void
   ): ClientUnaryCall;
+  /** Import imports previously serialized records */
   import(
     request: ImportRequest,
     callback: (error: ServiceError | null, response: ImportResponse) => void
@@ -1920,6 +1982,28 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function toTimestamp(date: Date): Timestamp {
+  const seconds = date.getTime() / 1_000;
+  const nanos = (date.getTime() % 1_000) * 1_000_000;
+  return { seconds, nanos };
+}
+
+function fromTimestamp(t: Timestamp): Date {
+  let millis = t.seconds * 1_000;
+  millis += t.nanos / 1_000_000;
+  return new Date(millis);
+}
+
+function fromJsonTimestamp(o: any): Date {
+  if (o instanceof Date) {
+    return o;
+  } else if (typeof o === 'string') {
+    return new Date(o);
+  } else {
+    return fromTimestamp(Timestamp.fromJSON(o));
+  }
+}
 
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any;

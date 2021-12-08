@@ -119,7 +119,7 @@ const ConnectionView = (): JSX.Element => {
     msg: ConnectionStatusUpdate,
     remoteAddr: string
   ): SimplifiedLog => {
-    const date = new Date().toISOString();
+    const date = msg.ts?.toLocaleTimeString() || '';
     const status = msg.lastError ? 'error' : 'info';
     let message = '';
 
@@ -140,6 +140,12 @@ const ConnectionView = (): JSX.Element => {
         break;
       case 4:
         message = msg.peerAddr + ' disconnected from ' + remoteAddr;
+        break;
+      case 5:
+        message = 'Listener opened';
+        break;
+      case 6:
+        message = 'Listener closed connection to ' + remoteAddr;
         break;
       default:
         break;
