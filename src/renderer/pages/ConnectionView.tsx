@@ -153,12 +153,7 @@ const ConnectionView = (): JSX.Element => {
     }
 
     if (msg.lastError) {
-      message =
-        msg.peerAddr +
-        'failed to connect to ' +
-        remoteAddr +
-        ':' +
-        msg.lastError;
+      message += ' : ' + msg.lastError;
     }
 
     return { message, status, date };
