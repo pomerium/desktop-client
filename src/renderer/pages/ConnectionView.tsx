@@ -26,11 +26,11 @@ import {
   EXPORT,
   ExportFile,
   GET_RECORDS,
+  LISTENER_LOG,
   LISTENER_STATUS,
   QueryParams,
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
-  LISTENER_LOG,
 } from '../../shared/constants';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
@@ -40,6 +40,7 @@ import Delete from '../icons/Delete';
 import {
   Connection,
   ConnectionStatusUpdate,
+  ConnectionStatusUpdate_ConnectionStatus,
   ListenerUpdateRequest,
   Record,
   Selector,
@@ -124,10 +125,10 @@ const ConnectionView = (): JSX.Element => {
     let message = '';
 
     switch (msg.status) {
-      case 1:
+      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTING:
         message = msg.peerAddr + ' opening connection to ' + remoteAddr;
         break;
-      case 2:
+      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_AUTH_REQUIRED:
         message =
           msg.peerAddr +
           ' authentication with ' +
@@ -135,16 +136,16 @@ const ConnectionView = (): JSX.Element => {
           ' required for ' +
           remoteAddr;
         break;
-      case 3:
+      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTED:
         message = msg.peerAddr + ' connected to ' + remoteAddr;
         break;
-      case 4:
+      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED:
         message = msg.peerAddr + ' disconnected from ' + remoteAddr;
         break;
-      case 5:
+      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_LISTENING:
         message = 'Listener opened';
         break;
-      case 6:
+      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CLOSED:
         message = 'Listener closed connection to ' + remoteAddr;
         break;
       default:
