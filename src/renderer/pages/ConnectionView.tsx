@@ -153,7 +153,7 @@ const ConnectionView = (): JSX.Element => {
     }
 
     if (msg.lastError) {
-      message += ' : ' + msg.lastError;
+      message += ': ' + msg.lastError;
     }
 
     return { message, status, date };
