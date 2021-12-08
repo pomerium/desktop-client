@@ -9,7 +9,7 @@ import {
   capitalize,
 } from '@material-ui/core';
 import { MoreVertical } from 'react-feather';
-import { ipcRenderer } from 'electron';
+import { clipboard, ipcRenderer } from 'electron';
 import { Link } from 'react-router-dom';
 import {
   CONNECT,
@@ -36,12 +36,14 @@ type ConnectionRowProps = {
   folderName: string;
   connection: ListenerRecord;
   connected: boolean;
+  port: string;
 };
 
 const ConnectionRow: React.FC<ConnectionRowProps> = ({
   folderName,
   connection,
   connected,
+  port,
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
 
@@ -74,6 +76,11 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
         } = { ...connection };
         delete dupe.id;
         ipcRenderer.send(SAVE_RECORD, dupe);
+        break;
+      case 'copy_port':
+        // eslint-disable-next-line no-case-declarations
+        const parsed = port?.match(/\d+(?![^:]*:)/g);
+        clipboard.writeText(parsed?.length ? parsed[0] : '');
         break;
       default:
         ipcRenderer.send(action, connection?.id || '');
@@ -158,6 +165,14 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             >
               Duplicate
             </MenuItem>
+            {connected && (
+              <MenuItem
+                key="copy_port"
+                onClick={() => handleMenuClick('copy_port')}
+              >
+                Copy Port
+              </MenuItem>
+            )}
             <MenuItem key={EXPORT} onClick={() => handleMenuClick(EXPORT)}>
               Export
             </MenuItem>
