@@ -178,7 +178,7 @@ const ConnectionView = (): JSX.Element => {
       }
     });
     ipcRenderer.on(LISTENER_LOG, (_, args) => {
-      setLogs((oldLogs) => [...oldLogs, formatLog(args.msg, args.remoteAddr)]);
+      setLogs((oldLogs) => [formatLog(args.msg, args.remoteAddr), ...oldLogs]);
     });
     ipcRenderer.on(EXPORT, (_, args) => {
       setError('');
