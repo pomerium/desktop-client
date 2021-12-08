@@ -1,13 +1,13 @@
 import axios from 'axios';
 import path from 'path';
-import { createWriteStream } from 'fs';
-import fs from 'fs';
+import fs, { createWriteStream } from 'fs';
 
 const { createGunzip } = require('gunzip-stream');
 const tar = require('tar-stream');
 const unzip = require('unzip-stream');
 
 const { pomeriumCli } = require('../../package.json');
+
 const pomeriumBuilds: { [char: string]: string[] } = {
   linux: ['amd64', 'arm64'],
   windows: ['amd64'],
@@ -16,9 +16,9 @@ const pomeriumBuilds: { [char: string]: string[] } = {
 const baseSavePath = './system_files';
 
 const resolveDetails = (platform: string, arch: string) => {
-  let details = {
-    platform: platform,
-    arch: arch,
+  const details = {
+    platform,
+    arch,
     format: 'tar.gz',
     binary: 'pomerium-cli',
   };
@@ -32,12 +32,16 @@ const resolveDetails = (platform: string, arch: string) => {
     case 'darwin':
       details.platform = 'mac';
       break;
+    default:
+      break;
   }
 
   switch (arch) {
     case 'amd64':
     case 'x86_64':
       details.arch = 'x64';
+      break;
+    default:
       break;
   }
 
@@ -59,7 +63,7 @@ const fetchURL = async (platform: string, arch: string) => {
 
   fs.mkdirSync(path.dirname(savePath), { recursive: true });
 
-  let resp = await axios
+  const resp = await axios
     .get(url, { responseType: 'stream' })
     .then((response: { data: any }) => {
       return response.data;
@@ -69,7 +73,7 @@ const fetchURL = async (platform: string, arch: string) => {
     fs.chmodSync(savePath, '0755');
   });
 
-  if (saveDetails.format == 'tar.gz') {
+  if (saveDetails.format === 'tar.gz') {
     resp.pipe(createGunzip()).pipe(
       tar
         .extract()
@@ -78,22 +82,22 @@ const fetchURL = async (platform: string, arch: string) => {
             next();
           });
 
-          if (header.name == saveDetails.binary) {
+          if (header.name === saveDetails.binary) {
             stream.pipe(writeStream);
           }
           stream.resume();
         })
     );
-  } else if (saveDetails.format == 'zip') {
+  } else if (saveDetails.format === 'zip') {
     resp.pipe(unzip.Parse()).on('entry', (entry: any) => {
-      if (entry.path == saveDetails.binary) {
+      if (entry.path === saveDetails.binary) {
         entry.pipe(writeStream);
       } else {
         entry.autodrain();
       }
     });
   } else {
-    throw 'unknown file format: ' + saveDetails.format;
+    throw new Error('unknown file format: ' + saveDetails.format);
   }
 };
 
