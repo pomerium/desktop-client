@@ -28,7 +28,7 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
         <Grid item xs={1}>
           <IconButton
             key={'menuButton' + folderName}
-            aria-label={'toggle connections for ' + folderName}
+            aria-label={'toggle listeners for ' + folderName}
             component="span"
             onClick={toggleOpen}
           >
@@ -41,7 +41,7 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
         <Grid item xs={5} />
         <Grid container item xs={2} justifyContent="flex-end">
           <Typography variant="subtitle2">
-            {connectedListeners} of {totalListeners} connected
+            {connectedListeners} of {totalListeners} listening
           </Typography>
         </Grid>
         <Grid item xs={1} />

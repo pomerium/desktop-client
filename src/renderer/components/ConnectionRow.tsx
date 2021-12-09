@@ -7,8 +7,9 @@ import {
   MenuItem,
   Menu,
   capitalize,
+  Tooltip,
 } from '@material-ui/core';
-import { MoreVertical } from 'react-feather';
+import { Copy, MoreVertical } from 'react-feather';
 import { clipboard, ipcRenderer } from 'electron';
 import { Link } from 'react-router-dom';
 import {
@@ -78,13 +79,15 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
         ipcRenderer.send(SAVE_RECORD, dupe);
         break;
       case 'copy_port':
-        // eslint-disable-next-line no-case-declarations
-        const parsed = port?.match(/\d+(?![^:]*:)/g);
-        clipboard.writeText(parsed?.length ? parsed[0] : '');
+        clipboard.writeText(port);
         break;
       default:
         ipcRenderer.send(action, connection?.id || '');
     }
+  };
+
+  const copyAddress = () => {
+    clipboard.writeText(port);
   };
 
   const toggleConnected = () => {
@@ -101,7 +104,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           <IconButton
             key={'menuButton' + folderName}
             aria-label={
-              'toggle connected for ' + folderName + ' ' + connection?.id || ''
+              'toggle listeners for ' + folderName + ' ' + connection?.id || ''
             }
             component="span"
             onClick={toggleConnected}
@@ -114,12 +117,19 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             {capitalize(connection?.conn?.name || '')}
           </Typography>
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={4}>
           <Link to={'/view_connection/' + connection?.id || ''} />
         </Grid>
-        <Grid container item xs={2} justifyContent="flex-end">
+        <Grid container item xs={3} justifyContent="flex-end">
           <Typography variant="subtitle2">
-            {connected ? 'Connected' : 'Disconnected'}
+            {connected && (
+              <Tooltip title="Copy to Clipboard">
+                <IconButton onClick={copyAddress}>
+                  <Copy size="20" />
+                </IconButton>
+              </Tooltip>
+            )}
+            {connected ? 'Listening on ' + port : 'Inactive'}
           </Typography>
         </Grid>
         <Grid container item xs={1} justifyContent="center">
@@ -128,7 +138,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             aria-haspopup="true"
             onClick={toggleMenu}
             aria-label={
-              'Menu for connection: ' +
+              'Menu for listener: ' +
                 folderName +
                 '-' +
                 connection?.conn?.name || ''
