@@ -40,7 +40,6 @@ import Delete from '../icons/Delete';
 import {
   Connection,
   ConnectionStatusUpdate,
-  ConnectionStatusUpdate_ConnectionStatus,
   ListenerUpdateRequest,
   Record,
   Selector,
