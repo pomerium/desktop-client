@@ -4,4 +4,3 @@ declare module 'electron-devtools-installer';
 declare module 'validator';
 declare module 'uuid';
 declare module 'lodash';
-declare module '@grpc/grpc-js';
