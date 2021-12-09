@@ -125,10 +125,10 @@ const ConnectionView = (): JSX.Element => {
     let message = '';
 
     switch (msg.status) {
-      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTING:
+      case 1:
         message = msg.peerAddr + ' opening connection to ' + remoteAddr;
         break;
-      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_AUTH_REQUIRED:
+      case 2:
         message =
           msg.peerAddr +
           ' authentication with ' +
@@ -136,16 +136,16 @@ const ConnectionView = (): JSX.Element => {
           ' required for ' +
           remoteAddr;
         break;
-      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTED:
+      case 3:
         message = msg.peerAddr + ' connected to ' + remoteAddr;
         break;
-      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED:
+      case 4:
         message = msg.peerAddr + ' disconnected from ' + remoteAddr;
         break;
-      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_LISTENING:
+      case 5:
         message = 'Listener opened';
         break;
-      case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CLOSED:
+      case 6:
         message = 'Listener closed connection to ' + remoteAddr;
         break;
       default:
