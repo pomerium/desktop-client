@@ -26,11 +26,11 @@ import {
   EXPORT,
   ExportFile,
   GET_RECORDS,
+  LISTENER_LOG,
   LISTENER_STATUS,
   QueryParams,
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
-  LISTENER_LOG,
 } from '../../shared/constants';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
@@ -119,7 +119,7 @@ const ConnectionView = (): JSX.Element => {
     msg: ConnectionStatusUpdate,
     remoteAddr: string
   ): SimplifiedLog => {
-    const date = new Date().toISOString();
+    const date = msg.ts?.toLocaleTimeString() || '';
     const status = msg.lastError ? 'error' : 'info';
     let message = '';
 
@@ -141,17 +141,18 @@ const ConnectionView = (): JSX.Element => {
       case 4:
         message = msg.peerAddr + ' disconnected from ' + remoteAddr;
         break;
+      case 5:
+        message = 'Listener opened';
+        break;
+      case 6:
+        message = 'Listener closed connection to ' + remoteAddr;
+        break;
       default:
         break;
     }
 
     if (msg.lastError) {
-      message =
-        msg.peerAddr +
-        'failed to connect to ' +
-        remoteAddr +
-        ':' +
-        msg.lastError;
+      message += ': ' + msg.lastError;
     }
 
     return { message, status, date };
@@ -172,7 +173,7 @@ const ConnectionView = (): JSX.Element => {
       }
     });
     ipcRenderer.on(LISTENER_LOG, (_, args) => {
-      setLogs((oldLogs) => [...oldLogs, formatLog(args.msg, args.remoteAddr)]);
+      setLogs((oldLogs) => [formatLog(args.msg, args.remoteAddr), ...oldLogs]);
     });
     ipcRenderer.on(EXPORT, (_, args) => {
       setError('');
