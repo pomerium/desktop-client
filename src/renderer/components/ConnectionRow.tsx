@@ -138,10 +138,8 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
                 onClick={copyAddress}
                 className={classes.cursor}
               >
-                {'Listening on ' + port}
-                <IconButton>
-                  <Copy size="15" />
-                </IconButton>
+                {'Listening on ' + port + ' '}
+                <Copy size="15" />
               </Typography>
             </Tooltip>
           )}
