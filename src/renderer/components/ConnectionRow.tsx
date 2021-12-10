@@ -45,6 +45,9 @@ const useStyles = makeStyles(() => ({
   cursor: {
     cursor: 'pointer',
   },
+  spacing: {
+    marginLeft: '5px',
+  },
 }));
 
 const ConnectionRow: React.FC<ConnectionRowProps> = ({
@@ -130,18 +133,28 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
         <Grid item xs={4}>
           <Link to={'/view_connection/' + connection?.id || ''} />
         </Grid>
-        <Grid container item xs={3} justifyContent="flex-end">
+        <Grid
+          container
+          item
+          xs={3}
+          justifyContent="flex-end"
+          alignItems="center"
+        >
           {connected && (
-            <Tooltip title="Copy to Clipboard">
-              <Typography
-                variant="subtitle2"
-                onClick={copyAddress}
-                className={classes.cursor}
-              >
-                {'Listening on ' + port + ' '}
-                <Copy size="15" />
-              </Typography>
-            </Tooltip>
+            <>
+              <Tooltip title="Copy to Clipboard">
+                <Typography
+                  variant="subtitle2"
+                  onClick={copyAddress}
+                  className={classes.cursor}
+                >
+                  {'Listening on ' + port}
+                </Typography>
+              </Tooltip>
+              <Tooltip title="Copy to Clipboard" className={classes.spacing}>
+                <Copy size="14" onClick={copyAddress} />
+              </Tooltip>
+            </>
           )}
           {!connected && <Typography variant="subtitle2">Inactive</Typography>}
         </Grid>
