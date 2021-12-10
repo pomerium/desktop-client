@@ -8,6 +8,7 @@ import {
   Menu,
   capitalize,
   Tooltip,
+  makeStyles,
 } from '@material-ui/core';
 import { Copy, MoreVertical } from 'react-feather';
 import { clipboard, ipcRenderer } from 'electron';
@@ -40,6 +41,12 @@ type ConnectionRowProps = {
   port: string;
 };
 
+const useStyles = makeStyles(() => ({
+  cursor: {
+    cursor: 'pointer',
+  },
+}));
+
 const ConnectionRow: React.FC<ConnectionRowProps> = ({
   folderName,
   connection,
@@ -47,6 +54,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   port,
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
+  const classes = useStyles();
 
   const toggleMenu = (e) => {
     setMenuAnchor(e.currentTarget);
@@ -79,7 +87,9 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
         ipcRenderer.send(SAVE_RECORD, dupe);
         break;
       case 'copy_port':
-        clipboard.writeText(port);
+        // eslint-disable-next-line no-case-declarations
+        const parsed = port?.match(/\d+(?![^:]*:)/g);
+        clipboard.writeText(parsed?.length ? parsed[0] : '');
         break;
       default:
         ipcRenderer.send(action, connection?.id || '');
@@ -121,16 +131,21 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           <Link to={'/view_connection/' + connection?.id || ''} />
         </Grid>
         <Grid container item xs={3} justifyContent="flex-end">
-          <Typography variant="subtitle2">
-            {connected && (
-              <Tooltip title="Copy to Clipboard">
-                <IconButton onClick={copyAddress}>
-                  <Copy size="20" />
+          {connected && (
+            <Tooltip title="Copy to Clipboard">
+              <Typography
+                variant="subtitle2"
+                onClick={copyAddress}
+                className={classes.cursor}
+              >
+                {'Listening on ' + port}
+                <IconButton>
+                  <Copy size="15" />
                 </IconButton>
-              </Tooltip>
-            )}
-            {connected ? 'Listening on ' + port : 'Inactive'}
-          </Typography>
+              </Typography>
+            </Tooltip>
+          )}
+          {!connected && <Typography variant="subtitle2">Inactive</Typography>}
         </Grid>
         <Grid container item xs={1} justifyContent="center">
           <IconButton
