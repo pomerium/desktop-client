@@ -3,6 +3,7 @@ import { Box, Collapse, IconButton } from '@material-ui/core';
 import { Alert, Color } from '@material-ui/lab';
 import { X } from 'react-feather';
 import { useEffect, useRef, useState } from 'react';
+import { TOAST_LENGTH } from '../../shared/constants';
 
 type ToastProps = {
   msg: string;
@@ -20,7 +21,7 @@ const Toast = ({ msg, alertType }: ToastProps) => {
       if (mounted.current) {
         setOpen(false);
       }
-    }, 6000);
+    }, TOAST_LENGTH);
 
     return () => {
       mounted.current = false;
