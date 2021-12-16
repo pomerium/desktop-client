@@ -56,6 +56,7 @@ const ManageConnections = (): JSX.Element => {
   const [statuses, setStatuses] = useState<Record<string, ListenerStatus>>({});
   const [error, setError] = useState<ServiceError | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [addressCopied, setAddressCopied] = useState(false);
 
   const getConnectedCount = (conns: ListenerRecord[]) => {
     return (
@@ -70,6 +71,12 @@ const ManageConnections = (): JSX.Element => {
       setTimeout(() => setUploadSuccess(false), 1100);
     }
   }, [uploadSuccess]);
+
+  useEffect(() => {
+    if (addressCopied) {
+      setTimeout(() => setAddressCopied(false), 1100);
+    }
+  }, [addressCopied]);
 
   useEffect(() => {
     ipcRenderer.on(GET_UNIQUE_TAGS, (_, args) => {
@@ -221,6 +228,7 @@ const ManageConnections = (): JSX.Element => {
 
       {error && <Toast msg={error.message} alertType="error" />}
       {uploadSuccess && <Toast msg="Upload Successful" alertType="success" />}
+      {addressCopied && <Toast msg="Address Copied" alertType="success" />}
       {Object.values(statuses)
         .filter((status) => !!status.lastError)
         .map((status) => (
@@ -254,6 +262,7 @@ const ManageConnections = (): JSX.Element => {
                       !!record?.id && statuses[record.id as string]?.listening
                     }
                     port={statuses[record.id as string]?.listenAddr || ''}
+                    setAddressCopied={setAddressCopied}
                   />
                 );
               })}
@@ -275,6 +284,7 @@ const ManageConnections = (): JSX.Element => {
                   !!record?.id && statuses[record.id as string]?.listening
                 }
                 port={statuses[record.id as string]?.listenAddr || ''}
+                setAddressCopied={setAddressCopied}
               />
             );
           })}
@@ -294,6 +304,7 @@ const ManageConnections = (): JSX.Element => {
                   !!record?.id && statuses[record.id as string]?.listening
                 }
                 port={statuses[record.id as string]?.listenAddr || ''}
+                setAddressCopied={setAddressCopied}
               />
             );
           })}

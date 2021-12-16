@@ -39,11 +39,15 @@ type ConnectionRowProps = {
   connection: ListenerRecord;
   connected: boolean;
   port: string;
+  setAddressCopied: (state: boolean) => void;
 };
 
 const useStyles = makeStyles(() => ({
   cursor: {
     cursor: 'pointer',
+    '&:hover': {
+      color: '#6E43E8',
+    },
   },
   spacing: {
     marginLeft: '5px',
@@ -55,6 +59,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   connection,
   connected,
   port,
+  setAddressCopied,
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const classes = useStyles();
@@ -93,6 +98,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
         // eslint-disable-next-line no-case-declarations
         const parsed = port?.match(/\d+(?![^:]*:)/g);
         clipboard.writeText(parsed?.length ? parsed[0] : '');
+        setAddressCopied(true);
         break;
       default:
         ipcRenderer.send(action, connection?.id || '');
@@ -101,6 +107,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
 
   const copyAddress = () => {
     clipboard.writeText(port);
+    setAddressCopied(true);
   };
 
   const toggleConnected = () => {
@@ -152,7 +159,11 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
                 </Typography>
               </Tooltip>
               <Tooltip title="Copy to Clipboard" className={classes.spacing}>
-                <Copy size="14" onClick={copyAddress} />
+                <Copy
+                  size="14"
+                  onClick={copyAddress}
+                  className={classes.cursor}
+                />
               </Tooltip>
             </>
           )}
