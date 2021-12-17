@@ -94,7 +94,7 @@ const App: FC = () => {
       <StylesProvider jss={jss}>
         <SnackbarProvider
           anchorOrigin={{
-            vertical: 'top',
+            vertical: 'bottom',
             horizontal: 'center',
           }}
           maxSnack={1}
