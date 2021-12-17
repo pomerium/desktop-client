@@ -25,6 +25,7 @@ import TopBar from './renderer/components/TopBar';
 import ManageConnections from './renderer/pages/ManageConnections';
 import TopTabs from './renderer/components/TopTabs';
 import ConnectionView from './renderer/pages/ConnectionView';
+import SnackbarCloseButton from './renderer/components/SnackbarCloseButton';
 
 const RouteListener: FC = ({
   children,
@@ -93,10 +94,13 @@ const App: FC = () => {
       <StylesProvider jss={jss}>
         <SnackbarProvider
           anchorOrigin={{
-            vertical: 'top',
+            vertical: 'bottom',
             horizontal: 'center',
           }}
           maxSnack={1}
+          action={(snackbarKey) => (
+            <SnackbarCloseButton snackbarKey={snackbarKey} />
+          )}
         >
           <HashRouter>
             <TopBar>

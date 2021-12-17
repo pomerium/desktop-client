@@ -4,7 +4,7 @@ export const isProd = process.env.NODE_ENV === 'production';
 export const isDev = process.env.NODE_ENV === 'development';
 export const prodDebug = process.env.DEBUG_PROD === 'true';
 
-export const TOAST_LENGTH = 4000;
+export const TOAST_LENGTH = 2000;
 
 // Actions for the ipcMain and ipcRenderer messages
 export const CONNECTION_RESPONSE = 'connection-resp';
