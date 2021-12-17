@@ -17,6 +17,7 @@ import {
   ThemeProvider,
 } from '@material-ui/core';
 import { create } from 'jss';
+import { SnackbarProvider } from 'notistack';
 import { createMuiTheme } from './shared/theme';
 import ConnectForm from './renderer/pages/ConnectForm';
 import { THEMES } from './shared/constants';
@@ -90,28 +91,36 @@ const App: FC = () => {
     <ThemeProvider theme={createMuiTheme(defaultSettings)}>
       <CssBaseline />
       <StylesProvider jss={jss}>
-        <HashRouter>
-          <TopBar>
-            <TopTabs />
-          </TopBar>
-          <Switch>
-            <RouteListener>
-              <Route exact path="/">
-                <Redirect to="/manage" />
-              </Route>
-              <Route exact path="/connectForm" component={ConnectForm} />
-              <Route
-                path="/edit_connect/:connectionID"
-                component={ConnectForm}
-              />
-              <Route
-                path="/view_connection/:connectionID"
-                component={ConnectionView}
-              />
-              <Route exact path="/manage" component={ManageConnections} />
-            </RouteListener>
-          </Switch>
-        </HashRouter>
+        <SnackbarProvider
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          maxSnack={1}
+        >
+          <HashRouter>
+            <TopBar>
+              <TopTabs />
+            </TopBar>
+            <Switch>
+              <RouteListener>
+                <Route exact path="/">
+                  <Redirect to="/manage" />
+                </Route>
+                <Route exact path="/connectForm" component={ConnectForm} />
+                <Route
+                  path="/edit_connect/:connectionID"
+                  component={ConnectForm}
+                />
+                <Route
+                  path="/view_connection/:connectionID"
+                  component={ConnectionView}
+                />
+                <Route exact path="/manage" component={ManageConnections} />
+              </RouteListener>
+            </Switch>
+          </HashRouter>
+        </SnackbarProvider>
       </StylesProvider>
     </ThemeProvider>
   );

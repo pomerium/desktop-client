@@ -17,12 +17,13 @@ import { useParams } from 'react-router-dom';
 import { CheckCircle, ChevronDown } from 'react-feather';
 import { Autocomplete } from '@material-ui/lab';
 import { ipcRenderer } from 'electron';
-import { ServiceError } from '@grpc/grpc-js';
+import { useSnackbar } from 'notistack';
 import {
   GET_RECORDS,
   GET_UNIQUE_TAGS,
   QueryParams,
   SAVE_RECORD,
+  TOAST_LENGTH,
   VIEW,
 } from '../../shared/constants';
 import TextField from '../components/TextField';
@@ -30,7 +31,6 @@ import { Theme } from '../../shared/theme';
 import Card from '../components/Card';
 import { formatTag } from '../../shared/validators';
 import { Connection, Record, Selector } from '../../shared/pb/api';
-import Toast from '../components/Toast';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -75,7 +75,6 @@ const initialConnData: Connection = {
 
 const ConnectForm: FC<Props> = () => {
   const classes = useStyles();
-  const [error, setError] = useState(null as ServiceError | null);
   const [tags, setTags] = useState<string[]>([]);
   const [connection, setConnection] = useState(initialConnData);
   const [refresh, setRefresh] = useState('');
@@ -84,11 +83,15 @@ const ConnectForm: FC<Props> = () => {
     evt.preventDefault();
   };
   const { connectionID }: QueryParams = useParams();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     ipcRenderer.on(GET_RECORDS, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        enqueueSnackbar(args.err, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else if (args.res.records.length === 1) {
         setTags(args.res.records[0].tags || []);
         setConnection(args.res.records[0].conn || initialConnData);
@@ -180,7 +183,10 @@ const ConnectForm: FC<Props> = () => {
     }
     ipcRenderer.once(SAVE_RECORD, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        enqueueSnackbar(args.err, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else if (args.res) {
         ipcRenderer.send(VIEW, args.res.id);
       }
@@ -204,8 +210,6 @@ const ConnectForm: FC<Props> = () => {
             </Grid>
           </Grid>
         </Grid>
-
-        {error && <Toast msg={error.details} alertType="error" />}
 
         <Card>
           <Grid container spacing={2}>
