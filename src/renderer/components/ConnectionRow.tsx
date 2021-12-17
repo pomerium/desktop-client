@@ -46,6 +46,9 @@ type ConnectionRowProps = {
 const useStyles = makeStyles(() => ({
   cursor: {
     cursor: 'pointer',
+    '&:hover': {
+      color: '#6E43E8',
+    },
   },
   spacing: {
     marginLeft: '5px',
@@ -163,7 +166,11 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
                 </Typography>
               </Tooltip>
               <Tooltip title="Copy to Clipboard" className={classes.spacing}>
-                <Copy size="14" onClick={copyAddress} />
+                <Copy
+                  size="14"
+                  onClick={copyAddress}
+                  className={classes.cursor}
+                />
               </Tooltip>
             </>
           )}

@@ -232,7 +232,6 @@ const ManageConnections = (): JSX.Element => {
           </Grid>
         </Grid>
       </Grid>
-
       <Card>
         {folderNames.map((folderName) => {
           const folderConns = connections.filter(
