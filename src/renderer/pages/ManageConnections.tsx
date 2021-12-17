@@ -9,7 +9,7 @@ import {
 import { Download, Plus } from 'react-feather';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { ServiceError } from '@grpc/grpc-js';
+import { useSnackbar } from 'notistack';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
 import TagFolderRow from '../components/TagFolderRow';
@@ -29,9 +29,9 @@ import {
   IMPORT,
   LISTENER_STATUS,
   SAVE_RECORD,
+  TOAST_LENGTH,
   VIEW,
 } from '../../shared/constants';
-import Toast from '../components/Toast';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -54,8 +54,7 @@ const ManageConnections = (): JSX.Element => {
   const [folderNames, setFolderNames] = useState([] as string[]);
   const [connections, setConnections] = useState([] as ListenerRecord[]);
   const [statuses, setStatuses] = useState<Record<string, ListenerStatus>>({});
-  const [error, setError] = useState<ServiceError | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const getConnectedCount = (conns: ListenerRecord[]) => {
     return (
@@ -66,12 +65,6 @@ const ManageConnections = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (uploadSuccess) {
-      setTimeout(() => setUploadSuccess(false), 1100);
-    }
-  }, [uploadSuccess]);
-
-  useEffect(() => {
     ipcRenderer.on(GET_UNIQUE_TAGS, (_, args) => {
       if (args.tags && !args.err) {
         setFolderNames(args.tags);
@@ -79,24 +72,32 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(GET_ALL_RECORDS, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        enqueueSnackbar(args.err, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else {
-        setError(null);
         setConnections(args.res.records);
       }
     });
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        enqueueSnackbar(args.err, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else {
-        setError(null);
-        setStatuses((prevState) => {
-          Object.keys(prevState).forEach((key) => {
-            if (prevState[key].lastError) {
-              // don't want to show stale errors again but need to keep connected status
-              delete prevState[key].lastError;
+        Object.values(args.res.listeners as ListenerStatus[]).forEach(
+          ({ lastError }) => {
+            if (lastError) {
+              enqueueSnackbar(lastError, {
+                variant: 'error',
+                autoHideDuration: TOAST_LENGTH,
+              });
             }
-          });
+          }
+        );
+        setStatuses((prevState) => {
           return {
             ...prevState,
             ...args.res.listeners,
@@ -106,14 +107,19 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(DELETE, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        enqueueSnackbar(args.err, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       }
     });
     ipcRenderer.on(EXPORT, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        enqueueSnackbar(args.err, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else {
-        setError(null);
         const blob = new Blob([args.data], { type: 'application/json' });
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
@@ -123,16 +129,24 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(IMPORT, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        enqueueSnackbar(args.err, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else {
-        setError(null);
-        setUploadSuccess(true);
+        enqueueSnackbar('Uploaded Successfully', {
+          variant: 'success',
+          autoHideDuration: TOAST_LENGTH,
+        });
         ipcRenderer.send(GET_ALL_RECORDS);
       }
     });
     ipcRenderer.on(SAVE_RECORD, (_, args) => {
       if (args.err) {
-        setError(args.err);
+        enqueueSnackbar(args.err, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else {
         ipcRenderer.send(VIEW, args.res.id);
       }
@@ -218,18 +232,6 @@ const ManageConnections = (): JSX.Element => {
           </Grid>
         </Grid>
       </Grid>
-
-      {error && <Toast msg={error.message} alertType="error" />}
-      {uploadSuccess && <Toast msg="Upload Successful" alertType="success" />}
-      {Object.values(statuses)
-        .filter((status) => !!status.lastError)
-        .map((status) => (
-          <Toast
-            key={'error' + Math.random()}
-            msg={status.lastError || ''}
-            alertType="error"
-          />
-        ))}
 
       <Card>
         {folderNames.map((folderName) => {

@@ -13,6 +13,7 @@ import {
 import { Copy, MoreVertical } from 'react-feather';
 import { clipboard, ipcRenderer } from 'electron';
 import { Link } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 import {
   CONNECT,
   DELETE,
@@ -22,6 +23,7 @@ import {
   EXPORT,
   ExportFile,
   SAVE_RECORD,
+  TOAST_LENGTH,
   UPDATE_LISTENERS,
   VIEW,
 } from '../../shared/constants';
@@ -58,6 +60,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
 
   const toggleMenu = (e) => {
     setMenuAnchor(e.currentTarget);
@@ -93,6 +96,10 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
         // eslint-disable-next-line no-case-declarations
         const parsed = port?.match(/\d+(?![^:]*:)/g);
         clipboard.writeText(parsed?.length ? parsed[0] : '');
+        enqueueSnackbar('Port Copied', {
+          variant: 'success',
+          autoHideDuration: TOAST_LENGTH,
+        });
         break;
       default:
         ipcRenderer.send(action, connection?.id || '');
@@ -101,6 +108,10 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
 
   const copyAddress = () => {
     clipboard.writeText(port);
+    enqueueSnackbar('Address Copied', {
+      variant: 'success',
+      autoHideDuration: TOAST_LENGTH,
+    });
   };
 
   const toggleConnected = () => {

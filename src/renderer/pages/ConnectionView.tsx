@@ -18,6 +18,7 @@ import {
 import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { AlertTriangle, ChevronDown, Info } from 'react-feather';
+import { useSnackbar } from 'notistack';
 import Card from '../components/Card';
 import { Theme } from '../../shared/theme';
 import {
@@ -29,6 +30,7 @@ import {
   LISTENER_LOG,
   LISTENER_STATUS,
   QueryParams,
+  TOAST_LENGTH,
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
@@ -44,7 +46,6 @@ import {
   Record,
   Selector,
 } from '../../shared/pb/api';
-import Toast from '../components/Toast';
 import ExportJSON from '../icons/ExportJSON';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -76,7 +77,6 @@ const ConnectionView = (): JSX.Element => {
   const classes = useStyles();
   const [tags, setTags] = useState([] as Record['tags']);
   const [connection, setConnection] = useState({} as Connection);
-  const [error, setError] = useState('');
   const [connected, setConnected] = useState(false);
   const [errorFilter, setErrorFilter] = useState(false);
   const [infoFilter, setInfoFilter] = useState(false);
@@ -84,6 +84,7 @@ const ConnectionView = (): JSX.Element => {
   const [filteredLogs, setFilteredLogs] = useState([] as SimplifiedLog[]);
   const [logs, setLogs] = useState([] as SimplifiedLog[]);
   const [menuAnchor, setMenuAnchor] = React.useState(null);
+  const { enqueueSnackbar } = useSnackbar();
   const { connectionID }: QueryParams = useParams();
 
   const toggleMenu = (e) => {
@@ -160,15 +161,20 @@ const ConnectionView = (): JSX.Element => {
 
   useEffect(() => {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
-      setError('');
       if (args.err) {
-        setError(args.err.message);
+        enqueueSnackbar(args.err.message, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else {
         setConnected(!!args?.res?.listeners[connectionID]?.listening);
         const listenAddr = args?.res?.listeners[connectionID]?.listenAddr;
         setConnectionPort(listenAddr || '');
         if (args?.res?.listeners[connectionID]?.lastError) {
-          setError(args?.res?.listeners[connectionID]?.lastError);
+          enqueueSnackbar(args?.res?.listeners[connectionID]?.lastError, {
+            variant: 'error',
+            autoHideDuration: TOAST_LENGTH,
+          });
         }
       }
     });
@@ -176,9 +182,11 @@ const ConnectionView = (): JSX.Element => {
       setLogs((oldLogs) => [formatLog(args.msg, args.remoteAddr), ...oldLogs]);
     });
     ipcRenderer.on(EXPORT, (_, args) => {
-      setError('');
       if (args.err) {
-        setError(args.err.message);
+        enqueueSnackbar(args.err.message, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
       } else {
         const blob = new Blob([args.data], { type: 'application/json' });
         const link = document.createElement('a');
@@ -307,8 +315,6 @@ const ConnectionView = (): JSX.Element => {
             </Grid>
           </Grid>
         </Grid>
-
-        {error && <Toast msg={error} alertType="error" />}
 
         <Card>
           <Grid container spacing={2}>
