@@ -318,6 +318,6 @@
     }
   },
   "pomeriumCli": {
-    "version": "v0.0.0-rc2"
+    "version": "v0.16.0"
   }
 }
