@@ -134,12 +134,25 @@ export default class Helper {
     const { appWindow } = this;
     const template: (MenuItemConstructorOptions | MenuItem)[] = [];
     template.push({
-      label: 'Connections',
-      icon: nativeImage.createFromPath(path.join(menuIconPath, 'add.png')),
+      label: 'Add Connection',
+      accelerator: 'CommandOrControl+A',
       click() {
         appWindow?.webContents.send('redirectTo', '/connectForm');
         appWindow?.show();
       },
+    });
+
+    template.push({
+      label: 'Manage Connections',
+      accelerator: 'CommandOrControl+M',
+      click() {
+        appWindow?.webContents.send('redirectTo', '/manage');
+        appWindow?.show();
+      },
+    });
+
+    template.push({
+      type: 'separator',
     });
 
     this.tags.forEach((tag) => {
@@ -152,15 +165,6 @@ export default class Helper {
         icon: nativeImage.createFromPath(path.join(menuIconPath, 'folder.png')),
         submenu: conns,
       });
-    });
-
-    template.push({
-      label: 'Manage Connections',
-      accelerator: 'CommandOrControl+M',
-      click() {
-        appWindow?.webContents.send('redirectTo', '/manage');
-        appWindow?.show();
-      },
     });
 
     template.push({

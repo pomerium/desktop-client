@@ -141,6 +141,10 @@ app.on('ready', async () => {
       mainWindow?.webContents.send('redirectTo', '/manage');
       mainWindow?.show();
     });
+    globalShortcut.register('CommandOrControl+A', () => {
+      mainWindow?.webContents.send('redirectTo', '/connectForm');
+      mainWindow?.show();
+    });
     menu.tray.on('click', () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu());
     });
