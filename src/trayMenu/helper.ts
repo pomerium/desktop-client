@@ -142,6 +142,19 @@ export default class Helper {
       },
     });
 
+    template.push({
+      label: 'Manage Connections',
+      accelerator: 'CommandOrControl+M',
+      click() {
+        appWindow?.webContents.send('redirectTo', '/manage');
+        appWindow?.show();
+      },
+    });
+
+    template.push({
+      type: 'separator',
+    });
+
     this.tags.forEach((tag) => {
       const conns = this.buildFolderSubmenu(
         this.records.filter((rec) => rec.tags.includes(tag))
@@ -152,15 +165,6 @@ export default class Helper {
         icon: nativeImage.createFromPath(path.join(menuIconPath, 'folder.png')),
         submenu: conns,
       });
-    });
-
-    template.push({
-      label: 'Manage Connections',
-      accelerator: 'CommandOrControl+M',
-      click() {
-        appWindow?.webContents.send('redirectTo', '/manage');
-        appWindow?.show();
-      },
     });
 
     template.push({
