@@ -134,8 +134,8 @@ export default class Helper {
     const { appWindow } = this;
     const template: (MenuItemConstructorOptions | MenuItem)[] = [];
     template.push({
-      label: 'Connections',
-      icon: nativeImage.createFromPath(path.join(menuIconPath, 'add.png')),
+      label: 'Add Connection',
+      accelerator: 'CommandOrControl+A',
       click() {
         appWindow?.webContents.send('redirectTo', '/connectForm');
         appWindow?.show();
