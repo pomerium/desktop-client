@@ -9,7 +9,7 @@
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
 import 'core-js/stable';
-import { app, BrowserWindow, dialog, globalShortcut, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import * as grpc from '@grpc/grpc-js';
 import * as child_process from 'child_process';
@@ -137,14 +137,6 @@ app.on('ready', async () => {
   });
   trayMenuHelper.setMenu(menu);
   menu.on('ready', async () => {
-    globalShortcut.register('CommandOrControl+M', () => {
-      mainWindow?.webContents.send('redirectTo', '/manage');
-      mainWindow?.show();
-    });
-    globalShortcut.register('CommandOrControl+A', () => {
-      mainWindow?.webContents.send('redirectTo', '/connectForm');
-      mainWindow?.show();
-    });
     menu.tray.on('click', () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu());
     });

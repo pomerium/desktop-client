@@ -135,7 +135,6 @@ export default class Helper {
     const template: (MenuItemConstructorOptions | MenuItem)[] = [];
     template.push({
       label: 'Add Connection',
-      accelerator: 'CommandOrControl+A',
       click() {
         appWindow?.webContents.send('redirectTo', '/connectForm');
         appWindow?.show();
@@ -144,7 +143,6 @@ export default class Helper {
 
     template.push({
       label: 'Manage Connections',
-      accelerator: 'CommandOrControl+M',
       click() {
         appWindow?.webContents.send('redirectTo', '/manage');
         appWindow?.show();
