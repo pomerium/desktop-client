@@ -229,11 +229,11 @@ const ConnectForm: FC<Props> = () => {
               <TextField
                 fullWidth
                 required
-                label="Destination URL"
+                label="Destination"
                 value={connection?.remoteAddr}
                 onChange={(evt): void => saveDestination(evt.target.value)}
                 variant="outlined"
-                helperText="The remote address to connect to. The FROM field in a pomerium route."
+                helperText="The remote address to connect to. Do not include a protocol. Example: mysql.example.com:3306"
               />
             </Grid>
             <Grid item xs={12}>
