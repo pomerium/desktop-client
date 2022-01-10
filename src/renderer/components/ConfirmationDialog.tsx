@@ -22,7 +22,7 @@ const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
   onClose,
 }) => {
   return (
-    <Dialog open={true} onClose={onClose}>
+    <Dialog open onClose={onClose}>
       <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
