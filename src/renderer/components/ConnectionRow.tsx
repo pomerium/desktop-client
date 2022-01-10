@@ -6,7 +6,6 @@ import {
   Divider,
   MenuItem,
   Menu,
-  capitalize,
   Tooltip,
   makeStyles,
 } from '@material-ui/core';
@@ -140,9 +139,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
           </IconButton>
         </Grid>
         <Grid item xs={3}>
-          <Typography variant="h6">
-            {capitalize(connection?.conn?.name || '')}
-          </Typography>
+          <Typography variant="h6">{connection?.conn?.name || ''}</Typography>
         </Grid>
         <Grid item xs={4}>
           <Link to={'/view_connection/' + connection?.id || ''} />
