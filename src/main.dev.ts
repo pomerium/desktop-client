@@ -61,7 +61,7 @@ import { pomeriumCli } from './main/binaries';
 
 let mainWindow: BrowserWindow | null;
 let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
-child_process.spawn(pomeriumCli, ['api']);
+const cliProcess = child_process.spawn(pomeriumCli, ['api']);
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
