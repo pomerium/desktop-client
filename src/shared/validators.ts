@@ -1,13 +1,10 @@
 import validator from 'validator';
-import { capitalize } from '@material-ui/core';
 
-export const formatTag = (tag: string): string => {
-  return tag
+export const formatTag = (tag: string): string => tag
     .replace(/\s+/g, ' ')
     .split(' ')
-    .map((word) => capitalize(word.toLocaleLowerCase()))
+    .filter(s => s != '')
     .join(' ');
-};
 
 // generic url validator
 export const isUrl = (input: string): boolean => {

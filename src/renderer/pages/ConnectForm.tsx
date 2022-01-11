@@ -140,9 +140,7 @@ const ConnectForm: FC<Props> = () => {
     });
   };
 
-  const saveTags = (arr: string[]): void => {
-    setTags(arr.map(formatTag));
-  };
+  const saveTags = (arr: string[]): void => setTags(arr.map(formatTag));
 
   const saveDestination = (value: string): void => {
     setConnection({
