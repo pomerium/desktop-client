@@ -21,6 +21,9 @@ import {
 import ClosedFolder from '../icons/ClosedFolder';
 import OpenFolder from '../icons/OpenFolder';
 import { ListenerUpdateRequest, Selector } from '../../shared/pb/api';
+import ConfirmationDialog, {
+  ConfirmationDialogProps,
+} from './ConfirmationDialog';
 
 type FolderProps = {
   folderName: string;
@@ -37,6 +40,8 @@ const TagFolderRow: React.FC<FolderProps> = ({
   children,
 }: PropsWithChildren<FolderProps>): JSX.Element => {
   const [open, setOpen] = React.useState<boolean>(false);
+  const [confirmation, setConfirmation] =
+    React.useState<ConfirmationDialogProps | null>(null);
 
   const toggleOpen = () => {
     setOpen(!open);
@@ -76,74 +81,94 @@ const TagFolderRow: React.FC<FolderProps> = ({
   };
 
   return (
-    <Grid container>
-      <Grid container item xs={12} alignItems="center">
-        <Grid item xs={1}>
-          <IconButton
-            key={'menuButton' + folderName}
-            aria-label={'toggle listeners for ' + folderName}
-            component="span"
-            onClick={toggleOpen}
-          >
-            {open ? <OpenFolder /> : <ClosedFolder />}
-          </IconButton>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h6">{folderName}</Typography>
-        </Grid>
-        <Grid item xs={5} />
-        <Grid container item xs={2} justifyContent="flex-end">
-          <Typography variant="subtitle2">
-            {connectedListeners} of {totalListeners} listening
-          </Typography>
-        </Grid>
-        <Grid container item xs={1} justifyContent="center">
-          <IconButton
-            aria-controls="folder-menu"
-            aria-haspopup="true"
-            onClick={toggleMenu}
-            aria-label={'Menu for folder: ' + folderName}
-          >
-            <MoreVertical />
-          </IconButton>
-          <Menu
-            id={'folder-menu' + folderName}
-            anchorEl={menuAnchor}
-            keepMounted
-            open={Boolean(menuAnchor)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem
-              key={CONNECT_ALL}
-              onClick={() => handleMenuClick(CONNECT_ALL)}
+    <>
+      {confirmation && (
+        <ConfirmationDialog
+          title={confirmation.title}
+          text={confirmation.text}
+          onConfirm={confirmation.onConfirm}
+          onClose={confirmation.onClose}
+        />
+      )}
+      <Grid container>
+        <Grid container item xs={12} alignItems="center">
+          <Grid item xs={1}>
+            <IconButton
+              key={'menuButton' + folderName}
+              aria-label={'toggle listeners for ' + folderName}
+              component="span"
+              onClick={toggleOpen}
             >
-              Connect All
-            </MenuItem>
-            <MenuItem
-              key={DISCONNECT_ALL}
-              onClick={() => handleMenuClick(DISCONNECT_ALL)}
+              {open ? <OpenFolder /> : <ClosedFolder />}
+            </IconButton>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="h6">{folderName}</Typography>
+          </Grid>
+          <Grid item xs={5} />
+          <Grid container item xs={2} justifyContent="flex-end">
+            <Typography variant="subtitle2">
+              {connectedListeners} of {totalListeners} listening
+            </Typography>
+          </Grid>
+          <Grid container item xs={1} justifyContent="center">
+            <IconButton
+              aria-controls="folder-menu"
+              aria-haspopup="true"
+              onClick={toggleMenu}
+              aria-label={'Menu for folder: ' + folderName}
             >
-              Disconnect All
-            </MenuItem>
-            <MenuItem key={EXPORT} onClick={() => handleMenuClick(EXPORT)}>
-              Export
-            </MenuItem>
-            <MenuItem
-              key={DELETE_ALL}
-              onClick={() => handleMenuClick(DELETE_ALL)}
+              <MoreVertical />
+            </IconButton>
+            <Menu
+              id={'folder-menu' + folderName}
+              anchorEl={menuAnchor}
+              keepMounted
+              open={Boolean(menuAnchor)}
+              onClose={handleMenuClose}
             >
-              Delete
-            </MenuItem>
-          </Menu>
+              <MenuItem
+                key={CONNECT_ALL}
+                onClick={() => handleMenuClick(CONNECT_ALL)}
+              >
+                Connect All
+              </MenuItem>
+              <MenuItem
+                key={DISCONNECT_ALL}
+                onClick={() => handleMenuClick(DISCONNECT_ALL)}
+              >
+                Disconnect All
+              </MenuItem>
+              <MenuItem key={EXPORT} onClick={() => handleMenuClick(EXPORT)}>
+                Export
+              </MenuItem>
+              <MenuItem
+                key={DELETE_ALL}
+                onClick={() => {
+                  setConfirmation({
+                    title: 'Delete connections?',
+                    text: `All connections with tag ${folderName} will be deleted:`,
+                    onClose: () => setConfirmation(null),
+                    onConfirm: () => {
+                      setConfirmation(null);
+                      handleMenuClick(DELETE_ALL);
+                    },
+                  });
+                }}
+              >
+                Delete
+              </MenuItem>
+            </Menu>
+          </Grid>
         </Grid>
+        <Grid container item xs={12}>
+          <Grid item xs={12}>
+            <Divider />
+          </Grid>
+        </Grid>
+        {open && children}
       </Grid>
-      <Grid container item xs={12}>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-      </Grid>
-      {open && children}
-    </Grid>
+    </>
   );
 };
 
