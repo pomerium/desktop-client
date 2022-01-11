@@ -147,7 +147,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
                 onClick={() => {
                   setConfirmation({
                     title: 'Delete connections?',
-                    text: `All connections with tag ${folderName} will be deleted:`,
+                    text: `All connections with tag ${folderName} will be deleted.`,
                     onClose: () => setConfirmation(null),
                     onConfirm: () => {
                       setConfirmation(null);
