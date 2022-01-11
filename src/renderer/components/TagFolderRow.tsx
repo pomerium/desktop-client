@@ -82,7 +82,14 @@ const TagFolderRow: React.FC<FolderProps> = ({
 
   return (
     <>
-      {confirmation && <ConfirmationDialog {...confirmation} />}
+      {confirmation && (
+        <ConfirmationDialog
+          title={confirmation.title}
+          text={confirmation.text}
+          onConfirm={confirmation.onConfirm}
+          onClose={confirmation.onClose}
+        />
+      )}
       <Grid container>
         <Grid container item xs={12} alignItems="center">
           <Grid item xs={1}>
