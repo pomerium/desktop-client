@@ -1,10 +1,12 @@
 import validator from 'validator';
 
-export const formatTag = (tag: string): string => tag
+export const formatTag = (tag: string): string => {
+  return tag
     .replace(/\s+/g, ' ')
     .split(' ')
-    .filter(s => s != '')
+    .filter((s) => s !== '')
     .join(' ');
+}
 
 // generic url validator
 export const isUrl = (input: string): boolean => {
