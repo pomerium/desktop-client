@@ -6,7 +6,7 @@ export const formatTag = (tag: string): string => {
     .split(' ')
     .filter((s) => s !== '')
     .join(' ');
-}
+};
 
 // generic url validator
 export const isUrl = (input: string): boolean => {
