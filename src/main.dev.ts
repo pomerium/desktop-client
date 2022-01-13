@@ -12,6 +12,7 @@ import 'core-js/stable';
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import * as grpc from '@grpc/grpc-js';
+import * as Sentry from '@sentry/electron';
 import * as child_process from 'child_process';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
@@ -59,6 +60,10 @@ import {
 } from './shared/pb/api';
 import { pomeriumCli } from './main/binaries';
 
+Sentry.init({
+  dsn: 'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413',
+});
+
 let mainWindow: BrowserWindow | null;
 let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
 const cliProcess = child_process.spawn(pomeriumCli, ['api']);
@@ -89,22 +94,36 @@ const listenerClient = new ListenerClient(
   grpc.ChannelCredentials.createInsecure()
 );
 
-process.on('uncaughtException', (err) => {
-  const msg = {
-    type: 'error',
-    title: 'Error in Main process',
-    message:
-      'Something went wrong. Contact your administrator or Pomerium representative.',
-  } as Electron.MessageBoxSyncOptions;
+const onUncaughtException = (() => {
+  let shuttingDown = false;
+  return async (err: Error) => {
+    console.error(err);
 
-  if ('spawnargs' in err) {
-    msg.title = 'Incorrect CLI supplied.';
-    msg.message = 'Make sure the correct version for your OS is installed.';
-  }
-  console.log(err);
-  dialog.showMessageBoxSync(msg);
-  app.exit(1);
-});
+    if (shuttingDown) {
+      return;
+    }
+    shuttingDown = true;
+    Sentry.captureException(err);
+
+    const msg = {
+      type: 'error',
+      title: 'Error in Main process',
+      message:
+        'Something went wrong. Contact your administrator or Pomerium representative.',
+    } as Electron.MessageBoxOptions;
+
+    if ('spawnargs' in err) {
+      msg.title = 'Incorrect CLI supplied.';
+      msg.message = 'Make sure the correct version for your OS is installed.';
+    }
+    // eslint-disable-next-line promise/no-promise-in-callback
+    await Promise.all([Sentry.close(2000), dialog.showMessageBox(msg)]);
+
+    app.quit();
+  };
+})();
+
+process.on('uncaughtException', onUncaughtException);
 
 app.on('activate', async () => {
   // On macOS it's common to re-create a window in the app when the
@@ -260,7 +279,10 @@ app.on('ready', async () => {
           }
           return null;
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          Sentry.captureException(err);
+          console.error(err);
+        });
     });
     ipcMain.on(DUPLICATE, (_evt, args: ConnectionData) => {
       console.log(DUPLICATE + ' ' + args.connectionID + ' action was called.');
