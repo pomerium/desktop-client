@@ -35,11 +35,17 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
             {open ? <VirtualOpenFolder /> : <VirtualClosedFolder />}
           </IconButton>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={3} onClick={toggleOpen}>
           <Typography variant="h6">{folderName}</Typography>
         </Grid>
-        <Grid item xs={5} />
-        <Grid container item xs={2} justifyContent="flex-end">
+        <Grid item xs={5} onClick={toggleOpen} />
+        <Grid
+          container
+          item
+          xs={2}
+          justifyContent="flex-end"
+          onClick={toggleOpen}
+        >
           <Typography variant="subtitle2">
             {connectedListeners} of {totalListeners} listening
           </Typography>
