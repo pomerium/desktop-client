@@ -66,7 +66,25 @@ Sentry.init({
 
 let mainWindow: BrowserWindow | null;
 let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
-const cliProcess = child_process.spawn(pomeriumCli, ['api']);
+
+const cliProcess = child_process
+  .spawn(pomeriumCli, ['api'])
+  .on('error', (error) => {
+    Sentry.captureEvent({
+      message: 'API process failed to start',
+      extra: { error },
+    });
+  })
+  .on('close', (code, signal) => {
+    if (signal != null) return;
+    Sentry.captureEvent({
+      message: 'API process unexpectedly quit',
+      extra: { code },
+    });
+  });
+
+cliProcess.stderr.on('data', (data) => console.error(data.toString()));
+cliProcess.stdout.on('data', (data) => console.info(data.toString()));
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
