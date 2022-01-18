@@ -60,15 +60,18 @@ import {
 } from './shared/pb/api';
 import { pomeriumCli } from './main/binaries';
 
+const SentryDSN =
+  'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413';
 Sentry.init({
-  dsn: 'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413',
+  dsn: SentryDSN,
+  debug: process.env.NODE_ENV !== 'production',
 });
 
 let mainWindow: BrowserWindow | null;
 let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
 
 const cliProcess = child_process
-  .spawn(pomeriumCli, ['api'])
+  .spawn(pomeriumCli, ['api', '--sentry-dsn', SentryDSN])
   .on('error', (error) => {
     Sentry.captureEvent({
       message: 'API process failed to start',
@@ -348,7 +351,7 @@ app.on('ready', async () => {
     app.on('before-quit', () => {
       mainWindow?.removeAllListeners('close');
       updateStream?.cancel();
-      cliProcess.kill();
+      cliProcess.kill('SIGINT');
       mainWindow?.close();
     });
   });
