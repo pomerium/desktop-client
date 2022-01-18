@@ -116,10 +116,7 @@ const ConnectionView = (): JSX.Element => {
     link.click();
   };
 
-  const formatLog = (
-    msg: ConnectionStatusUpdate,
-    remoteAddr: string
-  ): SimplifiedLog => {
+  const formatLog = (msg: ConnectionStatusUpdate): SimplifiedLog => {
     const date = msg.ts?.toLocaleTimeString() || '';
     const status = msg.lastError ? 'error' : 'info';
     let message = '';
@@ -174,7 +171,7 @@ const ConnectionView = (): JSX.Element => {
       }
     });
     ipcRenderer.on(LISTENER_LOG, (_, args) => {
-      setLogs((oldLogs) => [formatLog(args.msg, args.remoteAddr), ...oldLogs]);
+      setLogs((oldLogs) => [formatLog(args.msg), ...oldLogs]);
     });
     ipcRenderer.on(EXPORT, (_, args) => {
       if (args.err) {
