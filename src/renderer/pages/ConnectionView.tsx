@@ -116,37 +116,29 @@ const ConnectionView = (): JSX.Element => {
     link.click();
   };
 
-  const formatLog = (
-    msg: ConnectionStatusUpdate,
-    remoteAddr: string
-  ): SimplifiedLog => {
+  const formatLog = (msg: ConnectionStatusUpdate): SimplifiedLog => {
     const date = msg.ts?.toLocaleTimeString() || '';
     const status = msg.lastError ? 'error' : 'info';
     let message = '';
 
     switch (msg.status) {
       case 1:
-        message = msg.peerAddr + ' opening connection to ' + remoteAddr;
+        message = 'Connecting to Pomerium...';
         break;
       case 2:
-        message =
-          msg.peerAddr +
-          ' authentication with ' +
-          msg.authUrl +
-          ' required for ' +
-          remoteAddr;
+        message = `Authentication required, web browser was open`;
         break;
       case 3:
-        message = msg.peerAddr + ' connected to ' + remoteAddr;
+        message = 'Connected to Pomerium';
         break;
       case 4:
-        message = msg.peerAddr + ' disconnected from ' + remoteAddr;
+        message = 'Disconnected from Pomerium';
         break;
       case 5:
-        message = 'Listener opened';
+        message = 'Listening for new connections';
         break;
       case 6:
-        message = 'Listener closed connection to ' + remoteAddr;
+        message = 'Stop listening for new connections';
         break;
       default:
         break;
@@ -179,7 +171,7 @@ const ConnectionView = (): JSX.Element => {
       }
     });
     ipcRenderer.on(LISTENER_LOG, (_, args) => {
-      setLogs((oldLogs) => [formatLog(args.msg, args.remoteAddr), ...oldLogs]);
+      setLogs((oldLogs) => [formatLog(args.msg), ...oldLogs]);
     });
     ipcRenderer.on(EXPORT, (_, args) => {
       if (args.err) {
