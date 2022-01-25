@@ -186,8 +186,10 @@ app.on('ready', async () => {
           err,
           res,
         });
-        trayMenuHelper.setRecord(res);
-        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        if (!err && res) {
+          trayMenuHelper.setRecord(res);
+          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        }
       });
     });
     ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
@@ -197,14 +199,16 @@ app.on('ready', async () => {
           err,
           res,
         });
-        if (selector.all) {
-          trayMenuHelper.setRecords(res.records);
-        } else {
-          res.records.forEach((rec) => {
-            trayMenuHelper.setRecord(rec);
-          });
+        if (!err && res) {
+          if (selector.all) {
+            trayMenuHelper.setRecords(res.records);
+          } else {
+            res.records.forEach((rec) => {
+              trayMenuHelper.setRecord(rec);
+            });
+          }
+          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
         }
-        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
       });
     });
     ipcMain.on(GET_ALL_RECORDS, (evt) => {
@@ -220,8 +224,10 @@ app.on('ready', async () => {
             err,
             res,
           });
-          trayMenuHelper.setRecords(res.records);
-          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+          if (!err && res) {
+            trayMenuHelper.setRecords(res.records);
+            menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+          }
         }
       );
     });
@@ -232,8 +238,10 @@ app.on('ready', async () => {
           err,
           tags: res?.tags || [],
         });
-        trayMenuHelper.setTags(res.tags);
-        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        if (!err && res) {
+          trayMenuHelper.setTags(res.tags);
+          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        }
       });
     });
     ipcMain.on(DELETE, (evt, id: string) => {
@@ -315,8 +323,10 @@ app.on('ready', async () => {
           err,
           res,
         });
-        trayMenuHelper.setStatuses(res.listeners);
-        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        if (!err && res) {
+          trayMenuHelper.setStatuses(res.listeners);
+          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        }
       });
     });
     ipcMain.on(LISTENER_STATUS, (evt, args: Selector) => {
@@ -326,8 +336,10 @@ app.on('ready', async () => {
           err,
           res,
         });
-        trayMenuHelper.setStatuses(res.listeners);
-        menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        if (!err && res) {
+          trayMenuHelper.setStatuses(res.listeners);
+          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+        }
       });
     });
     ipcMain.on(LISTENER_LOG, (evt, args) => {
