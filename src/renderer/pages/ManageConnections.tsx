@@ -6,7 +6,7 @@ import {
   makeStyles,
   Typography,
 } from '@material-ui/core';
-import { Download, Plus, Upload } from 'react-feather';
+import { Save, Plus, Upload } from 'react-feather';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
@@ -210,7 +210,7 @@ const ManageConnections = (): JSX.Element => {
                       } as Selector,
                     } as ExportFile)
                   }
-                  endIcon={<Download />}
+                  endIcon={<Save />}
                 >
                   Export
                 </Button>
