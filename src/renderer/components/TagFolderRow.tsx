@@ -105,7 +105,9 @@ const TagFolderRow: React.FC<FolderProps> = ({
           <Grid item xs={3} onClick={toggleOpen}>
             <Typography variant="h6">{folderName}</Typography>
           </Grid>
-          <Grid item xs={5} onClick={toggleOpen} />
+          <Grid container item xs={5} onClick={toggleOpen}>
+            &nbsp;
+          </Grid>
           <Grid
             container
             item
