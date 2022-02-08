@@ -58,3 +58,5 @@ npm-debug.log.*
 
 # Transient build time metadata stored here
 src/meta.json
+
+/cli

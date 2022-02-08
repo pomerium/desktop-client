@@ -25,12 +25,14 @@ import {
   SAVE_RECORD,
   TOAST_LENGTH,
   VIEW,
+  VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
 import TextField from '../components/TextField';
 import { Theme } from '../../shared/theme';
 import Card from '../components/Card';
 import { formatTag } from '../../shared/validators';
 import { Connection, Record, Selector } from '../../shared/pb/api';
+import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -75,9 +77,10 @@ const initialConnData: Connection = {
 
 const ConnectForm: FC<Props> = () => {
   const classes = useStyles();
+  const [showBackWarning, setShowBackWarning] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [connection, setConnection] = useState(initialConnData);
-  const [refresh, setRefresh] = useState('');
+  const [originalConnection, setOriginalConnection] = useState(initialConnData);
   const [tagOptions, setTagOptions] = useState([] as string[]);
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
@@ -95,6 +98,7 @@ const ConnectForm: FC<Props> = () => {
       } else if (args.res.records.length === 1) {
         setTags(args.res.records[0].tags || []);
         setConnection(args.res.records[0].conn || initialConnData);
+        setOriginalConnection(args.res.records[0].conn || initialConnData);
       }
     });
     ipcRenderer.once(GET_UNIQUE_TAGS, (_, args) => {
@@ -117,21 +121,6 @@ const ConnectForm: FC<Props> = () => {
       ipcRenderer.removeAllListeners(GET_UNIQUE_TAGS);
     };
   }, []);
-
-  useEffect(() => {
-    if (refresh) {
-      if (connectionID) {
-        ipcRenderer.send(GET_RECORDS, {
-          all: false,
-          ids: [connectionID],
-          tags: [],
-        } as Selector);
-      } else {
-        setConnection(initialConnData);
-      }
-      setRefresh('');
-    }
-  }, [connectionID, refresh]);
 
   const saveName = (value: string): void => {
     setConnection({
@@ -170,6 +159,14 @@ const ConnectForm: FC<Props> = () => {
     });
   };
 
+  const handleClickBack = (): void => {
+    if (JSON.stringify(originalConnection) !== JSON.stringify(connection)) {
+      setShowBackWarning(true);
+    } else {
+      ipcRenderer.send(VIEW_CONNECTION_LIST);
+    }
+  };
+
   const saveConnection = (): void => {
     const record = {
       tags,
@@ -192,12 +189,12 @@ const ConnectForm: FC<Props> = () => {
     ipcRenderer.send(SAVE_RECORD, record);
   };
 
-  const discardChanges = (): void => {
-    setRefresh('yes');
-  };
-
   return (
     <Container maxWidth={false}>
+      <BeforeBackActionDialog
+        open={showBackWarning}
+        onClose={() => setShowBackWarning(false)}
+      />
       <form onSubmit={handleSubmit}>
         <Grid className={classes.titleGrid}>
           <Grid container alignItems="flex-start">
@@ -326,22 +323,22 @@ const ConnectForm: FC<Props> = () => {
             <Button
               type="button"
               variant="contained"
-              disabled={!connection?.name || !connection?.remoteAddr.trim()}
-              color="primary"
-              onClick={saveConnection}
-              endIcon={<CheckCircle />}
+              color="secondary"
+              onClick={handleClickBack}
             >
-              Save
+              Back
             </Button>
           </Grid>
           <Grid item>
             <Button
               type="button"
               variant="contained"
-              color="secondary"
-              onClick={discardChanges}
+              disabled={!connection?.name || !connection?.remoteAddr.trim()}
+              color="primary"
+              onClick={saveConnection}
+              endIcon={<CheckCircle />}
             >
-              Discard
+              Save
             </Button>
           </Grid>
         </Grid>
