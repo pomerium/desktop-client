@@ -27,11 +27,9 @@ import {
   isDev,
   isProd,
   prodDebug,
-  ConnectionData,
   DELETE_ALL,
   DELETE,
   EXPORT,
-  DUPLICATE,
   VIEW,
   EDIT,
   VIEW_CONNECTION_LIST,
@@ -68,6 +66,8 @@ Sentry.init({
 });
 
 let mainWindow: BrowserWindow | null;
+const singleInstanceLock = app.requestSingleInstanceLock();
+
 let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
 
 const cliProcess = child_process
@@ -152,219 +152,227 @@ app.on('activate', async () => {
   if (mainWindow === null) mainWindow = createWindow();
 });
 
-app.on('ready', async () => {
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
-  installExtension(REDUX_DEVTOOLS)
-    .then((name: string) => console.log(`Added Extension:  ${name}`))
-    .catch((err: Error) => console.log('An error occurred: ', err));
-  mainWindow = createWindow();
-  mainWindow?.loadURL(
-    url.format({
-      pathname: path.join(__dirname, 'index.html'),
-      protocol: 'file:',
-      slashes: true,
-    })
-  );
-
-  const trayMenuHelper = new Helper([], {}, [], mainWindow, null);
-  const tray = trayMenuHelper.createTray();
-  const menu = menubar({
-    preloadWindow: true,
-    browserWindow: { width: 0, height: 0 },
-    tray,
+if (!singleInstanceLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
   });
-  trayMenuHelper.setMenu(menu);
-  menu.on('ready', async () => {
-    menu.tray.on('click', () => {
-      menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu());
+
+  app.on('ready', async () => {
+    // Remove this if your app does not use auto updates
+    // eslint-disable-next-line
+    new AppUpdater();
+    installExtension(REDUX_DEVTOOLS)
+      .then((name: string) => console.log(`Added Extension:  ${name}`))
+      .catch((err: Error) => console.log('An error occurred: ', err));
+    mainWindow = createWindow();
+    mainWindow?.loadURL(
+      url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true,
+      })
+    );
+
+    const trayMenuHelper = new Helper([], {}, [], mainWindow, null);
+    const tray = trayMenuHelper.createTray();
+    const menu = menubar({
+      preloadWindow: true,
+      browserWindow: { width: 0, height: 0 },
+      tray,
     });
-    ipcMain.on(SAVE_RECORD, (evt, args: ListenerRecord) => {
-      configClient.upsert(args, (err, res) => {
-        evt?.sender.send(SAVE_RECORD, {
-          err,
-          res,
-        });
-        if (!err && res) {
-          trayMenuHelper.setRecord(res);
-          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
-        }
+    trayMenuHelper.setMenu(menu);
+    menu.on('ready', async () => {
+      menu.tray.on('click', () => {
+        menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu());
       });
-    });
-    ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
-      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
-      configClient.list(selector, (err, res) => {
-        sendTo?.send(GET_RECORDS, {
-          err,
-          res,
-        });
-        if (!err && res) {
-          if (selector.all) {
-            trayMenuHelper.setRecords(res.records);
-          } else {
-            res.records.forEach((rec) => {
-              trayMenuHelper.setRecord(rec);
-            });
-          }
-          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
-        }
-      });
-    });
-    ipcMain.on(GET_ALL_RECORDS, (evt) => {
-      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
-      configClient.list(
-        {
-          all: true,
-          ids: [],
-          tags: [],
-        } as Selector,
-        (err, res) => {
-          sendTo?.send(GET_ALL_RECORDS, {
+      ipcMain.on(SAVE_RECORD, (evt, args: ListenerRecord) => {
+        configClient.upsert(args, (err, res) => {
+          evt?.sender.send(SAVE_RECORD, {
             err,
             res,
           });
           if (!err && res) {
-            trayMenuHelper.setRecords(res.records);
+            trayMenuHelper.setRecord(res);
             menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
           }
-        }
-      );
-    });
-    ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
-      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
-      configClient.getTags(GetTagsRequest, (err, res) => {
-        sendTo?.send(GET_UNIQUE_TAGS, {
-          err,
-          tags: res?.tags || [],
         });
-        if (!err && res) {
-          trayMenuHelper.setTags(res.tags);
-          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
-        }
       });
-    });
-    ipcMain.on(DELETE, (evt, id: string) => {
-      configClient.delete({ ids: [id], tags: [], all: false }, (err) => {
-        evt?.sender.send(DELETE, {
-          err,
-        });
-        if (!err) {
-          ipcMain.emit(GET_ALL_RECORDS);
-          ipcMain.emit(GET_UNIQUE_TAGS);
-        }
-      });
-    });
-    ipcMain.on(DELETE_ALL, (evt, tag: string) => {
-      configClient.delete({ ids: [], tags: [tag], all: false }, (err) => {
-        evt?.sender.send(DELETE, {
-          err,
-        });
-        if (!err) {
-          ipcMain.emit(GET_ALL_RECORDS);
-          ipcMain.emit(GET_UNIQUE_TAGS);
-        }
-      });
-    });
-    ipcMain.on(EDIT, (_evt, id: string) => {
-      mainWindow?.webContents.send('redirectTo', `/edit_connect/${id}`);
-    });
-    ipcMain.on(VIEW, (_evt, id: string) => {
-      mainWindow?.webContents.send('redirectTo', `/view_connection/${id}`);
-    });
-    ipcMain.on(VIEW_CONNECTION_LIST, () => {
-      mainWindow?.webContents.send('redirectTo', `/manage`);
-    });
-    ipcMain.on(EXPORT, (evt, args: ExportFile) => {
-      configClient.export(
-        {
-          selector: args.selector,
-          removeTags: true,
-          format: 2,
-        } as ExportRequest,
-        (err, res) => {
-          evt?.sender?.send(EXPORT, {
+      ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
+        const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+        configClient.list(selector, (err, res) => {
+          sendTo?.send(GET_RECORDS, {
             err,
-            data: res.data,
-            filename: args.filename,
+            res,
           });
-        }
-      );
-    });
-    ipcMain.on(IMPORT, (evt) => {
-      dialog
-        .showOpenDialog({ properties: ['openFile'] })
-        .then((response) => {
-          if (!response.canceled) {
-            const bytes = fs.readFileSync(response.filePaths[0], null);
-            configClient.import(
-              {
-                data: bytes,
-              } as ImportRequest,
-              (err, res) => {
-                evt?.sender?.send(IMPORT, { err, res });
-              }
-            );
+          if (!err && res) {
+            if (selector.all) {
+              trayMenuHelper.setRecords(res.records);
+            } else {
+              res.records.forEach((rec) => {
+                trayMenuHelper.setRecord(rec);
+              });
+            }
+            menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
           }
-          return null;
-        })
-        .catch((err) => {
-          Sentry.captureException(err);
-          console.error(err);
-        });
-    });
-    ipcMain.on(DUPLICATE, (_evt, args: ConnectionData) => {
-      console.log(DUPLICATE + ' ' + args.connectionID + ' action was called.');
-    });
-    ipcMain.on(UPDATE_LISTENERS, (evt, args: ListenerUpdateRequest) => {
-      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
-      listenerClient.update(args, (err, res) => {
-        sendTo?.send(LISTENER_STATUS, {
-          err,
-          res,
-        });
-        if (!err && res) {
-          trayMenuHelper.setStatuses(res.listeners);
-          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
-        }
-      });
-    });
-    ipcMain.on(LISTENER_STATUS, (evt, args: Selector) => {
-      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
-      listenerClient.getStatus(args, (err, res) => {
-        sendTo?.send(LISTENER_STATUS, {
-          err,
-          res,
-        });
-        if (!err && res) {
-          trayMenuHelper.setStatuses(res.listeners);
-          menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
-        }
-      });
-    });
-    ipcMain.on(LISTENER_LOG, (evt, args) => {
-      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
-      updateStream?.cancel();
-      updateStream = listenerClient.statusUpdates({
-        connectionId: args.id as string,
-      } as StatusUpdatesRequest);
-      updateStream.on('data', (response) => {
-        sendTo?.send(LISTENER_LOG, {
-          msg: response as ConnectionStatusUpdate,
-          remoteAddr: args.remoteAddr,
         });
       });
-      // empty function otherwise causes fatal error on cancel !!!
-      updateStream.on('error', () => {});
-    });
-    menu.app.on('web-contents-created', () => {
-      contextMenu();
-    });
-    app.on('before-quit', () => {
-      mainWindow?.removeAllListeners('close');
-      updateStream?.cancel();
-      cliProcess.kill('SIGINT');
-      mainWindow?.close();
+      ipcMain.on(GET_ALL_RECORDS, (evt) => {
+        const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+        configClient.list(
+          {
+            all: true,
+            ids: [],
+            tags: [],
+          } as Selector,
+          (err, res) => {
+            sendTo?.send(GET_ALL_RECORDS, {
+              err,
+              res,
+            });
+            if (!err && res) {
+              trayMenuHelper.setRecords(res.records);
+              menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+            }
+          }
+        );
+      });
+      ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
+        const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+        configClient.getTags(GetTagsRequest, (err, res) => {
+          sendTo?.send(GET_UNIQUE_TAGS, {
+            err,
+            tags: res?.tags || [],
+          });
+          if (!err && res) {
+            trayMenuHelper.setTags(res.tags);
+            menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+          }
+        });
+      });
+      ipcMain.on(DELETE, (evt, id: string) => {
+        configClient.delete({ ids: [id], tags: [], all: false }, (err) => {
+          evt?.sender.send(DELETE, {
+            err,
+          });
+          if (!err) {
+            ipcMain.emit(GET_ALL_RECORDS);
+            ipcMain.emit(GET_UNIQUE_TAGS);
+          }
+        });
+      });
+      ipcMain.on(DELETE_ALL, (evt, tag: string) => {
+        configClient.delete({ ids: [], tags: [tag], all: false }, (err) => {
+          evt?.sender.send(DELETE, {
+            err,
+          });
+          if (!err) {
+            ipcMain.emit(GET_ALL_RECORDS);
+            ipcMain.emit(GET_UNIQUE_TAGS);
+          }
+        });
+      });
+      ipcMain.on(EDIT, (_evt, id: string) => {
+        mainWindow?.webContents.send('redirectTo', `/edit_connect/${id}`);
+      });
+      ipcMain.on(VIEW, (_evt, id: string) => {
+        mainWindow?.webContents.send('redirectTo', `/view_connection/${id}`);
+      });
+      ipcMain.on(VIEW_CONNECTION_LIST, () => {
+        mainWindow?.webContents.send('redirectTo', `/manage`);
+      });
+      ipcMain.on(EXPORT, (evt, args: ExportFile) => {
+        configClient.export(
+          {
+            selector: args.selector,
+            removeTags: true,
+            format: 2,
+          } as ExportRequest,
+          (err, res) => {
+            evt?.sender?.send(EXPORT, {
+              err,
+              data: res.data,
+              filename: args.filename,
+            });
+          }
+        );
+      });
+      ipcMain.on(IMPORT, (evt) => {
+        dialog
+          .showOpenDialog({ properties: ['openFile'] })
+          .then((response) => {
+            if (!response.canceled) {
+              const bytes = fs.readFileSync(response.filePaths[0], null);
+              configClient.import(
+                {
+                  data: bytes,
+                } as ImportRequest,
+                (err, res) => {
+                  evt?.sender?.send(IMPORT, { err, res });
+                }
+              );
+            }
+            return null;
+          })
+          .catch((err) => {
+            Sentry.captureException(err);
+            console.error(err);
+          });
+      });
+      ipcMain.on(UPDATE_LISTENERS, (evt, args: ListenerUpdateRequest) => {
+        const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+        listenerClient.update(args, (err, res) => {
+          sendTo?.send(LISTENER_STATUS, {
+            err,
+            res,
+          });
+          if (!err && res) {
+            trayMenuHelper.setStatuses(res.listeners);
+            menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+          }
+        });
+      });
+      ipcMain.on(LISTENER_STATUS, (evt, args: Selector) => {
+        const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+        listenerClient.getStatus(args, (err, res) => {
+          sendTo?.send(LISTENER_STATUS, {
+            err,
+            res,
+          });
+          if (!err && res) {
+            trayMenuHelper.setStatuses(res.listeners);
+            menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+          }
+        });
+      });
+      ipcMain.on(LISTENER_LOG, (evt, args) => {
+        const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+        updateStream?.cancel();
+        updateStream = listenerClient.statusUpdates({
+          connectionId: args.id as string,
+        } as StatusUpdatesRequest);
+        updateStream.on('data', (response) => {
+          sendTo?.send(LISTENER_LOG, {
+            msg: response as ConnectionStatusUpdate,
+            remoteAddr: args.remoteAddr,
+          });
+        });
+        // empty function otherwise causes fatal error on cancel !!!
+        updateStream.on('error', () => {});
+      });
+      menu.app.on('web-contents-created', () => {
+        contextMenu();
+      });
+      app.on('before-quit', () => {
+        mainWindow?.removeAllListeners('close');
+        updateStream?.cancel();
+        cliProcess.kill('SIGINT');
+        mainWindow?.close();
+      });
     });
   });
-});
+}
