@@ -72,7 +72,7 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(GET_ALL_RECORDS, (_, args) => {
       if (args.err) {
-        enqueueSnackbar(args.err, {
+        enqueueSnackbar(args.err.message, {
           variant: 'error',
           autoHideDuration: TOAST_LENGTH,
         });
@@ -82,7 +82,7 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
       if (args.err) {
-        enqueueSnackbar(args.err, {
+        enqueueSnackbar(args.err.message, {
           variant: 'error',
           autoHideDuration: TOAST_LENGTH,
         });
@@ -107,7 +107,7 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(DELETE, (_, args) => {
       if (args.err) {
-        enqueueSnackbar(args.err, {
+        enqueueSnackbar(args.err.message, {
           variant: 'error',
           autoHideDuration: TOAST_LENGTH,
         });
@@ -115,7 +115,7 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(EXPORT, (_, args) => {
       if (args.err) {
-        enqueueSnackbar(args.err, {
+        enqueueSnackbar(args.err.message, {
           variant: 'error',
           autoHideDuration: TOAST_LENGTH,
         });
@@ -129,7 +129,7 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(IMPORT, (_, args) => {
       if (args.err) {
-        enqueueSnackbar(args.err, {
+        enqueueSnackbar(args.err.message, {
           variant: 'error',
           autoHideDuration: TOAST_LENGTH,
         });
@@ -143,7 +143,7 @@ const ManageConnections = (): JSX.Element => {
     });
     ipcRenderer.on(SAVE_RECORD, (_, args) => {
       if (args.err) {
-        enqueueSnackbar(args.err, {
+        enqueueSnackbar(args.err.message, {
           variant: 'error',
           autoHideDuration: TOAST_LENGTH,
         });

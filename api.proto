@@ -131,6 +131,77 @@ message ConnectionStatusUpdate {
   google.protobuf.Timestamp ts = 6;
 }
 
+message KeyUsage {
+  // standard key usages
+  bool digital_signature = 1;
+  bool content_commitment = 2;
+  bool key_encipherment = 3;
+  bool data_encipherment = 4;
+  bool key_agreement = 5;
+  // certificate authority
+  bool cert_sign = 6;
+  bool crl_sign = 7;
+  bool encipher_only = 8;
+  bool decipher_only = 9;
+  // extensions derived from x509.ExtKeyUsage
+  // server certificate
+  bool server_auth = 10;
+  // client certificate
+  bool client_auth = 11;
+}
+
+// Name defines the x509 identity
+message Name {
+  repeated string country = 1;
+  repeated string organization = 2;
+  repeated string organizational_unit = 3;
+  repeated string locality = 4;
+  repeated string province = 5;
+  repeated string street_address = 6;
+  repeated string postal_code = 7;
+  string serial_number = 8;
+  string common_name = 9;
+}
+
+message CertificateInfo {
+  int64 version = 1;
+  string serial = 2;
+
+  Name issuer = 3;
+  Name subject = 4;
+
+  google.protobuf.Timestamp not_before = 5;
+  google.protobuf.Timestamp not_after = 6;
+
+  KeyUsage key_usage = 7;
+
+  repeated string dns_names = 10;
+  repeated string email_addresses = 11;
+  repeated string ip_addresses = 12;
+  repeated string uris = 13;
+
+  bool permitted_dns_domains_critical = 14;
+  repeated string permitted_dns_domains = 15;
+  repeated string excluded_dns_domains = 16;
+  repeated string permitted_ip_ranges = 17;
+  repeated string excluded_ip_ranges = 18;
+  repeated string permitted_email_addresses = 19;
+  repeated string excluded_email_addresses = 20;
+  repeated string permitted_uri_domains = 21;
+  repeated string excluded_uri_domains = 22;
+
+  // error is set if there was an error parsing provided certificate
+  optional string error = 23;
+}
+
+message Certificate {
+  bytes cert = 1;
+  optional bytes key = 2;
+  // info field is ignored during upsert requests
+  // and is set when returning certificate info
+  optional CertificateInfo info = 3;
+}
+
 // Connection
 message Connection {
   // name is a user friendly connection name that a user may define
@@ -145,4 +216,5 @@ message Connection {
     bool disable_tls_verification = 5;
     bytes ca_cert = 6;
   }
+  optional Certificate client_cert = 7;
 }
