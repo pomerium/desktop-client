@@ -236,6 +236,75 @@ export function connectionStatusUpdate_ConnectionStatusToJSON(
   }
 }
 
+export interface KeyUsage {
+  /** standard key usages */
+  digitalSignature: boolean;
+  contentCommitment: boolean;
+  keyEncipherment: boolean;
+  dataEncipherment: boolean;
+  keyAgreement: boolean;
+  /** certificate authority */
+  certSign: boolean;
+  crlSign: boolean;
+  encipherOnly: boolean;
+  decipherOnly: boolean;
+  /**
+   * extensions derived from x509.ExtKeyUsage
+   * server certificate
+   */
+  serverAuth: boolean;
+  /** client certificate */
+  clientAuth: boolean;
+}
+
+/** Name defines the x509 identity */
+export interface Name {
+  country: string[];
+  organization: string[];
+  organizationalUnit: string[];
+  locality: string[];
+  province: string[];
+  streetAddress: string[];
+  postalCode: string[];
+  serialNumber: string;
+  commonName: string;
+}
+
+export interface CertificateInfo {
+  version: number;
+  serial: string;
+  issuer: Name | undefined;
+  subject: Name | undefined;
+  notBefore: Date | undefined;
+  notAfter: Date | undefined;
+  keyUsage: KeyUsage | undefined;
+  dnsNames: string[];
+  emailAddresses: string[];
+  ipAddresses: string[];
+  uris: string[];
+  permittedDnsDomainsCritical: boolean;
+  permittedDnsDomains: string[];
+  excludedDnsDomains: string[];
+  permittedIpRanges: string[];
+  excludedIpRanges: string[];
+  permittedEmailAddresses: string[];
+  excludedEmailAddresses: string[];
+  permittedUriDomains: string[];
+  excludedUriDomains: string[];
+  /** error is set if there was an error parsing provided certificate */
+  error?: string | undefined;
+}
+
+export interface Certificate {
+  cert: Uint8Array;
+  key?: Uint8Array | undefined;
+  /**
+   * info field is ignored during upsert requests
+   * and is set when returning certificate info
+   */
+  info?: CertificateInfo | undefined;
+}
+
 /** Connection */
 export interface Connection {
   /** name is a user friendly connection name that a user may define */
@@ -248,6 +317,7 @@ export interface Connection {
   pomeriumUrl?: string | undefined;
   disableTlsVerification: boolean | undefined;
   caCert: Uint8Array | undefined;
+  clientCert?: Certificate | undefined;
 }
 
 const baseRecord: object = { tags: '' };
@@ -1445,6 +1515,1110 @@ export const ConnectionStatusUpdate = {
   },
 };
 
+const baseKeyUsage: object = {
+  digitalSignature: false,
+  contentCommitment: false,
+  keyEncipherment: false,
+  dataEncipherment: false,
+  keyAgreement: false,
+  certSign: false,
+  crlSign: false,
+  encipherOnly: false,
+  decipherOnly: false,
+  serverAuth: false,
+  clientAuth: false,
+};
+
+export const KeyUsage = {
+  encode(
+    message: KeyUsage,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.digitalSignature === true) {
+      writer.uint32(8).bool(message.digitalSignature);
+    }
+    if (message.contentCommitment === true) {
+      writer.uint32(16).bool(message.contentCommitment);
+    }
+    if (message.keyEncipherment === true) {
+      writer.uint32(24).bool(message.keyEncipherment);
+    }
+    if (message.dataEncipherment === true) {
+      writer.uint32(32).bool(message.dataEncipherment);
+    }
+    if (message.keyAgreement === true) {
+      writer.uint32(40).bool(message.keyAgreement);
+    }
+    if (message.certSign === true) {
+      writer.uint32(48).bool(message.certSign);
+    }
+    if (message.crlSign === true) {
+      writer.uint32(56).bool(message.crlSign);
+    }
+    if (message.encipherOnly === true) {
+      writer.uint32(64).bool(message.encipherOnly);
+    }
+    if (message.decipherOnly === true) {
+      writer.uint32(72).bool(message.decipherOnly);
+    }
+    if (message.serverAuth === true) {
+      writer.uint32(80).bool(message.serverAuth);
+    }
+    if (message.clientAuth === true) {
+      writer.uint32(88).bool(message.clientAuth);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): KeyUsage {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseKeyUsage } as KeyUsage;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.digitalSignature = reader.bool();
+          break;
+        case 2:
+          message.contentCommitment = reader.bool();
+          break;
+        case 3:
+          message.keyEncipherment = reader.bool();
+          break;
+        case 4:
+          message.dataEncipherment = reader.bool();
+          break;
+        case 5:
+          message.keyAgreement = reader.bool();
+          break;
+        case 6:
+          message.certSign = reader.bool();
+          break;
+        case 7:
+          message.crlSign = reader.bool();
+          break;
+        case 8:
+          message.encipherOnly = reader.bool();
+          break;
+        case 9:
+          message.decipherOnly = reader.bool();
+          break;
+        case 10:
+          message.serverAuth = reader.bool();
+          break;
+        case 11:
+          message.clientAuth = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): KeyUsage {
+    const message = { ...baseKeyUsage } as KeyUsage;
+    if (
+      object.digitalSignature !== undefined &&
+      object.digitalSignature !== null
+    ) {
+      message.digitalSignature = Boolean(object.digitalSignature);
+    } else {
+      message.digitalSignature = false;
+    }
+    if (
+      object.contentCommitment !== undefined &&
+      object.contentCommitment !== null
+    ) {
+      message.contentCommitment = Boolean(object.contentCommitment);
+    } else {
+      message.contentCommitment = false;
+    }
+    if (
+      object.keyEncipherment !== undefined &&
+      object.keyEncipherment !== null
+    ) {
+      message.keyEncipherment = Boolean(object.keyEncipherment);
+    } else {
+      message.keyEncipherment = false;
+    }
+    if (
+      object.dataEncipherment !== undefined &&
+      object.dataEncipherment !== null
+    ) {
+      message.dataEncipherment = Boolean(object.dataEncipherment);
+    } else {
+      message.dataEncipherment = false;
+    }
+    if (object.keyAgreement !== undefined && object.keyAgreement !== null) {
+      message.keyAgreement = Boolean(object.keyAgreement);
+    } else {
+      message.keyAgreement = false;
+    }
+    if (object.certSign !== undefined && object.certSign !== null) {
+      message.certSign = Boolean(object.certSign);
+    } else {
+      message.certSign = false;
+    }
+    if (object.crlSign !== undefined && object.crlSign !== null) {
+      message.crlSign = Boolean(object.crlSign);
+    } else {
+      message.crlSign = false;
+    }
+    if (object.encipherOnly !== undefined && object.encipherOnly !== null) {
+      message.encipherOnly = Boolean(object.encipherOnly);
+    } else {
+      message.encipherOnly = false;
+    }
+    if (object.decipherOnly !== undefined && object.decipherOnly !== null) {
+      message.decipherOnly = Boolean(object.decipherOnly);
+    } else {
+      message.decipherOnly = false;
+    }
+    if (object.serverAuth !== undefined && object.serverAuth !== null) {
+      message.serverAuth = Boolean(object.serverAuth);
+    } else {
+      message.serverAuth = false;
+    }
+    if (object.clientAuth !== undefined && object.clientAuth !== null) {
+      message.clientAuth = Boolean(object.clientAuth);
+    } else {
+      message.clientAuth = false;
+    }
+    return message;
+  },
+
+  toJSON(message: KeyUsage): unknown {
+    const obj: any = {};
+    message.digitalSignature !== undefined &&
+      (obj.digitalSignature = message.digitalSignature);
+    message.contentCommitment !== undefined &&
+      (obj.contentCommitment = message.contentCommitment);
+    message.keyEncipherment !== undefined &&
+      (obj.keyEncipherment = message.keyEncipherment);
+    message.dataEncipherment !== undefined &&
+      (obj.dataEncipherment = message.dataEncipherment);
+    message.keyAgreement !== undefined &&
+      (obj.keyAgreement = message.keyAgreement);
+    message.certSign !== undefined && (obj.certSign = message.certSign);
+    message.crlSign !== undefined && (obj.crlSign = message.crlSign);
+    message.encipherOnly !== undefined &&
+      (obj.encipherOnly = message.encipherOnly);
+    message.decipherOnly !== undefined &&
+      (obj.decipherOnly = message.decipherOnly);
+    message.serverAuth !== undefined && (obj.serverAuth = message.serverAuth);
+    message.clientAuth !== undefined && (obj.clientAuth = message.clientAuth);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<KeyUsage>): KeyUsage {
+    const message = { ...baseKeyUsage } as KeyUsage;
+    message.digitalSignature = object.digitalSignature ?? false;
+    message.contentCommitment = object.contentCommitment ?? false;
+    message.keyEncipherment = object.keyEncipherment ?? false;
+    message.dataEncipherment = object.dataEncipherment ?? false;
+    message.keyAgreement = object.keyAgreement ?? false;
+    message.certSign = object.certSign ?? false;
+    message.crlSign = object.crlSign ?? false;
+    message.encipherOnly = object.encipherOnly ?? false;
+    message.decipherOnly = object.decipherOnly ?? false;
+    message.serverAuth = object.serverAuth ?? false;
+    message.clientAuth = object.clientAuth ?? false;
+    return message;
+  },
+};
+
+const baseName: object = {
+  country: '',
+  organization: '',
+  organizationalUnit: '',
+  locality: '',
+  province: '',
+  streetAddress: '',
+  postalCode: '',
+  serialNumber: '',
+  commonName: '',
+};
+
+export const Name = {
+  encode(message: Name, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.country) {
+      writer.uint32(10).string(v!);
+    }
+    for (const v of message.organization) {
+      writer.uint32(18).string(v!);
+    }
+    for (const v of message.organizationalUnit) {
+      writer.uint32(26).string(v!);
+    }
+    for (const v of message.locality) {
+      writer.uint32(34).string(v!);
+    }
+    for (const v of message.province) {
+      writer.uint32(42).string(v!);
+    }
+    for (const v of message.streetAddress) {
+      writer.uint32(50).string(v!);
+    }
+    for (const v of message.postalCode) {
+      writer.uint32(58).string(v!);
+    }
+    if (message.serialNumber !== '') {
+      writer.uint32(66).string(message.serialNumber);
+    }
+    if (message.commonName !== '') {
+      writer.uint32(74).string(message.commonName);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Name {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseName } as Name;
+    message.country = [];
+    message.organization = [];
+    message.organizationalUnit = [];
+    message.locality = [];
+    message.province = [];
+    message.streetAddress = [];
+    message.postalCode = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.country.push(reader.string());
+          break;
+        case 2:
+          message.organization.push(reader.string());
+          break;
+        case 3:
+          message.organizationalUnit.push(reader.string());
+          break;
+        case 4:
+          message.locality.push(reader.string());
+          break;
+        case 5:
+          message.province.push(reader.string());
+          break;
+        case 6:
+          message.streetAddress.push(reader.string());
+          break;
+        case 7:
+          message.postalCode.push(reader.string());
+          break;
+        case 8:
+          message.serialNumber = reader.string();
+          break;
+        case 9:
+          message.commonName = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Name {
+    const message = { ...baseName } as Name;
+    message.country = [];
+    message.organization = [];
+    message.organizationalUnit = [];
+    message.locality = [];
+    message.province = [];
+    message.streetAddress = [];
+    message.postalCode = [];
+    if (object.country !== undefined && object.country !== null) {
+      for (const e of object.country) {
+        message.country.push(String(e));
+      }
+    }
+    if (object.organization !== undefined && object.organization !== null) {
+      for (const e of object.organization) {
+        message.organization.push(String(e));
+      }
+    }
+    if (
+      object.organizationalUnit !== undefined &&
+      object.organizationalUnit !== null
+    ) {
+      for (const e of object.organizationalUnit) {
+        message.organizationalUnit.push(String(e));
+      }
+    }
+    if (object.locality !== undefined && object.locality !== null) {
+      for (const e of object.locality) {
+        message.locality.push(String(e));
+      }
+    }
+    if (object.province !== undefined && object.province !== null) {
+      for (const e of object.province) {
+        message.province.push(String(e));
+      }
+    }
+    if (object.streetAddress !== undefined && object.streetAddress !== null) {
+      for (const e of object.streetAddress) {
+        message.streetAddress.push(String(e));
+      }
+    }
+    if (object.postalCode !== undefined && object.postalCode !== null) {
+      for (const e of object.postalCode) {
+        message.postalCode.push(String(e));
+      }
+    }
+    if (object.serialNumber !== undefined && object.serialNumber !== null) {
+      message.serialNumber = String(object.serialNumber);
+    } else {
+      message.serialNumber = '';
+    }
+    if (object.commonName !== undefined && object.commonName !== null) {
+      message.commonName = String(object.commonName);
+    } else {
+      message.commonName = '';
+    }
+    return message;
+  },
+
+  toJSON(message: Name): unknown {
+    const obj: any = {};
+    if (message.country) {
+      obj.country = message.country.map((e) => e);
+    } else {
+      obj.country = [];
+    }
+    if (message.organization) {
+      obj.organization = message.organization.map((e) => e);
+    } else {
+      obj.organization = [];
+    }
+    if (message.organizationalUnit) {
+      obj.organizationalUnit = message.organizationalUnit.map((e) => e);
+    } else {
+      obj.organizationalUnit = [];
+    }
+    if (message.locality) {
+      obj.locality = message.locality.map((e) => e);
+    } else {
+      obj.locality = [];
+    }
+    if (message.province) {
+      obj.province = message.province.map((e) => e);
+    } else {
+      obj.province = [];
+    }
+    if (message.streetAddress) {
+      obj.streetAddress = message.streetAddress.map((e) => e);
+    } else {
+      obj.streetAddress = [];
+    }
+    if (message.postalCode) {
+      obj.postalCode = message.postalCode.map((e) => e);
+    } else {
+      obj.postalCode = [];
+    }
+    message.serialNumber !== undefined &&
+      (obj.serialNumber = message.serialNumber);
+    message.commonName !== undefined && (obj.commonName = message.commonName);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Name>): Name {
+    const message = { ...baseName } as Name;
+    message.country = [];
+    if (object.country !== undefined && object.country !== null) {
+      for (const e of object.country) {
+        message.country.push(e);
+      }
+    }
+    message.organization = [];
+    if (object.organization !== undefined && object.organization !== null) {
+      for (const e of object.organization) {
+        message.organization.push(e);
+      }
+    }
+    message.organizationalUnit = [];
+    if (
+      object.organizationalUnit !== undefined &&
+      object.organizationalUnit !== null
+    ) {
+      for (const e of object.organizationalUnit) {
+        message.organizationalUnit.push(e);
+      }
+    }
+    message.locality = [];
+    if (object.locality !== undefined && object.locality !== null) {
+      for (const e of object.locality) {
+        message.locality.push(e);
+      }
+    }
+    message.province = [];
+    if (object.province !== undefined && object.province !== null) {
+      for (const e of object.province) {
+        message.province.push(e);
+      }
+    }
+    message.streetAddress = [];
+    if (object.streetAddress !== undefined && object.streetAddress !== null) {
+      for (const e of object.streetAddress) {
+        message.streetAddress.push(e);
+      }
+    }
+    message.postalCode = [];
+    if (object.postalCode !== undefined && object.postalCode !== null) {
+      for (const e of object.postalCode) {
+        message.postalCode.push(e);
+      }
+    }
+    message.serialNumber = object.serialNumber ?? '';
+    message.commonName = object.commonName ?? '';
+    return message;
+  },
+};
+
+const baseCertificateInfo: object = {
+  version: 0,
+  serial: '',
+  dnsNames: '',
+  emailAddresses: '',
+  ipAddresses: '',
+  uris: '',
+  permittedDnsDomainsCritical: false,
+  permittedDnsDomains: '',
+  excludedDnsDomains: '',
+  permittedIpRanges: '',
+  excludedIpRanges: '',
+  permittedEmailAddresses: '',
+  excludedEmailAddresses: '',
+  permittedUriDomains: '',
+  excludedUriDomains: '',
+};
+
+export const CertificateInfo = {
+  encode(
+    message: CertificateInfo,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.version !== 0) {
+      writer.uint32(8).int64(message.version);
+    }
+    if (message.serial !== '') {
+      writer.uint32(18).string(message.serial);
+    }
+    if (message.issuer !== undefined) {
+      Name.encode(message.issuer, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.subject !== undefined) {
+      Name.encode(message.subject, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.notBefore !== undefined) {
+      Timestamp.encode(
+        toTimestamp(message.notBefore),
+        writer.uint32(42).fork()
+      ).ldelim();
+    }
+    if (message.notAfter !== undefined) {
+      Timestamp.encode(
+        toTimestamp(message.notAfter),
+        writer.uint32(50).fork()
+      ).ldelim();
+    }
+    if (message.keyUsage !== undefined) {
+      KeyUsage.encode(message.keyUsage, writer.uint32(58).fork()).ldelim();
+    }
+    for (const v of message.dnsNames) {
+      writer.uint32(82).string(v!);
+    }
+    for (const v of message.emailAddresses) {
+      writer.uint32(90).string(v!);
+    }
+    for (const v of message.ipAddresses) {
+      writer.uint32(98).string(v!);
+    }
+    for (const v of message.uris) {
+      writer.uint32(106).string(v!);
+    }
+    if (message.permittedDnsDomainsCritical === true) {
+      writer.uint32(112).bool(message.permittedDnsDomainsCritical);
+    }
+    for (const v of message.permittedDnsDomains) {
+      writer.uint32(122).string(v!);
+    }
+    for (const v of message.excludedDnsDomains) {
+      writer.uint32(130).string(v!);
+    }
+    for (const v of message.permittedIpRanges) {
+      writer.uint32(138).string(v!);
+    }
+    for (const v of message.excludedIpRanges) {
+      writer.uint32(146).string(v!);
+    }
+    for (const v of message.permittedEmailAddresses) {
+      writer.uint32(154).string(v!);
+    }
+    for (const v of message.excludedEmailAddresses) {
+      writer.uint32(162).string(v!);
+    }
+    for (const v of message.permittedUriDomains) {
+      writer.uint32(170).string(v!);
+    }
+    for (const v of message.excludedUriDomains) {
+      writer.uint32(178).string(v!);
+    }
+    if (message.error !== undefined) {
+      writer.uint32(186).string(message.error);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CertificateInfo {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseCertificateInfo } as CertificateInfo;
+    message.dnsNames = [];
+    message.emailAddresses = [];
+    message.ipAddresses = [];
+    message.uris = [];
+    message.permittedDnsDomains = [];
+    message.excludedDnsDomains = [];
+    message.permittedIpRanges = [];
+    message.excludedIpRanges = [];
+    message.permittedEmailAddresses = [];
+    message.excludedEmailAddresses = [];
+    message.permittedUriDomains = [];
+    message.excludedUriDomains = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.version = longToNumber(reader.int64() as Long);
+          break;
+        case 2:
+          message.serial = reader.string();
+          break;
+        case 3:
+          message.issuer = Name.decode(reader, reader.uint32());
+          break;
+        case 4:
+          message.subject = Name.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.notBefore = fromTimestamp(
+            Timestamp.decode(reader, reader.uint32())
+          );
+          break;
+        case 6:
+          message.notAfter = fromTimestamp(
+            Timestamp.decode(reader, reader.uint32())
+          );
+          break;
+        case 7:
+          message.keyUsage = KeyUsage.decode(reader, reader.uint32());
+          break;
+        case 10:
+          message.dnsNames.push(reader.string());
+          break;
+        case 11:
+          message.emailAddresses.push(reader.string());
+          break;
+        case 12:
+          message.ipAddresses.push(reader.string());
+          break;
+        case 13:
+          message.uris.push(reader.string());
+          break;
+        case 14:
+          message.permittedDnsDomainsCritical = reader.bool();
+          break;
+        case 15:
+          message.permittedDnsDomains.push(reader.string());
+          break;
+        case 16:
+          message.excludedDnsDomains.push(reader.string());
+          break;
+        case 17:
+          message.permittedIpRanges.push(reader.string());
+          break;
+        case 18:
+          message.excludedIpRanges.push(reader.string());
+          break;
+        case 19:
+          message.permittedEmailAddresses.push(reader.string());
+          break;
+        case 20:
+          message.excludedEmailAddresses.push(reader.string());
+          break;
+        case 21:
+          message.permittedUriDomains.push(reader.string());
+          break;
+        case 22:
+          message.excludedUriDomains.push(reader.string());
+          break;
+        case 23:
+          message.error = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CertificateInfo {
+    const message = { ...baseCertificateInfo } as CertificateInfo;
+    message.dnsNames = [];
+    message.emailAddresses = [];
+    message.ipAddresses = [];
+    message.uris = [];
+    message.permittedDnsDomains = [];
+    message.excludedDnsDomains = [];
+    message.permittedIpRanges = [];
+    message.excludedIpRanges = [];
+    message.permittedEmailAddresses = [];
+    message.excludedEmailAddresses = [];
+    message.permittedUriDomains = [];
+    message.excludedUriDomains = [];
+    if (object.version !== undefined && object.version !== null) {
+      message.version = Number(object.version);
+    } else {
+      message.version = 0;
+    }
+    if (object.serial !== undefined && object.serial !== null) {
+      message.serial = String(object.serial);
+    } else {
+      message.serial = '';
+    }
+    if (object.issuer !== undefined && object.issuer !== null) {
+      message.issuer = Name.fromJSON(object.issuer);
+    } else {
+      message.issuer = undefined;
+    }
+    if (object.subject !== undefined && object.subject !== null) {
+      message.subject = Name.fromJSON(object.subject);
+    } else {
+      message.subject = undefined;
+    }
+    if (object.notBefore !== undefined && object.notBefore !== null) {
+      message.notBefore = fromJsonTimestamp(object.notBefore);
+    } else {
+      message.notBefore = undefined;
+    }
+    if (object.notAfter !== undefined && object.notAfter !== null) {
+      message.notAfter = fromJsonTimestamp(object.notAfter);
+    } else {
+      message.notAfter = undefined;
+    }
+    if (object.keyUsage !== undefined && object.keyUsage !== null) {
+      message.keyUsage = KeyUsage.fromJSON(object.keyUsage);
+    } else {
+      message.keyUsage = undefined;
+    }
+    if (object.dnsNames !== undefined && object.dnsNames !== null) {
+      for (const e of object.dnsNames) {
+        message.dnsNames.push(String(e));
+      }
+    }
+    if (object.emailAddresses !== undefined && object.emailAddresses !== null) {
+      for (const e of object.emailAddresses) {
+        message.emailAddresses.push(String(e));
+      }
+    }
+    if (object.ipAddresses !== undefined && object.ipAddresses !== null) {
+      for (const e of object.ipAddresses) {
+        message.ipAddresses.push(String(e));
+      }
+    }
+    if (object.uris !== undefined && object.uris !== null) {
+      for (const e of object.uris) {
+        message.uris.push(String(e));
+      }
+    }
+    if (
+      object.permittedDnsDomainsCritical !== undefined &&
+      object.permittedDnsDomainsCritical !== null
+    ) {
+      message.permittedDnsDomainsCritical = Boolean(
+        object.permittedDnsDomainsCritical
+      );
+    } else {
+      message.permittedDnsDomainsCritical = false;
+    }
+    if (
+      object.permittedDnsDomains !== undefined &&
+      object.permittedDnsDomains !== null
+    ) {
+      for (const e of object.permittedDnsDomains) {
+        message.permittedDnsDomains.push(String(e));
+      }
+    }
+    if (
+      object.excludedDnsDomains !== undefined &&
+      object.excludedDnsDomains !== null
+    ) {
+      for (const e of object.excludedDnsDomains) {
+        message.excludedDnsDomains.push(String(e));
+      }
+    }
+    if (
+      object.permittedIpRanges !== undefined &&
+      object.permittedIpRanges !== null
+    ) {
+      for (const e of object.permittedIpRanges) {
+        message.permittedIpRanges.push(String(e));
+      }
+    }
+    if (
+      object.excludedIpRanges !== undefined &&
+      object.excludedIpRanges !== null
+    ) {
+      for (const e of object.excludedIpRanges) {
+        message.excludedIpRanges.push(String(e));
+      }
+    }
+    if (
+      object.permittedEmailAddresses !== undefined &&
+      object.permittedEmailAddresses !== null
+    ) {
+      for (const e of object.permittedEmailAddresses) {
+        message.permittedEmailAddresses.push(String(e));
+      }
+    }
+    if (
+      object.excludedEmailAddresses !== undefined &&
+      object.excludedEmailAddresses !== null
+    ) {
+      for (const e of object.excludedEmailAddresses) {
+        message.excludedEmailAddresses.push(String(e));
+      }
+    }
+    if (
+      object.permittedUriDomains !== undefined &&
+      object.permittedUriDomains !== null
+    ) {
+      for (const e of object.permittedUriDomains) {
+        message.permittedUriDomains.push(String(e));
+      }
+    }
+    if (
+      object.excludedUriDomains !== undefined &&
+      object.excludedUriDomains !== null
+    ) {
+      for (const e of object.excludedUriDomains) {
+        message.excludedUriDomains.push(String(e));
+      }
+    }
+    if (object.error !== undefined && object.error !== null) {
+      message.error = String(object.error);
+    } else {
+      message.error = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: CertificateInfo): unknown {
+    const obj: any = {};
+    message.version !== undefined && (obj.version = message.version);
+    message.serial !== undefined && (obj.serial = message.serial);
+    message.issuer !== undefined &&
+      (obj.issuer = message.issuer ? Name.toJSON(message.issuer) : undefined);
+    message.subject !== undefined &&
+      (obj.subject = message.subject
+        ? Name.toJSON(message.subject)
+        : undefined);
+    message.notBefore !== undefined &&
+      (obj.notBefore = message.notBefore.toISOString());
+    message.notAfter !== undefined &&
+      (obj.notAfter = message.notAfter.toISOString());
+    message.keyUsage !== undefined &&
+      (obj.keyUsage = message.keyUsage
+        ? KeyUsage.toJSON(message.keyUsage)
+        : undefined);
+    if (message.dnsNames) {
+      obj.dnsNames = message.dnsNames.map((e) => e);
+    } else {
+      obj.dnsNames = [];
+    }
+    if (message.emailAddresses) {
+      obj.emailAddresses = message.emailAddresses.map((e) => e);
+    } else {
+      obj.emailAddresses = [];
+    }
+    if (message.ipAddresses) {
+      obj.ipAddresses = message.ipAddresses.map((e) => e);
+    } else {
+      obj.ipAddresses = [];
+    }
+    if (message.uris) {
+      obj.uris = message.uris.map((e) => e);
+    } else {
+      obj.uris = [];
+    }
+    message.permittedDnsDomainsCritical !== undefined &&
+      (obj.permittedDnsDomainsCritical = message.permittedDnsDomainsCritical);
+    if (message.permittedDnsDomains) {
+      obj.permittedDnsDomains = message.permittedDnsDomains.map((e) => e);
+    } else {
+      obj.permittedDnsDomains = [];
+    }
+    if (message.excludedDnsDomains) {
+      obj.excludedDnsDomains = message.excludedDnsDomains.map((e) => e);
+    } else {
+      obj.excludedDnsDomains = [];
+    }
+    if (message.permittedIpRanges) {
+      obj.permittedIpRanges = message.permittedIpRanges.map((e) => e);
+    } else {
+      obj.permittedIpRanges = [];
+    }
+    if (message.excludedIpRanges) {
+      obj.excludedIpRanges = message.excludedIpRanges.map((e) => e);
+    } else {
+      obj.excludedIpRanges = [];
+    }
+    if (message.permittedEmailAddresses) {
+      obj.permittedEmailAddresses = message.permittedEmailAddresses.map(
+        (e) => e
+      );
+    } else {
+      obj.permittedEmailAddresses = [];
+    }
+    if (message.excludedEmailAddresses) {
+      obj.excludedEmailAddresses = message.excludedEmailAddresses.map((e) => e);
+    } else {
+      obj.excludedEmailAddresses = [];
+    }
+    if (message.permittedUriDomains) {
+      obj.permittedUriDomains = message.permittedUriDomains.map((e) => e);
+    } else {
+      obj.permittedUriDomains = [];
+    }
+    if (message.excludedUriDomains) {
+      obj.excludedUriDomains = message.excludedUriDomains.map((e) => e);
+    } else {
+      obj.excludedUriDomains = [];
+    }
+    message.error !== undefined && (obj.error = message.error);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<CertificateInfo>): CertificateInfo {
+    const message = { ...baseCertificateInfo } as CertificateInfo;
+    message.version = object.version ?? 0;
+    message.serial = object.serial ?? '';
+    if (object.issuer !== undefined && object.issuer !== null) {
+      message.issuer = Name.fromPartial(object.issuer);
+    } else {
+      message.issuer = undefined;
+    }
+    if (object.subject !== undefined && object.subject !== null) {
+      message.subject = Name.fromPartial(object.subject);
+    } else {
+      message.subject = undefined;
+    }
+    message.notBefore = object.notBefore ?? undefined;
+    message.notAfter = object.notAfter ?? undefined;
+    if (object.keyUsage !== undefined && object.keyUsage !== null) {
+      message.keyUsage = KeyUsage.fromPartial(object.keyUsage);
+    } else {
+      message.keyUsage = undefined;
+    }
+    message.dnsNames = [];
+    if (object.dnsNames !== undefined && object.dnsNames !== null) {
+      for (const e of object.dnsNames) {
+        message.dnsNames.push(e);
+      }
+    }
+    message.emailAddresses = [];
+    if (object.emailAddresses !== undefined && object.emailAddresses !== null) {
+      for (const e of object.emailAddresses) {
+        message.emailAddresses.push(e);
+      }
+    }
+    message.ipAddresses = [];
+    if (object.ipAddresses !== undefined && object.ipAddresses !== null) {
+      for (const e of object.ipAddresses) {
+        message.ipAddresses.push(e);
+      }
+    }
+    message.uris = [];
+    if (object.uris !== undefined && object.uris !== null) {
+      for (const e of object.uris) {
+        message.uris.push(e);
+      }
+    }
+    message.permittedDnsDomainsCritical =
+      object.permittedDnsDomainsCritical ?? false;
+    message.permittedDnsDomains = [];
+    if (
+      object.permittedDnsDomains !== undefined &&
+      object.permittedDnsDomains !== null
+    ) {
+      for (const e of object.permittedDnsDomains) {
+        message.permittedDnsDomains.push(e);
+      }
+    }
+    message.excludedDnsDomains = [];
+    if (
+      object.excludedDnsDomains !== undefined &&
+      object.excludedDnsDomains !== null
+    ) {
+      for (const e of object.excludedDnsDomains) {
+        message.excludedDnsDomains.push(e);
+      }
+    }
+    message.permittedIpRanges = [];
+    if (
+      object.permittedIpRanges !== undefined &&
+      object.permittedIpRanges !== null
+    ) {
+      for (const e of object.permittedIpRanges) {
+        message.permittedIpRanges.push(e);
+      }
+    }
+    message.excludedIpRanges = [];
+    if (
+      object.excludedIpRanges !== undefined &&
+      object.excludedIpRanges !== null
+    ) {
+      for (const e of object.excludedIpRanges) {
+        message.excludedIpRanges.push(e);
+      }
+    }
+    message.permittedEmailAddresses = [];
+    if (
+      object.permittedEmailAddresses !== undefined &&
+      object.permittedEmailAddresses !== null
+    ) {
+      for (const e of object.permittedEmailAddresses) {
+        message.permittedEmailAddresses.push(e);
+      }
+    }
+    message.excludedEmailAddresses = [];
+    if (
+      object.excludedEmailAddresses !== undefined &&
+      object.excludedEmailAddresses !== null
+    ) {
+      for (const e of object.excludedEmailAddresses) {
+        message.excludedEmailAddresses.push(e);
+      }
+    }
+    message.permittedUriDomains = [];
+    if (
+      object.permittedUriDomains !== undefined &&
+      object.permittedUriDomains !== null
+    ) {
+      for (const e of object.permittedUriDomains) {
+        message.permittedUriDomains.push(e);
+      }
+    }
+    message.excludedUriDomains = [];
+    if (
+      object.excludedUriDomains !== undefined &&
+      object.excludedUriDomains !== null
+    ) {
+      for (const e of object.excludedUriDomains) {
+        message.excludedUriDomains.push(e);
+      }
+    }
+    message.error = object.error ?? undefined;
+    return message;
+  },
+};
+
+const baseCertificate: object = {};
+
+export const Certificate = {
+  encode(
+    message: Certificate,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.cert.length !== 0) {
+      writer.uint32(10).bytes(message.cert);
+    }
+    if (message.key !== undefined) {
+      writer.uint32(18).bytes(message.key);
+    }
+    if (message.info !== undefined) {
+      CertificateInfo.encode(message.info, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Certificate {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseCertificate } as Certificate;
+    message.cert = new Uint8Array();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.cert = reader.bytes();
+          break;
+        case 2:
+          message.key = reader.bytes();
+          break;
+        case 3:
+          message.info = CertificateInfo.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Certificate {
+    const message = { ...baseCertificate } as Certificate;
+    message.cert = new Uint8Array();
+    if (object.cert !== undefined && object.cert !== null) {
+      message.cert = bytesFromBase64(object.cert);
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = bytesFromBase64(object.key);
+    }
+    if (object.info !== undefined && object.info !== null) {
+      message.info = CertificateInfo.fromJSON(object.info);
+    } else {
+      message.info = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: Certificate): unknown {
+    const obj: any = {};
+    message.cert !== undefined &&
+      (obj.cert = base64FromBytes(
+        message.cert !== undefined ? message.cert : new Uint8Array()
+      ));
+    message.key !== undefined &&
+      (obj.key =
+        message.key !== undefined ? base64FromBytes(message.key) : undefined);
+    message.info !== undefined &&
+      (obj.info = message.info
+        ? CertificateInfo.toJSON(message.info)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Certificate>): Certificate {
+    const message = { ...baseCertificate } as Certificate;
+    message.cert = object.cert ?? new Uint8Array();
+    message.key = object.key ?? undefined;
+    if (object.info !== undefined && object.info !== null) {
+      message.info = CertificateInfo.fromPartial(object.info);
+    } else {
+      message.info = undefined;
+    }
+    return message;
+  },
+};
+
 const baseConnection: object = { remoteAddr: '' };
 
 export const Connection = {
@@ -1469,6 +2643,9 @@ export const Connection = {
     }
     if (message.caCert !== undefined) {
       writer.uint32(50).bytes(message.caCert);
+    }
+    if (message.clientCert !== undefined) {
+      Certificate.encode(message.clientCert, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -1497,6 +2674,9 @@ export const Connection = {
           break;
         case 6:
           message.caCert = reader.bytes();
+          break;
+        case 7:
+          message.clientCert = Certificate.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1539,6 +2719,11 @@ export const Connection = {
     if (object.caCert !== undefined && object.caCert !== null) {
       message.caCert = bytesFromBase64(object.caCert);
     }
+    if (object.clientCert !== undefined && object.clientCert !== null) {
+      message.clientCert = Certificate.fromJSON(object.clientCert);
+    } else {
+      message.clientCert = undefined;
+    }
     return message;
   },
 
@@ -1556,6 +2741,10 @@ export const Connection = {
         message.caCert !== undefined
           ? base64FromBytes(message.caCert)
           : undefined);
+    message.clientCert !== undefined &&
+      (obj.clientCert = message.clientCert
+        ? Certificate.toJSON(message.clientCert)
+        : undefined);
     return obj;
   },
 
@@ -1567,6 +2756,11 @@ export const Connection = {
     message.pomeriumUrl = object.pomeriumUrl ?? undefined;
     message.disableTlsVerification = object.disableTlsVerification ?? undefined;
     message.caCert = object.caCert ?? undefined;
+    if (object.clientCert !== undefined && object.clientCert !== null) {
+      message.clientCert = Certificate.fromPartial(object.clientCert);
+    } else {
+      message.clientCert = undefined;
+    }
     return message;
   },
 };
@@ -2003,6 +3197,13 @@ function fromJsonTimestamp(o: any): Date {
   } else {
     return fromTimestamp(Timestamp.fromJSON(o));
   }
+}
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
+  }
+  return long.toNumber();
 }
 
 if (_m0.util.Long !== Long) {

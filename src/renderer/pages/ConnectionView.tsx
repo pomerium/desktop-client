@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
   Container,
   Divider,
   Grid,
@@ -47,6 +48,7 @@ import {
   Selector,
 } from '../../shared/pb/api';
 import ExportJSON from '../icons/ExportJSON';
+import CertDetails from '../components/CertDetails';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -84,6 +86,7 @@ const ConnectionView = (): JSX.Element => {
   const [filteredLogs, setFilteredLogs] = useState([] as SimplifiedLog[]);
   const [logs, setLogs] = useState([] as SimplifiedLog[]);
   const [menuAnchor, setMenuAnchor] = React.useState(null);
+  const [showDetail, setShowDetail] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const { connectionID }: QueryParams = useParams();
 
@@ -378,6 +381,30 @@ const ConnectionView = (): JSX.Element => {
                   <Typography variant="subtitle2">
                     {connection.pomeriumUrl}
                   </Typography>
+                </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                <Divider />
+              </Grid>
+              <Grid container item xs={12} alignItems="center">
+                <Grid item xs={4}>
+                  <Typography variant="h6">Client Certificate</Typography>
+                </Grid>
+                <Grid item xs={8}>
+                  {connection?.clientCert?.info && (
+                    <>
+                      <CertDetails
+                        open={showDetail}
+                        onClose={() => setShowDetail(false)}
+                        certInfo={connection?.clientCert?.info}
+                      />
+                      <Chip
+                        label="Details"
+                        color="primary"
+                        onClick={() => setShowDetail(true)}
+                      />
+                    </>
+                  )}
                 </Grid>
               </Grid>
             </Grid>

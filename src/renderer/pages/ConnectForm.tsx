@@ -4,20 +4,24 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  Chip,
   Container,
   FormControlLabel,
   FormHelperText,
   Grid,
+  IconButton,
   makeStyles,
+  styled,
   Switch,
   Typography,
 } from '@material-ui/core';
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CheckCircle, ChevronDown } from 'react-feather';
+import { CheckCircle, ChevronDown, Trash } from 'react-feather';
 import { Autocomplete } from '@material-ui/lab';
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
+import { set } from 'lodash';
 import {
   GET_RECORDS,
   GET_UNIQUE_TAGS,
@@ -33,6 +37,37 @@ import Card from '../components/Card';
 import { formatTag } from '../../shared/validators';
 import { Connection, Record, Selector } from '../../shared/pb/api';
 import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
+import CertDetails from '../components/CertDetails';
+
+export const TextArea = styled(TextField)({
+  '& div.MuiFilledInput-root': {
+    background: `rgba(110, 67, 232, 0.05)`,
+    padding: `0px`,
+    marginTop: `10px`,
+    display: `flex`,
+    flexFlow: `row nowrap`,
+    boxShadow: `0 0 0 1px rgb(63 63 68 / 5%), 0 1px 2px 0 rgb(63 63 68 / 15%)`,
+
+    '& div.MuiFilledInput-root': {
+      margin: `2px 0px 0px 6px`,
+      height: `100%`,
+    },
+    '& input.MuiInputBase-input': {
+      padding: `6px`,
+      margin: `6px`,
+    },
+
+    '& .MuiFilledInput-inputMultiline': {
+      padding: `10px`,
+    },
+  },
+  '& div.MuiFilledInput-underline:before': {
+    borderBottom: `0px`,
+  },
+  '& div.MuiFilledInput-underline:after': {
+    border: `0px`,
+  },
+});
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -73,6 +108,7 @@ const initialConnData: Connection = {
   pomeriumUrl: undefined,
   disableTlsVerification: false,
   caCert: undefined,
+  clientCert: undefined,
 };
 
 const ConnectForm: FC<Props> = () => {
@@ -87,11 +123,17 @@ const ConnectForm: FC<Props> = () => {
   };
   const { connectionID }: QueryParams = useParams();
   const { enqueueSnackbar } = useSnackbar();
+  const certRef = React.useRef<HTMLInputElement>(null);
+  const keyRef = React.useRef<HTMLInputElement>(null);
+  const [certText, setCertText] = useState('');
+  const [keyText, setKeyText] = useState('');
+  const [showCertInput, setShowCertInput] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
   useEffect(() => {
     ipcRenderer.on(GET_RECORDS, (_, args) => {
       if (args.err) {
-        enqueueSnackbar(args.err, {
+        enqueueSnackbar(args.err.message, {
           variant: 'error',
           autoHideDuration: TOAST_LENGTH,
         });
@@ -99,6 +141,7 @@ const ConnectForm: FC<Props> = () => {
         setTags(args.res.records[0].tags || []);
         setConnection(args.res.records[0].conn || initialConnData);
         setOriginalConnection(args.res.records[0].conn || initialConnData);
+        setShowCertInput(!args.res.records[0].conn.clientCert);
       }
     });
     ipcRenderer.once(GET_UNIQUE_TAGS, (_, args) => {
@@ -167,6 +210,48 @@ const ConnectForm: FC<Props> = () => {
     }
   };
 
+  const saveCertText = (value: string): void => {
+    setCertText(value);
+    setConnection((oldConnection) => {
+      set(oldConnection, 'clientCert.cert', new TextEncoder().encode(value));
+      return oldConnection;
+    });
+  };
+
+  const saveKeyText = (value: string): void => {
+    setKeyText(value);
+    setConnection((oldConnection) => {
+      set(oldConnection, 'clientCert.key', new TextEncoder().encode(value));
+      return oldConnection;
+    });
+  };
+
+  const handleCertFile = (evt) => {
+    const file = evt.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      saveCertText(e?.target?.result as string);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleKeyFile = (evt) => {
+    const file = evt.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      saveKeyText(e?.target?.result as string);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleDeleteCert = () => {
+    setConnection((oldConnection) => {
+      oldConnection.clientCert = undefined;
+      return oldConnection;
+    });
+    setShowCertInput(true);
+  };
+
   const saveConnection = (): void => {
     const record = {
       tags,
@@ -178,7 +263,7 @@ const ConnectForm: FC<Props> = () => {
     }
     ipcRenderer.once(SAVE_RECORD, (_, args) => {
       if (args.err) {
-        enqueueSnackbar(args.err, {
+        enqueueSnackbar(args.err.message, {
           variant: 'error',
           autoHideDuration: TOAST_LENGTH,
         });
@@ -189,6 +274,15 @@ const ConnectForm: FC<Props> = () => {
     ipcRenderer.send(SAVE_RECORD, record);
   };
 
+  const canSave = (): boolean => {
+    if (certText && !keyText) {
+      return false;
+    }
+    if (!!keyText && !certText) {
+      return false;
+    }
+    return !!connection?.name && !!connection?.remoteAddr.trim();
+  };
   return (
     <Container maxWidth={false}>
       <BeforeBackActionDialog
@@ -308,6 +402,115 @@ const ConnectForm: FC<Props> = () => {
                   Skips TLS verification. No Cert Authority Needed.
                 </FormHelperText>
               </Grid>
+
+              {showCertInput && (
+                <Grid item xs={12}>
+                  <label htmlFor="cert-file">
+                    <input
+                      style={{ display: 'none' }}
+                      id="cert-file"
+                      ref={certRef}
+                      type="file"
+                      onChange={handleCertFile}
+                    />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      component="span"
+                    >
+                      Client Certificate from File
+                    </Button>
+                  </label>
+                </Grid>
+              )}
+              {showCertInput && (
+                <Grid item xs={12}>
+                  <Typography variant="body2">
+                    Client Certificate Text
+                  </Typography>
+                  <TextArea
+                    fullWidth
+                    variant="filled"
+                    value={certText}
+                    multiline
+                    required={!!keyText}
+                    rows={5}
+                    placeholder="e.g. copy/paste the cert in PEM format"
+                    onChange={(evt): void => saveCertText(evt.target.value)}
+                    spellCheck={false}
+                  />
+                  <FormHelperText className={classes.leftPad}>
+                    Add a Client Certificate with the File Selector or
+                    Copy/Paste to the Text Area. Key is required if the
+                    Certificate is present.
+                  </FormHelperText>
+                </Grid>
+              )}
+              {showCertInput && (
+                <Grid item xs={12}>
+                  <label htmlFor="key-file">
+                    <input
+                      style={{ display: 'none' }}
+                      id="key-file"
+                      ref={keyRef}
+                      type="file"
+                      onChange={handleKeyFile}
+                    />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      component="span"
+                    >
+                      Client Certificate Key from File
+                    </Button>
+                  </label>
+                </Grid>
+              )}
+              {showCertInput && (
+                <Grid item xs={12}>
+                  <Typography variant="body2">
+                    Client Certificate Key Text
+                  </Typography>
+                  <TextArea
+                    fullWidth
+                    variant="filled"
+                    value={keyText}
+                    required={!!certText}
+                    multiline
+                    rows={5}
+                    placeholder="e.g. copy/paste the key in PEM format"
+                    onChange={(evt): void => saveKeyText(evt.target.value)}
+                  />
+                  <FormHelperText className={classes.leftPad}>
+                    Add a Client Certificate Key with the File Selector or
+                    Copy/Paste to the Text Area. Certificate is required if the
+                    Key is present.
+                  </FormHelperText>
+                </Grid>
+              )}
+
+              {!showCertInput && (
+                <Grid item xs={12}>
+                  <CertDetails
+                    open={showDetail}
+                    onClose={() => setShowDetail(false)}
+                    certInfo={connection?.clientCert?.info}
+                  />
+                  <Typography variant="body2">Client Certificate</Typography>
+                  <Chip
+                    label="Details"
+                    color="primary"
+                    onClick={() => setShowDetail(true)}
+                  />
+                  <IconButton
+                    aria-label="delete"
+                    onClick={handleDeleteCert}
+                    color="primary"
+                  >
+                    <Trash />
+                  </IconButton>
+                </Grid>
+              )}
             </Grid>
           </AccordionDetails>
         </Accordion>
@@ -333,7 +536,7 @@ const ConnectForm: FC<Props> = () => {
             <Button
               type="button"
               variant="contained"
-              disabled={!connection?.name || !connection?.remoteAddr.trim()}
+              disabled={!canSave()}
               color="primary"
               onClick={saveConnection}
               endIcon={<CheckCircle />}
