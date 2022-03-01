@@ -168,6 +168,10 @@ app.on('ready', async () => {
     })
   );
 
+  if (process.platform !== 'darwin') {
+    app.dock.hide();
+  }
+
   const trayMenuHelper = new Helper([], {}, [], mainWindow, null);
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
