@@ -124,13 +124,14 @@ const onUncaughtException = (() => {
       return;
     }
     shuttingDown = true;
-    Sentry.captureException(err);
+    const sentryId = Sentry.captureException(err);
 
     const msg = {
       type: 'error',
       title: 'Error in Main process',
       message:
-        'Something went wrong. Contact your administrator or Pomerium representative.',
+        'If you would like to file a bug report please include the following Sentry Id: ' +
+        sentryId,
     } as Electron.MessageBoxOptions;
 
     if ('spawnargs' in err) {
@@ -285,7 +286,7 @@ app.on('ready', async () => {
         (err, res) => {
           evt?.sender?.send(EXPORT, {
             err,
-            data: res.data,
+            data: res?.data || [],
             filename: args.filename,
           });
         }
