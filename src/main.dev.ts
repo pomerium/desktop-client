@@ -168,7 +168,7 @@ app.on('ready', async () => {
     })
   );
 
-  if (process.platform !== 'darwin') {
+  if (process.platform === 'darwin') {
     app.dock.hide();
   }
 
