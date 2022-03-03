@@ -98,6 +98,7 @@ const App: FC = () => {
                 vertical: 'bottom',
                 horizontal: 'center',
               }}
+              transitionDuration={{ exit: 1000 }}
               maxSnack={1}
               action={(snackbarKey) => (
                 <SnackbarCloseButton snackbarKey={snackbarKey} />
