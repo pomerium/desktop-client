@@ -27,6 +27,7 @@ import ManageConnections from './renderer/pages/ManageConnections';
 import TopTabs from './renderer/components/TopTabs';
 import ConnectionView from './renderer/pages/ConnectionView';
 import SnackbarCloseButton from './renderer/components/SnackbarCloseButton';
+import { THEMES } from './shared/constants';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -86,10 +87,23 @@ const StyleWrapper: FC = ({
   return <>{children}</>;
 };
 
+interface Settings {
+  direction?: 'ltr' | 'rtl';
+  responsiveFontSizes?: boolean;
+  theme?: string;
+  rowCount?: number;
+}
+
+const defaultSettings: Settings = {
+  responsiveFontSizes: true,
+  theme: THEMES.LIGHT,
+  rowCount: 25,
+};
+
 const App: FC = () => {
   return (
     <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={createMuiTheme()}>
+      <ThemeProvider theme={createMuiTheme(defaultSettings)}>
         <StyleWrapper>
           <CssBaseline />
           <StylesProvider jss={jss}>
