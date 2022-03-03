@@ -73,6 +73,13 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const StyleWrapper: FC = ({
+  children,
+}: PropsWithChildren<unknown>): JSX.Element => {
+  useStyles();
+  return <>{children}</>;
+};
+
 interface Settings {
   direction?: 'ltr' | 'rtl';
   responsiveFontSizes?: boolean;
@@ -87,45 +94,46 @@ const defaultSettings: Settings = {
 };
 
 const App: FC = () => {
-  useStyles();
   return (
     <ThemeProvider theme={createMuiTheme(defaultSettings)}>
-      <CssBaseline />
-      <StylesProvider jss={jss}>
-        <SnackbarProvider
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          maxSnack={1}
-          action={(snackbarKey) => (
-            <SnackbarCloseButton snackbarKey={snackbarKey} />
-          )}
-        >
-          <HashRouter>
-            <TopBar>
-              <TopTabs />
-            </TopBar>
-            <Switch>
-              <RouteListener>
-                <Route exact path="/">
-                  <Redirect to="/manage" />
-                </Route>
-                <Route exact path="/connectForm" component={ConnectForm} />
-                <Route
-                  path="/edit_connect/:connectionID"
-                  component={ConnectForm}
-                />
-                <Route
-                  path="/view_connection/:connectionID"
-                  component={ConnectionView}
-                />
-                <Route exact path="/manage" component={ManageConnections} />
-              </RouteListener>
-            </Switch>
-          </HashRouter>
-        </SnackbarProvider>
-      </StylesProvider>
+      <StyleWrapper>
+        <CssBaseline />
+        <StylesProvider jss={jss}>
+          <SnackbarProvider
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            maxSnack={1}
+            action={(snackbarKey) => (
+              <SnackbarCloseButton snackbarKey={snackbarKey} />
+            )}
+          >
+            <HashRouter>
+              <TopBar>
+                <TopTabs />
+              </TopBar>
+              <Switch>
+                <RouteListener>
+                  <Route exact path="/">
+                    <Redirect to="/manage" />
+                  </Route>
+                  <Route exact path="/connectForm" component={ConnectForm} />
+                  <Route
+                    path="/edit_connect/:connectionID"
+                    component={ConnectForm}
+                  />
+                  <Route
+                    path="/view_connection/:connectionID"
+                    component={ConnectionView}
+                  />
+                  <Route exact path="/manage" component={ManageConnections} />
+                </RouteListener>
+              </Switch>
+            </HashRouter>
+          </SnackbarProvider>
+        </StylesProvider>
+      </StyleWrapper>
     </ThemeProvider>
   );
 };
