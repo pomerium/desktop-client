@@ -1,12 +1,5 @@
-import {
-  AppBar,
-  Grid,
-  makeStyles,
-  Tab,
-  Tabs,
-  Toolbar,
-  Typography,
-} from '@material-ui/core';
+import { AppBar, Grid, Tab, Tabs, Toolbar, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import metadata from '../../meta.json';

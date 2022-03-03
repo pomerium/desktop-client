@@ -6,7 +6,7 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-} from '@material-ui/core';
+} from '@mui/material';
 
 export interface ConfirmationDialogProps {
   title: string;

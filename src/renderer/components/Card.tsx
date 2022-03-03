@@ -1,4 +1,6 @@
-import { Card as BaseCard, CardContent, makeStyles } from '@material-ui/core';
+import { Card as BaseCard, CardContent } from '@mui/material';
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import React, { FC, PropsWithChildren } from 'react';
 import { Theme } from '../../shared/theme';

@@ -3,6 +3,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Autocomplete,
   Button,
   Chip,
   Container,
@@ -10,15 +11,14 @@ import {
   FormHelperText,
   Grid,
   IconButton,
-  makeStyles,
   styled,
   Switch,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CheckCircle, ChevronDown, Trash } from 'react-feather';
-import { Autocomplete } from '@material-ui/lab';
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
 import { set } from 'lodash';
@@ -506,6 +506,7 @@ const ConnectForm: FC<Props> = () => {
                     aria-label="delete"
                     onClick={handleDeleteCert}
                     color="primary"
+                    size="large"
                   >
                     <Trash />
                   </IconButton>

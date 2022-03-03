@@ -1,17 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import {
-  AppBar,
-  Grid,
-  makeStyles,
-  TextField,
-  Toolbar,
-} from '@material-ui/core';
+import { AppBar, Autocomplete, Grid, TextField, Toolbar } from '@mui/material';
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import { Search } from 'react-feather';
 import { ipcRenderer } from 'electron';
-import { Autocomplete, createFilterOptions } from '@material-ui/lab';
+import { createFilterOptions } from '@mui/material/useAutocomplete';
 import Logo from '../icons/Logo';
 import { GET_ALL_RECORDS, VIEW } from '../../shared/constants';
 import { Record as ListenerRecord } from '../../shared/pb/api';
@@ -76,7 +72,7 @@ const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
               getOptionLabel={(option: ListenerRecord) =>
                 option?.conn?.name || ''
               }
-              getOptionSelected={(
+              isOptionEqualToValue={(
                 option: ListenerRecord,
                 value: ListenerRecord
               ) => {

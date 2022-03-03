@@ -7,8 +7,8 @@ import {
   MenuItem,
   Menu,
   Tooltip,
-  makeStyles,
-} from '@material-ui/core';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { Copy, MoreVertical } from 'react-feather';
 import { clipboard, ipcRenderer } from 'electron';
 import { Link } from 'react-router-dom';
@@ -134,6 +134,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             }
             component="span"
             onClick={toggleConnected}
+            size="large"
           >
             {connected ? <Connected /> : <Disconnected />}
           </IconButton>
@@ -184,6 +185,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
                 '-' +
                 connection?.conn?.name || ''
             }
+            size="large"
           >
             <MoreVertical />
           </IconButton>

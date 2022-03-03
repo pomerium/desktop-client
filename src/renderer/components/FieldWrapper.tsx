@@ -1,12 +1,12 @@
 import {
   Grid,
-  makeStyles,
   Typography,
   SvgIcon,
   Divider,
   Container,
   Tooltip,
-} from '@material-ui/core';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { FC, ReactFragment, ReactNode } from 'react';
 import { HelpCircle } from 'react-feather';
 import { Theme } from '../../shared/theme';
