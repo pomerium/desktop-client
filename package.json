@@ -265,7 +265,7 @@
     "@emotion/styled": "^11.8.1",
     "@grpc/grpc-js": "^1.4.2",
     "@mui/lab": "^5.0.0-alpha.71",
-    "@mui/material": "^5.4.4",
+    "@mui/material": "5.4.3",
     "@mui/styles": "^5.4.4",
     "@sentry/electron": "^2.5.4",
     "electron-context-menu": "^3.1.1",
