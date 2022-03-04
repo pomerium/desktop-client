@@ -261,9 +261,12 @@
     "@babel/plugin-proposal-numeric-separator": "^7.14.5",
     "@babel/plugin-proposal-private-methods": "^7.14.5",
     "@babel/plugin-proposal-private-property-in-object": "^7.14.5",
+    "@emotion/react": "^11.8.1",
+    "@emotion/styled": "^11.8.1",
     "@grpc/grpc-js": "^1.4.2",
-    "@material-ui/core": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.60",
+    "@mui/lab": "^5.0.0-alpha.71",
+    "@mui/material": "^5.4.4",
+    "@mui/styles": "^5.4.4",
     "@sentry/electron": "^2.5.4",
     "electron-context-menu": "^3.1.1",
     "electron-debug": "^3.1.0",
@@ -274,7 +277,7 @@
     "history": "^5.0.0",
     "menubar": "^9.0.5",
     "moment": "^2.29.1",
-    "notistack": "^1.0.10",
+    "notistack": "^2.0.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-feather": "^2.0.9",
@@ -284,6 +287,9 @@
     "source-map-support": "^0.5.19",
     "ts-proto": "^1.85.0",
     "validator": "^13.6.0"
+  },
+  "resolutions": {
+    "csstype": "3.0.10"
   },
   "devEngines": {
     "node": ">=10.x",

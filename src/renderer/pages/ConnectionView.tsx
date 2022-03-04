@@ -11,11 +11,11 @@ import {
   Divider,
   Grid,
   IconButton,
-  makeStyles,
   Menu,
   MenuItem,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { AlertTriangle, ChevronDown, Info } from 'react-feather';
@@ -442,6 +442,7 @@ const ConnectionView = (): JSX.Element => {
                       toggleMenu(e);
                     }}
                     aria-label="Menu for filters/export"
+                    size="large"
                   >
                     <ExportJSON />
                   </IconButton>

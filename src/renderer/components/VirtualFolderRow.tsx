@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Typography, Grid, IconButton, Divider } from '@material-ui/core';
+import { Typography, Grid, IconButton, Divider } from '@mui/material';
 import { PropsWithChildren } from 'react';
 import VirtualClosedFolder from '../icons/VirtualClosedFolder';
 import VirtualOpenFolder from '../icons/VirtualOpenFolder';
@@ -31,6 +31,7 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
             aria-label={'toggle listeners for ' + folderName}
             component="span"
             onClick={toggleOpen}
+            size="large"
           >
             {open ? <VirtualOpenFolder /> : <VirtualClosedFolder />}
           </IconButton>

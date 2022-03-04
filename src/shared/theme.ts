@@ -1,14 +1,21 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { colors, createTheme, responsiveFontSizes } from '@material-ui/core';
-import type { Theme as MuiTheme } from '@material-ui/core/styles/createTheme';
-import type {
+import {
+  colors,
+  createTheme,
+  responsiveFontSizes,
+  adaptV4Theme,
+} from '@mui/material';
+
+import {
+  Theme as MuiTheme,
   Palette as MuiPalette,
   TypeBackground as MuiTypeBackground,
-} from '@material-ui/core/styles/createPalette';
-import type { Shadows as MuiShadows } from '@material-ui/core/styles/shadows';
+} from '@mui/material/styles';
+
 import _ from 'lodash';
 
+import { Shadows } from '@mui/material/styles/shadows';
 import { softShadows, strongShadows } from './shadows';
 import typography from './typography';
 import { THEMES } from './constants';
@@ -31,15 +38,15 @@ interface ThemeConfig {
   theme?: string;
 }
 
-interface ThemeOptions {
+interface DeprecatedThemeOptions {
   name?: string;
   typography?: Record<string, any>;
   overrides?: Record<string, any>;
   palette?: Record<string, any>;
-  shadows?: MuiShadows;
+  shadows?: Shadows;
 }
 
-const baseOptions: ThemeOptions = {
+const baseOptions: DeprecatedThemeOptions = {
   typography,
   overrides: {
     MuiLinearProgress: {
@@ -71,7 +78,7 @@ const baseOptions: ThemeOptions = {
   },
 };
 
-const themesOptions: ThemeOptions[] = [
+const themesOptions: DeprecatedThemeOptions[] = [
   {
     name: THEMES.LIGHT,
     overrides: {
@@ -85,7 +92,7 @@ const themesOptions: ThemeOptions[] = [
       },
     },
     palette: {
-      type: 'light',
+      mode: 'light',
       action: {
         active: colors.blueGrey[600],
       },
@@ -107,7 +114,7 @@ const themesOptions: ThemeOptions[] = [
   {
     name: THEMES.DARK,
     palette: {
-      type: 'dark',
+      mode: 'dark',
       text: {
         secondary: 'rgba(255,255,255,0.9)',
       },
@@ -135,7 +142,7 @@ export const createMuiTheme = (config: ThemeConfig = {}): Theme => {
     [themeOptions] = themesOptions;
   }
 
-  let theme = createTheme(_.merge({}, baseOptions, themeOptions));
+  let theme = createTheme(adaptV4Theme(_.merge({}, baseOptions, themeOptions)));
 
   if (config.responsiveFontSizes) {
     theme = responsiveFontSizes(theme);

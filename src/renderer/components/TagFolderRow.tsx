@@ -7,7 +7,7 @@ import {
   Menu,
   MenuItem,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import { MoreVertical } from 'react-feather';
 import { ipcRenderer } from 'electron';
 import {
@@ -98,6 +98,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
               aria-label={'toggle listeners for ' + folderName}
               component="span"
               onClick={toggleOpen}
+              size="large"
             >
               {open ? <OpenFolder /> : <ClosedFolder />}
             </IconButton>
@@ -125,6 +126,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
               aria-haspopup="true"
               onClick={toggleMenu}
               aria-label={'Menu for folder: ' + folderName}
+              size="large"
             >
               <MoreVertical />
             </IconButton>

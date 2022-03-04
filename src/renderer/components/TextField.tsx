@@ -1,9 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import {
-  makeStyles,
-  TextField as MuiTextField,
-  TextFieldProps,
-} from '@material-ui/core';
+import { TextField as MuiTextField, TextFieldProps } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import { Theme } from '../../shared/theme';
