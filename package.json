@@ -265,7 +265,7 @@
     "@emotion/styled": "^11.8.1",
     "@grpc/grpc-js": "^1.4.2",
     "@mui/lab": "^5.0.0-alpha.71",
-    "@mui/material": "5.4.3",
+    "@mui/material": "^5.4.4",
     "@mui/styles": "^5.4.4",
     "@sentry/electron": "^2.5.4",
     "electron-context-menu": "^3.1.1",
@@ -287,6 +287,9 @@
     "source-map-support": "^0.5.19",
     "ts-proto": "^1.85.0",
     "validator": "^13.6.0"
+  },
+  "resolutions": {
+    "csstype": "3.0.10"
   },
   "devEngines": {
     "node": ">=10.x",
