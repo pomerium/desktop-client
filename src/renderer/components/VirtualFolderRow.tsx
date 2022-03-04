@@ -31,7 +31,8 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
             aria-label={'toggle listeners for ' + folderName}
             component="span"
             onClick={toggleOpen}
-            size="large">
+            size="large"
+          >
             {open ? <VirtualOpenFolder /> : <VirtualClosedFolder />}
           </IconButton>
         </Grid>
