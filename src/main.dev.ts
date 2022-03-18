@@ -13,7 +13,6 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import * as grpc from '@grpc/grpc-js';
 import * as Sentry from '@sentry/electron';
-import * as child_process from 'child_process';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';
@@ -47,18 +46,16 @@ import {
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import {
-  ConfigClient,
   ConnectionStatusUpdate,
   ExportRequest,
   GetTagsRequest,
   ImportRequest,
-  ListenerClient,
   ListenerUpdateRequest,
   Record as ListenerRecord,
   Selector,
   StatusUpdatesRequest,
 } from './shared/pb/api';
-import { pomeriumCli } from './main/binaries';
+import { start } from './cli';
 
 const SentryDSN =
   'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413';
@@ -70,24 +67,6 @@ Sentry.init({
 let mainWindow: BrowserWindow | null;
 let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
 
-const cliProcess = child_process
-  .spawn(pomeriumCli, ['api', '--sentry-dsn', SentryDSN])
-  .on('error', (error) => {
-    Sentry.captureEvent({
-      message: 'API process failed to start',
-      extra: { error },
-    });
-  })
-  .on('close', (code, signal) => {
-    if (signal != null) return;
-    Sentry.captureEvent({
-      message: 'API process unexpectedly quit',
-      extra: { code },
-    });
-  });
-
-cliProcess.stderr.on('data', (data) => console.error(data.toString()));
-cliProcess.stdout.on('data', (data) => console.info(data.toString()));
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -104,16 +83,6 @@ if (isProd) {
 if (isDev || prodDebug) {
   require('electron-debug')();
 }
-
-const configClient = new ConfigClient(
-  '127.0.0.1:8800',
-  grpc.ChannelCredentials.createInsecure()
-);
-
-const listenerClient = new ListenerClient(
-  '127.0.0.1:8800',
-  grpc.ChannelCredentials.createInsecure()
-);
 
 const onUncaughtException = (() => {
   let shuttingDown = false;
@@ -153,7 +122,14 @@ app.on('activate', async () => {
   if (mainWindow === null) mainWindow = createWindow();
 });
 
-app.on('ready', async () => {
+async function init(): Promise<void> {
+  const [cli] = await Promise.all([
+    start(SentryDSN),
+    new Promise((resolve) => app.on('ready', resolve)),
+  ]);
+  const cliProcess = cli.process;
+  const { configClient, listenerClient } = cli;
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -368,4 +344,6 @@ app.on('ready', async () => {
       mainWindow?.close();
     });
   });
-});
+}
+
+init();
