@@ -65,6 +65,7 @@ Sentry.init({
 });
 
 let mainWindow: BrowserWindow | null;
+const singleInstanceLock = app.requestSingleInstanceLock();
 let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
 
 class AppUpdater {
@@ -346,4 +347,14 @@ async function init(): Promise<void> {
   });
 }
 
-init();
+if (!singleInstanceLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+  init();
+}
