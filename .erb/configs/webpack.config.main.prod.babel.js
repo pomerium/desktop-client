@@ -14,16 +14,8 @@ import CheckNodeEnv from '../scripts/CheckNodeEnv';
 CheckNodeEnv('production');
 DeleteSourceMaps();
 
-const devtoolsConfig =
-  process.env.DEBUG_PROD === 'true'
-    ? {
-        devtool: 'source-map',
-      }
-    : {};
-
 export default merge(baseConfig, {
-  ...devtoolsConfig,
-
+  devtool: 'source-map',
   mode: 'production',
 
   target: 'electron-main',
