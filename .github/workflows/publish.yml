@@ -1,11 +1,16 @@
 name: Publish
-
-on:   
+permissions:
+  contents: read
+on:
   push:
     branches: ['main']
 
 jobs:
   publish:
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: read
     runs-on: ${{ matrix.os }}
 
     strategy:
