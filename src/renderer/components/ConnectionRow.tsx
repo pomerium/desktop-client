@@ -30,10 +30,10 @@ import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
 import {
   ListenerUpdateRequest,
-  Selector,
   Record as ListenerRecord,
   Connection,
 } from '../../shared/pb/api';
+import ExportDialog from './ExportDialog';
 
 type ConnectionRowProps = {
   folderName: string;
@@ -61,6 +61,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   port,
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
+  const [exportFile, setExportFile] = React.useState<ExportFile | null>(null);
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -75,14 +76,14 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
     setMenuAnchor(null);
     switch (action) {
       case EXPORT:
-        ipcRenderer.send(EXPORT, {
+        setExportFile({
           filename: connection?.conn?.name || '',
           selector: {
             all: false,
             ids: [connection?.id || ''],
             tags: [],
-          } as Selector,
-        } as ExportFile);
+          },
+        });
         break;
       case DUPLICATE:
         // eslint-disable-next-line no-case-declarations
@@ -124,123 +125,132 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   };
 
   return (
-    <Grid container>
-      <Grid container item xs={12} alignItems="center">
-        <Grid container item xs={1} justifyContent="flex-end">
-          <IconButton
-            key={'menuButton' + folderName}
-            aria-label={
-              'toggle listeners for ' + folderName + ' ' + connection?.id || ''
-            }
-            component="span"
-            onClick={toggleConnected}
-            size="large"
-          >
-            {connected ? <Connected /> : <Disconnected />}
-          </IconButton>
-        </Grid>
-        <Grid item xs={3}>
-          <Typography variant="h6">{connection?.conn?.name || ''}</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Link to={'/view_connection/' + connection?.id || ''} />
-        </Grid>
-        <Grid
-          container
-          item
-          xs={3}
-          justifyContent="flex-end"
-          alignItems="center"
-        >
-          {connected && (
-            <>
-              <Tooltip title="Copy to Clipboard">
-                <Typography
-                  variant="subtitle2"
-                  onClick={copyAddress}
-                  className={classes.cursor}
-                >
-                  {'Listening on ' + port}
-                </Typography>
-              </Tooltip>
-              <Tooltip title="Copy to Clipboard" className={classes.spacing}>
-                <Copy
-                  size="14"
-                  onClick={copyAddress}
-                  className={classes.cursor}
-                />
-              </Tooltip>
-            </>
-          )}
-          {!connected && <Typography variant="subtitle2">Inactive</Typography>}
-        </Grid>
-        <Grid container item xs={1} justifyContent="center">
-          <IconButton
-            aria-controls="connection-menu"
-            aria-haspopup="true"
-            onClick={toggleMenu}
-            aria-label={
-              'Menu for listener: ' +
-                folderName +
-                '-' +
-                connection?.conn?.name || ''
-            }
-            size="large"
-          >
-            <MoreVertical />
-          </IconButton>
-          <Menu
-            id={'connection-menu' + folderName + connection?.id || ''}
-            anchorEl={menuAnchor}
-            keepMounted
-            open={Boolean(menuAnchor)}
-            onClose={handleMenuClose}
-          >
-            {!connected && (
-              <MenuItem key={CONNECT} onClick={toggleConnected}>
-                Connect
-              </MenuItem>
-            )}
-            {connected && (
-              <MenuItem key={DISCONNECT} onClick={toggleConnected}>
-                Disconnect
-              </MenuItem>
-            )}
-            <MenuItem key="edit" onClick={() => handleMenuClick(EDIT)}>
-              Edit
-            </MenuItem>
-            <MenuItem key="view" onClick={() => handleMenuClick(VIEW)}>
-              View
-            </MenuItem>
-            <MenuItem
-              key={DUPLICATE}
-              onClick={() => handleMenuClick(DUPLICATE)}
+    <>
+      <ExportDialog
+        exportFile={exportFile}
+        onClose={() => setExportFile(null)}
+      />
+      <Grid container>
+        <Grid container item xs={12} alignItems="center">
+          <Grid container item xs={1} justifyContent="flex-end">
+            <IconButton
+              key={'menuButton' + folderName}
+              aria-label={
+                'toggle listeners for ' + folderName + ' ' + connection?.id ||
+                ''
+              }
+              component="span"
+              onClick={toggleConnected}
+              size="large"
             >
-              Duplicate
-            </MenuItem>
+              {connected ? <Connected /> : <Disconnected />}
+            </IconButton>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="h6">{connection?.conn?.name || ''}</Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Link to={'/view_connection/' + connection?.id || ''} />
+          </Grid>
+          <Grid
+            container
+            item
+            xs={3}
+            justifyContent="flex-end"
+            alignItems="center"
+          >
             {connected && (
-              <MenuItem
-                key="copy_port"
-                onClick={() => handleMenuClick('copy_port')}
-              >
-                Copy Port
-              </MenuItem>
+              <>
+                <Tooltip title="Copy to Clipboard">
+                  <Typography
+                    variant="subtitle2"
+                    onClick={copyAddress}
+                    className={classes.cursor}
+                  >
+                    {'Listening on ' + port}
+                  </Typography>
+                </Tooltip>
+                <Tooltip title="Copy to Clipboard" className={classes.spacing}>
+                  <Copy
+                    size="14"
+                    onClick={copyAddress}
+                    className={classes.cursor}
+                  />
+                </Tooltip>
+              </>
             )}
-            <MenuItem key={EXPORT} onClick={() => handleMenuClick(EXPORT)}>
-              Export
-            </MenuItem>
-            <MenuItem key={DELETE} onClick={() => handleMenuClick(DELETE)}>
-              Delete
-            </MenuItem>
-          </Menu>
+            {!connected && (
+              <Typography variant="subtitle2">Inactive</Typography>
+            )}
+          </Grid>
+          <Grid container item xs={1} justifyContent="center">
+            <IconButton
+              aria-controls="connection-menu"
+              aria-haspopup="true"
+              onClick={toggleMenu}
+              aria-label={
+                'Menu for listener: ' +
+                  folderName +
+                  '-' +
+                  connection?.conn?.name || ''
+              }
+              size="large"
+            >
+              <MoreVertical />
+            </IconButton>
+            <Menu
+              id={'connection-menu' + folderName + connection?.id || ''}
+              anchorEl={menuAnchor}
+              keepMounted
+              open={Boolean(menuAnchor)}
+              onClose={handleMenuClose}
+            >
+              {!connected && (
+                <MenuItem key={CONNECT} onClick={toggleConnected}>
+                  Connect
+                </MenuItem>
+              )}
+              {connected && (
+                <MenuItem key={DISCONNECT} onClick={toggleConnected}>
+                  Disconnect
+                </MenuItem>
+              )}
+              <MenuItem key="edit" onClick={() => handleMenuClick(EDIT)}>
+                Edit
+              </MenuItem>
+              <MenuItem key="view" onClick={() => handleMenuClick(VIEW)}>
+                View
+              </MenuItem>
+              <MenuItem
+                key={DUPLICATE}
+                onClick={() => handleMenuClick(DUPLICATE)}
+              >
+                Duplicate
+              </MenuItem>
+              {connected && (
+                <MenuItem
+                  key="copy_port"
+                  onClick={() => handleMenuClick('copy_port')}
+                >
+                  Copy Port
+                </MenuItem>
+              )}
+              <MenuItem key={EXPORT} onClick={() => handleMenuClick(EXPORT)}>
+                Export
+              </MenuItem>
+              <MenuItem key={DELETE} onClick={() => handleMenuClick(DELETE)}>
+                Delete
+              </MenuItem>
+            </Menu>
+          </Grid>
+        </Grid>
+        <Grid container item xs={12}>
+          <Grid item xs={12}>
+            <Divider />
+          </Grid>
         </Grid>
       </Grid>
-      <Grid container item xs={12}>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-      </Grid>
-    </Grid>
+    </>
   );
 };
 

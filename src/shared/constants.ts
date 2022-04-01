@@ -36,6 +36,7 @@ export interface QueryParams {
 export interface ExportFile {
   selector: Selector;
   filename: string;
+  includeTags?: boolean;
 }
 
 export interface ConnectionData {

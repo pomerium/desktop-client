@@ -24,6 +24,7 @@ import { ListenerUpdateRequest, Selector } from '../../shared/pb/api';
 import ConfirmationDialog, {
   ConfirmationDialogProps,
 } from './ConfirmationDialog';
+import ExportDialog from './ExportDialog';
 
 type FolderProps = {
   folderName: string;
@@ -42,6 +43,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
   const [open, setOpen] = React.useState<boolean>(false);
   const [confirmation, setConfirmation] =
     React.useState<ConfirmationDialogProps | null>(null);
+  const [exportFile, setExportFile] = React.useState<ExportFile | null>(null);
 
   const toggleOpen = () => {
     setOpen(!open);
@@ -66,14 +68,14 @@ const TagFolderRow: React.FC<FolderProps> = ({
         } as ListenerUpdateRequest);
         break;
       case EXPORT:
-        ipcRenderer.send(EXPORT, {
+        setExportFile({
           filename: folderName,
           selector: {
             all: false,
             ids: [],
             tags: [folderName],
           } as Selector,
-        } as ExportFile);
+        });
         break;
       default:
         ipcRenderer.send(action, folderName);
@@ -90,6 +92,10 @@ const TagFolderRow: React.FC<FolderProps> = ({
           onClose={confirmation.onClose}
         />
       )}
+      <ExportDialog
+        exportFile={exportFile}
+        onClose={() => setExportFile(null)}
+      />
       <Grid container>
         <Grid container item xs={12} alignItems="center">
           <Grid item xs={1}>
