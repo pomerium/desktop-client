@@ -257,7 +257,7 @@ async function init(): Promise<void> {
       configClient.export(
         {
           selector: args.selector,
-          removeTags: true,
+          removeTags: !args.includeTags,
           format: 2,
         } as ExportRequest,
         (err, res) => {

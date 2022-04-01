@@ -17,7 +17,6 @@ import {
 } from '../../shared/pb/api';
 import {
   DELETE,
-  EXPORT,
   ExportFile,
   GET_ALL_RECORDS,
   GET_UNIQUE_TAGS,
@@ -27,6 +26,7 @@ import {
   TOAST_LENGTH,
   VIEW,
 } from '../../shared/constants';
+import ExportDialog from '../components/ExportDialog';
 
 const useStyles = makeStyles((theme: Theme) => ({
   titleGrid: {
@@ -48,6 +48,7 @@ const ManageConnections = (): JSX.Element => {
   const classes = useStyles();
   const [folderNames, setFolderNames] = useState([] as string[]);
   const [connections, setConnections] = useState([] as ListenerRecord[]);
+  const [exportFile, setExportFile] = useState<ExportFile | null>(null);
   const [statuses, setStatuses] = useState<Record<string, ListenerStatus>>({});
   const { enqueueSnackbar } = useSnackbar();
 
@@ -108,20 +109,6 @@ const ManageConnections = (): JSX.Element => {
         });
       }
     });
-    ipcRenderer.on(EXPORT, (_, args) => {
-      if (args.err) {
-        enqueueSnackbar(args.err.message, {
-          variant: 'error',
-          autoHideDuration: TOAST_LENGTH,
-        });
-      } else {
-        const blob = new Blob([args.data], { type: 'application/json' });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = args.filename.replace(/\s+/g, '_') + '.json';
-        link.click();
-      }
-    });
     ipcRenderer.on(IMPORT, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
@@ -159,7 +146,6 @@ const ManageConnections = (): JSX.Element => {
       ipcRenderer.removeAllListeners(GET_ALL_RECORDS);
       ipcRenderer.removeAllListeners(LISTENER_STATUS);
       ipcRenderer.removeAllListeners(DELETE);
-      ipcRenderer.removeAllListeners(EXPORT);
       ipcRenderer.removeAllListeners(IMPORT);
       ipcRenderer.removeAllListeners(SAVE_RECORD);
     };
@@ -170,132 +156,138 @@ const ManageConnections = (): JSX.Element => {
   );
 
   return (
-    <Container maxWidth={false}>
-      <Grid className={classes.titleGrid}>
-        <Grid container alignItems="flex-start">
-          <Grid item xs={6}>
-            <Typography variant="h3" color="textPrimary">
-              Manage Connections
-            </Typography>
-          </Grid>
-          <Grid item xs={6} container justifyContent="flex-end">
-            <Grid item>
-              <Button
-                type="button"
-                color="primary"
-                onClick={() => ipcRenderer.send(IMPORT)}
-                endIcon={<Upload />}
-              >
-                Import
-              </Button>
+    <>
+      <ExportDialog
+        exportFile={exportFile}
+        onClose={() => setExportFile(null)}
+      />
+      <Container maxWidth={false}>
+        <Grid className={classes.titleGrid}>
+          <Grid container alignItems="flex-start">
+            <Grid item xs={6}>
+              <Typography variant="h3" color="textPrimary">
+                Manage Connections
+              </Typography>
             </Grid>
-            <Grid item xs={1} />
-            {connections?.length > 0 && (
+            <Grid item xs={6} container justifyContent="flex-end">
               <Grid item>
                 <Button
                   type="button"
                   color="primary"
-                  onClick={() =>
-                    ipcRenderer.send(EXPORT, {
-                      filename: 'connections',
-                      selector: {
-                        all: true,
-                        ids: [],
-                        tags: [],
-                      } as Selector,
-                    } as ExportFile)
-                  }
-                  endIcon={<Save />}
+                  onClick={() => ipcRenderer.send(IMPORT)}
+                  endIcon={<Upload />}
                 >
-                  Export
+                  Import
                 </Button>
               </Grid>
-            )}
-            {connections?.length > 0 && <Grid item xs={1} />}
-            <Grid item>
-              <Button
-                type="button"
-                variant="contained"
-                component={Link}
-                to="/connectForm"
-                color="primary"
-                endIcon={<Plus />}
-              >
-                New Connection
-              </Button>
+              <Grid item xs={1} />
+              {connections?.length > 0 && (
+                <Grid item>
+                  <Button
+                    type="button"
+                    color="primary"
+                    onClick={() =>
+                      setExportFile({
+                        filename: 'connections',
+                        selector: {
+                          all: true,
+                          ids: [],
+                          tags: [],
+                        },
+                      })
+                    }
+                    endIcon={<Save />}
+                  >
+                    Export
+                  </Button>
+                </Grid>
+              )}
+              {connections?.length > 0 && <Grid item xs={1} />}
+              <Grid item>
+                <Button
+                  type="button"
+                  variant="contained"
+                  component={Link}
+                  to="/connectForm"
+                  color="primary"
+                  endIcon={<Plus />}
+                >
+                  New Connection
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
-      <Card>
-        {folderNames.map((folderName) => {
-          const folderConns = connections.filter(
-            (connection) => connection?.tags?.indexOf(folderName) >= 0
-          );
-          return (
-            <TagFolderRow
-              key={'folderRow' + folderName}
-              folderName={folderName}
-              connectedListeners={getConnectedCount(folderConns)}
-              totalListeners={folderConns.length}
-              connectionIds={folderConns.map((rec) => rec.id as string)}
-            >
-              {folderConns.map((record) => {
-                return (
-                  <ConnectionRow
-                    key={'connectionRow' + folderName + record.id}
-                    folderName={folderName}
-                    connection={record}
-                    connected={
-                      !!record?.id && statuses[record.id as string]?.listening
-                    }
-                    port={statuses[record.id as string]?.listenAddr || ''}
-                  />
-                );
-              })}
-            </TagFolderRow>
-          );
-        })}
-        <VirtualFolderRow
-          folderName="All Connections"
-          totalListeners={connections.length}
-          connectedListeners={getConnectedCount(connections)}
-        >
-          {connections.map((record) => {
+        <Card>
+          {folderNames.map((folderName) => {
+            const folderConns = connections.filter(
+              (connection) => connection?.tags?.indexOf(folderName) >= 0
+            );
             return (
-              <ConnectionRow
-                key={'connectionRowAllConnections' + record.id}
-                folderName="All Connections"
-                connection={record}
-                connected={
-                  !!record?.id && statuses[record.id as string]?.listening
-                }
-                port={statuses[record.id as string]?.listenAddr || ''}
-              />
+              <TagFolderRow
+                key={'folderRow' + folderName}
+                folderName={folderName}
+                connectedListeners={getConnectedCount(folderConns)}
+                totalListeners={folderConns.length}
+                connectionIds={folderConns.map((rec) => rec.id as string)}
+              >
+                {folderConns.map((record) => {
+                  return (
+                    <ConnectionRow
+                      key={'connectionRow' + folderName + record.id}
+                      folderName={folderName}
+                      connection={record}
+                      connected={
+                        !!record?.id && statuses[record.id as string]?.listening
+                      }
+                      port={statuses[record.id as string]?.listenAddr || ''}
+                    />
+                  );
+                })}
+              </TagFolderRow>
             );
           })}
-        </VirtualFolderRow>
-        <VirtualFolderRow
-          folderName="Untagged"
-          totalListeners={untagged.length}
-          connectedListeners={getConnectedCount(untagged)}
-        >
-          {untagged.map((record) => {
-            return (
-              <ConnectionRow
-                key={'connectionRowUntagged' + record.id}
-                folderName="Untagged"
-                connection={record}
-                connected={
-                  !!record?.id && statuses[record.id as string]?.listening
-                }
-                port={statuses[record.id as string]?.listenAddr || ''}
-              />
-            );
-          })}
-        </VirtualFolderRow>
-      </Card>
-    </Container>
+          <VirtualFolderRow
+            folderName="All Connections"
+            totalListeners={connections.length}
+            connectedListeners={getConnectedCount(connections)}
+          >
+            {connections.map((record) => {
+              return (
+                <ConnectionRow
+                  key={'connectionRowAllConnections' + record.id}
+                  folderName="All Connections"
+                  connection={record}
+                  connected={
+                    !!record?.id && statuses[record.id as string]?.listening
+                  }
+                  port={statuses[record.id as string]?.listenAddr || ''}
+                />
+              );
+            })}
+          </VirtualFolderRow>
+          <VirtualFolderRow
+            folderName="Untagged"
+            totalListeners={untagged.length}
+            connectedListeners={getConnectedCount(untagged)}
+          >
+            {untagged.map((record) => {
+              return (
+                <ConnectionRow
+                  key={'connectionRowUntagged' + record.id}
+                  folderName="Untagged"
+                  connection={record}
+                  connected={
+                    !!record?.id && statuses[record.id as string]?.listening
+                  }
+                  port={statuses[record.id as string]?.listenAddr || ''}
+                />
+              );
+            })}
+          </VirtualFolderRow>
+        </Card>
+      </Container>
+    </>
   );
 };
 export default ManageConnections;

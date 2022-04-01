@@ -6,6 +6,7 @@ module.exports = {
     // cause sometimes concat is more readable
     'prefer-template': 'off',
     'react-hooks/exhaustive-deps': 'off',
+    'typescript-eslint/no-explicit-any': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
