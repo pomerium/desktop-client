@@ -121,6 +121,7 @@ const ManageConnections = (): JSX.Element => {
           autoHideDuration: TOAST_LENGTH,
         });
         ipcRenderer.send(GET_ALL_RECORDS);
+        ipcRenderer.send(GET_UNIQUE_TAGS);
       }
     });
     ipcRenderer.on(SAVE_RECORD, (_, args) => {
