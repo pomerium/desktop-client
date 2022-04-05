@@ -5,6 +5,7 @@ import {
   AccordionSummary,
   Autocomplete,
   Button,
+  CardContent,
   Chip,
   Container,
   FormControlLabel,
@@ -15,7 +16,6 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CheckCircle, ChevronDown, Trash } from 'react-feather';
@@ -32,8 +32,7 @@ import {
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
 import TextField from '../components/TextField';
-import { Theme } from '../../shared/theme';
-import Card from '../components/Card';
+import StyledCard from '../components/StyledCard';
 import { formatTag } from '../../shared/validators';
 import { Connection, Record, Selector } from '../../shared/pb/api';
 import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
@@ -69,34 +68,6 @@ export const TextArea = styled(TextField)({
   },
 });
 
-const useStyles = makeStyles((theme: Theme) => ({
-  titleGrid: {
-    paddingTop: theme.spacing(4),
-  },
-  leftPad: {
-    paddingLeft: theme.spacing(2),
-  },
-  red: {
-    color: 'red',
-  },
-  green: {
-    color: 'green',
-  },
-  buttonWrapper: {
-    marginTop: 20,
-  },
-  accordion: {
-    backgroundColor: theme.palette.background.paper,
-    marginTop: theme.spacing(2),
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    borderRadius: '16px',
-    '&:before': {
-      display: 'none',
-    },
-  },
-}));
-
 interface Props {
   onComplete?: () => void;
 }
@@ -112,7 +83,6 @@ const initialConnData: Connection = {
 };
 
 const ConnectForm: FC<Props> = () => {
-  const classes = useStyles();
   const [showBackWarning, setShowBackWarning] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [connection, setConnection] = useState(initialConnData);
@@ -290,7 +260,7 @@ const ConnectForm: FC<Props> = () => {
         onClose={() => setShowBackWarning(false)}
       />
       <form onSubmit={handleSubmit}>
-        <Grid className={classes.titleGrid}>
+        <Grid sx={{ pt: 4 }}>
           <Grid container alignItems="flex-start">
             <Grid item xs={12}>
               <Typography variant="h3" color="textPrimary">
@@ -300,71 +270,85 @@ const ConnectForm: FC<Props> = () => {
           </Grid>
         </Grid>
 
-        <Card>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                required
-                label="Name"
-                value={connection?.name || ''}
-                onChange={(evt): void => saveName(evt.target.value)}
-                variant="outlined"
-                autoFocus
-                helperText="Name of the route."
-              />
+        <StyledCard>
+          <CardContent>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Name"
+                  value={connection?.name || ''}
+                  onChange={(evt): void => saveName(evt.target.value)}
+                  variant="outlined"
+                  autoFocus
+                  helperText="Name of the route."
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Destination"
+                  value={connection?.remoteAddr}
+                  onChange={(evt): void => saveDestination(evt.target.value)}
+                  variant="outlined"
+                  helperText="The remote address to connect to. Do not include a protocol. Example: mysql.example.com:3306"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Local Address"
+                  value={connection?.listenAddr || ''}
+                  onChange={(evt): void => saveLocal(evt.target.value)}
+                  variant="outlined"
+                  helperText="The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Autocomplete
+                  multiple
+                  id="tags-outlined"
+                  options={tagOptions}
+                  value={tags || []}
+                  onChange={(_, arr) => {
+                    saveTags(arr);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="outlined"
+                      label="Tags..."
+                      placeholder="Tags"
+                      onKeyDown={(e) => {
+                        const element = e.target as HTMLInputElement;
+                        const { value } = element;
+                        if (e.key === 'Enter' && value.trim()) {
+                          saveTags(tags.concat(value));
+                        }
+                      }}
+                    />
+                  )}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                required
-                label="Destination"
-                value={connection?.remoteAddr}
-                onChange={(evt): void => saveDestination(evt.target.value)}
-                variant="outlined"
-                helperText="The remote address to connect to. Do not include a protocol. Example: mysql.example.com:3306"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Local Address"
-                value={connection?.listenAddr || ''}
-                onChange={(evt): void => saveLocal(evt.target.value)}
-                variant="outlined"
-                helperText="The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Autocomplete
-                multiple
-                id="tags-outlined"
-                options={tagOptions}
-                value={tags || []}
-                onChange={(_, arr) => {
-                  saveTags(arr);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    variant="outlined"
-                    label="Tags..."
-                    placeholder="Tags"
-                    onKeyDown={(e) => {
-                      const element = e.target as HTMLInputElement;
-                      const { value } = element;
-                      if (e.key === 'Enter' && value.trim()) {
-                        saveTags(tags.concat(value));
-                      }
-                    }}
-                  />
-                )}
-              />
-            </Grid>
-          </Grid>
-        </Card>
+          </CardContent>
+        </StyledCard>
 
-        <Accordion className={classes.accordion} square={false}>
+        <Accordion
+          sx={{
+            backgroundColor: 'background.paper',
+            marginTop: 2,
+            paddingLeft: 2,
+            paddingRight: 2,
+            borderRadius: '16px',
+            '&:before': {
+              display: 'none',
+            },
+          }}
+          square={false}
+        >
           <AccordionSummary
             expandIcon={<ChevronDown />}
             aria-controls="advanced-settings-content"
@@ -398,7 +382,7 @@ const ConnectForm: FC<Props> = () => {
                   }
                   label="Disable TLS Verification"
                 />
-                <FormHelperText className={classes.leftPad}>
+                <FormHelperText sx={{ pl: 2 }}>
                   Skips TLS verification. No Cert Authority Needed.
                 </FormHelperText>
               </Grid>
@@ -439,7 +423,7 @@ const ConnectForm: FC<Props> = () => {
                     onChange={(evt): void => saveCertText(evt.target.value)}
                     spellCheck={false}
                   />
-                  <FormHelperText className={classes.leftPad}>
+                  <FormHelperText sx={{ pl: 2 }}>
                     Add a Client Certificate with the File Selector or
                     Copy/Paste to the Text Area. Key is required if the
                     Certificate is present.
@@ -481,7 +465,7 @@ const ConnectForm: FC<Props> = () => {
                     placeholder="e.g. copy/paste the key in PEM format"
                     onChange={(evt): void => saveKeyText(evt.target.value)}
                   />
-                  <FormHelperText className={classes.leftPad}>
+                  <FormHelperText sx={{ pl: 2 }}>
                     Add a Client Certificate Key with the File Selector or
                     Copy/Paste to the Text Area. Certificate is required if the
                     Key is present.
@@ -521,7 +505,7 @@ const ConnectForm: FC<Props> = () => {
           spacing={2}
           alignItems="flex-end"
           justifyContent="flex-end"
-          className={classes.buttonWrapper}
+          sx={{ mt: 3 }}
         >
           <Grid item>
             <Button

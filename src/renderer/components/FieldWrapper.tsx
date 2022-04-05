@@ -5,29 +5,10 @@ import {
   Divider,
   Container,
   Tooltip,
+  Box,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { FC, ReactFragment, ReactNode } from 'react';
 import { HelpCircle } from 'react-feather';
-import { Theme } from '../../shared/theme';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  container: {
-    padding: theme.spacing(2),
-  },
-  innerContainer: {
-    marginBottom: theme.spacing(1),
-  },
-  labelGridItem: {
-    width: '260px',
-    paddingRight: theme.spacing(2),
-    display: `flex`,
-    flexFlow: `row wrap`,
-  },
-  questionMark: {
-    marginLeft: theme.spacing(1),
-  },
-}));
 
 type FieldWrapperProps = {
   label: string;
@@ -40,20 +21,35 @@ const FieldWrapper: FC<FieldWrapperProps> = ({
   description,
   children,
 }: FieldWrapperProps): JSX.Element => {
-  const classes = useStyles();
-
   return (
-    <Container maxWidth={false} disableGutters className={classes.container}>
-      <Grid container className={classes.innerContainer}>
-        <Grid item xs={4} className={classes.labelGridItem}>
+    <Container maxWidth={false} disableGutters sx={{ p: 2 }}>
+      <Grid container sx={{ mb: 1 }}>
+        <Grid
+          item
+          sx={{
+            width: '260px',
+            paddingRight: 2,
+            display: `flex`,
+            flexFlow: `row wrap`,
+          }}
+          xs={4}
+        >
           <Typography variant="body1">{label}</Typography>
-          <sub className={classes.questionMark}>
-            <Tooltip title={description}>
-              <SvgIcon color="primary">
-                <HelpCircle width="16px" height="16px" fontSize="1em" />
-              </SvgIcon>
-            </Tooltip>
-          </sub>
+          <Box
+            sx={{
+              p: 0,
+              m: 0,
+              ml: 1,
+            }}
+          >
+            <sub>
+              <Tooltip title={description}>
+                <SvgIcon color="primary">
+                  <HelpCircle width="16px" height="16px" fontSize="1em" />
+                </SvgIcon>
+              </Tooltip>
+            </sub>
+          </Box>
         </Grid>
         <Grid item xs>
           {children}

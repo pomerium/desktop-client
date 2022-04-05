@@ -1,21 +1,19 @@
 import { AppBar, Grid, Tab, Tabs, Toolbar, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import metadata from '../../meta.json';
 
-const useStyles = makeStyles(() => ({
-  root: {
-    '& .MuiToolbar-regular': {
-      minHeight: 0,
-    },
-  },
-}));
-
 const TopTabs = (): JSX.Element => {
-  const classes = useStyles();
   return (
-    <AppBar position="sticky" color="secondary" className={classes.root}>
+    <AppBar
+      position="sticky"
+      color="secondary"
+      sx={{
+        '& .MuiToolbar-regular': {
+          minHeight: 0,
+        },
+      }}
+    >
       <Toolbar disableGutters>
         <Grid container alignItems="center">
           <Grid item xs={8}>

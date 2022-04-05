@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Container, Grid, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import {
+  Button,
+  CardContent,
+  Container,
+  Grid,
+  Typography,
+} from '@mui/material';
 import { Save, Plus, Upload } from 'react-feather';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
-import Card from '../components/Card';
-import { Theme } from '../../shared/theme';
 import TagFolderRow from '../components/TagFolderRow';
 import ConnectionRow from '../components/ConnectionRow';
 import VirtualFolderRow from '../components/VirtualFolderRow';
@@ -27,25 +30,9 @@ import {
   VIEW,
 } from '../../shared/constants';
 import ExportDialog from '../components/ExportDialog';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  titleGrid: {
-    paddingTop: theme.spacing(4),
-  },
-  accordion: {
-    backgroundColor: theme.palette.background.paper,
-    marginTop: theme.spacing(2),
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    borderRadius: '16px',
-    '&:before': {
-      display: 'none',
-    },
-  },
-}));
+import StyledCard from '../components/StyledCard';
 
 const ManageConnections = (): JSX.Element => {
-  const classes = useStyles();
   const [folderNames, setFolderNames] = useState([] as string[]);
   const [connections, setConnections] = useState([] as ListenerRecord[]);
   const [exportFile, setExportFile] = useState<ExportFile | null>(null);
@@ -163,7 +150,7 @@ const ManageConnections = (): JSX.Element => {
         onClose={() => setExportFile(null)}
       />
       <Container maxWidth={false}>
-        <Grid className={classes.titleGrid}>
+        <Grid sx={{ pt: 4 }}>
           <Grid container alignItems="flex-start">
             <Grid item xs={6}>
               <Typography variant="h3" color="textPrimary">
@@ -219,74 +206,77 @@ const ManageConnections = (): JSX.Element => {
             </Grid>
           </Grid>
         </Grid>
-        <Card>
-          {folderNames.map((folderName) => {
-            const folderConns = connections.filter(
-              (connection) => connection?.tags?.indexOf(folderName) >= 0
-            );
-            return (
-              <TagFolderRow
-                key={'folderRow' + folderName}
-                folderName={folderName}
-                connectedListeners={getConnectedCount(folderConns)}
-                totalListeners={folderConns.length}
-                connectionIds={folderConns.map((rec) => rec.id as string)}
-              >
-                {folderConns.map((record) => {
-                  return (
-                    <ConnectionRow
-                      key={'connectionRow' + folderName + record.id}
-                      folderName={folderName}
-                      connection={record}
-                      connected={
-                        !!record?.id && statuses[record.id as string]?.listening
-                      }
-                      port={statuses[record.id as string]?.listenAddr || ''}
-                    />
-                  );
-                })}
-              </TagFolderRow>
-            );
-          })}
-          <VirtualFolderRow
-            folderName="All Connections"
-            totalListeners={connections.length}
-            connectedListeners={getConnectedCount(connections)}
-          >
-            {connections.map((record) => {
+        <StyledCard>
+          <CardContent>
+            {folderNames.map((folderName) => {
+              const folderConns = connections.filter(
+                (connection) => connection?.tags?.indexOf(folderName) >= 0
+              );
               return (
-                <ConnectionRow
-                  key={'connectionRowAllConnections' + record.id}
-                  folderName="All Connections"
-                  connection={record}
-                  connected={
-                    !!record?.id && statuses[record.id as string]?.listening
-                  }
-                  port={statuses[record.id as string]?.listenAddr || ''}
-                />
+                <TagFolderRow
+                  key={'folderRow' + folderName}
+                  folderName={folderName}
+                  connectedListeners={getConnectedCount(folderConns)}
+                  totalListeners={folderConns.length}
+                  connectionIds={folderConns.map((rec) => rec.id as string)}
+                >
+                  {folderConns.map((record) => {
+                    return (
+                      <ConnectionRow
+                        key={'connectionRow' + folderName + record.id}
+                        folderName={folderName}
+                        connection={record}
+                        connected={
+                          !!record?.id &&
+                          statuses[record.id as string]?.listening
+                        }
+                        port={statuses[record.id as string]?.listenAddr || ''}
+                      />
+                    );
+                  })}
+                </TagFolderRow>
               );
             })}
-          </VirtualFolderRow>
-          <VirtualFolderRow
-            folderName="Untagged"
-            totalListeners={untagged.length}
-            connectedListeners={getConnectedCount(untagged)}
-          >
-            {untagged.map((record) => {
-              return (
-                <ConnectionRow
-                  key={'connectionRowUntagged' + record.id}
-                  folderName="Untagged"
-                  connection={record}
-                  connected={
-                    !!record?.id && statuses[record.id as string]?.listening
-                  }
-                  port={statuses[record.id as string]?.listenAddr || ''}
-                />
-              );
-            })}
-          </VirtualFolderRow>
-        </Card>
+            <VirtualFolderRow
+              folderName="All Connections"
+              totalListeners={connections.length}
+              connectedListeners={getConnectedCount(connections)}
+            >
+              {connections.map((record) => {
+                return (
+                  <ConnectionRow
+                    key={'connectionRowAllConnections' + record.id}
+                    folderName="All Connections"
+                    connection={record}
+                    connected={
+                      !!record?.id && statuses[record.id as string]?.listening
+                    }
+                    port={statuses[record.id as string]?.listenAddr || ''}
+                  />
+                );
+              })}
+            </VirtualFolderRow>
+            <VirtualFolderRow
+              folderName="Untagged"
+              totalListeners={untagged.length}
+              connectedListeners={getConnectedCount(untagged)}
+            >
+              {untagged.map((record) => {
+                return (
+                  <ConnectionRow
+                    key={'connectionRowUntagged' + record.id}
+                    folderName="Untagged"
+                    connection={record}
+                    connected={
+                      !!record?.id && statuses[record.id as string]?.listening
+                    }
+                    port={statuses[record.id as string]?.listenAddr || ''}
+                  />
+                );
+              })}
+            </VirtualFolderRow>
+          </CardContent>
+        </StyledCard>
       </Container>
     </>
   );

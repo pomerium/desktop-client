@@ -1,152 +1,215 @@
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import '@fontsource/dm-sans';
+import * as colors from '@mui/material/colors';
 import {
-  colors,
   createTheme,
   responsiveFontSizes,
-  adaptV4Theme,
-} from '@mui/material';
-
-import {
-  Theme as MuiTheme,
-  Palette as MuiPalette,
-  TypeBackground as MuiTypeBackground,
+  ThemeOptions,
+  Theme,
 } from '@mui/material/styles';
-
 import _ from 'lodash';
 
-import { Shadows } from '@mui/material/styles/shadows';
 import { softShadows, strongShadows } from './shadows';
 import typography from './typography';
 import { THEMES } from './constants';
 
-interface TypeBackground extends MuiTypeBackground {
-  dark: string;
-}
-
-interface Palette extends MuiPalette {
-  background: TypeBackground;
-}
-
-export interface Theme extends MuiTheme {
-  name: string;
-  palette: Palette;
-}
-
-interface ThemeConfig {
+export interface ThemeConfig {
   responsiveFontSizes?: boolean;
-  theme?: string;
+  theme: string;
 }
 
-interface DeprecatedThemeOptions {
-  name?: string;
-  typography?: Record<string, any>;
-  overrides?: Record<string, any>;
-  palette?: Record<string, any>;
-  shadows?: Shadows;
-}
-
-const baseOptions: DeprecatedThemeOptions = {
+const baseOptions: ThemeOptions = {
   typography,
-  overrides: {
-    MuiLinearProgress: {
-      root: {
-        borderRadius: 3,
-        overflow: 'hidden',
-      },
-    },
-    MuiListItemIcon: {
-      root: {
-        minWidth: 32,
-      },
-    },
-    MuiButton: {
-      root: {
-        borderRadius: 64,
-      },
-    },
-    MuiChip: {
-      root: {
-        backgroundColor: 'rgba(0,0,0,0.075)',
-      },
-    },
-    MuiBackdrop: {
-      root: {
-        backgroundColor: 'rgba(68, 56, 102, 0.8)',
-      },
-    },
+  shape: {
+    borderRadius: '16px',
   },
-};
-
-const themesOptions: DeprecatedThemeOptions[] = [
-  {
-    name: THEMES.LIGHT,
-    overrides: {
-      MuiInputBase: {
-        input: {
-          '&::placeholder': {
-            opacity: 1,
-            color: colors.blueGrey[600],
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        '@global': {
+          '@fontFace': ['DM Sans'],
+          '*': {
+            boxSizing: 'border-box',
+            margin: 0,
+            padding: 0,
+          },
+          html: {
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
+            height: '100%',
+            width: '100%',
+          },
+          body: {
+            height: '100%',
+            width: '100%',
+          },
+          '#root': {
+            height: '100%',
+            width: '100%',
           },
         },
       },
     },
-    palette: {
-      mode: 'light',
-      action: {
-        active: colors.blueGrey[600],
-      },
-      background: {
-        default: '#E3E3E3',
-        dark: '#f7f6fd',
-        paper: colors.common.white,
-      },
-      primary: {
-        main: '#6E43E8',
-      },
-      secondary: {
-        main: colors.common.white,
-        contrastText: '#6E43E8',
+    MuiLinearProgress: {
+      styleOverrides: {
+        root: {
+          borderRadius: 3,
+          overflow: 'hidden',
+        },
       },
     },
-    shadows: softShadows,
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          minWidth: 32,
+        },
+      },
+    },
+    MuiBackdrop: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgba(68, 56, 102, 0.8)',
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiBreadcrumbs: {
+      styleOverrides: {
+        separator: {
+          opacity: '30%',
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          padding: 0,
+        },
+      },
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          display: 'flex',
+          flexFlow: 'row nowrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '16px',
+        },
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: { padding: '16px' },
+      },
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          padding: '16px',
+          display: 'flex',
+          flexFlow: 'row nowrap',
+          justifyContent: 'flex-end',
+        },
+      },
+    },
   },
-  {
-    name: THEMES.DARK,
+};
+
+const getDesignTokens = (mode: string) => {
+  if (mode === THEMES.LIGHT) {
+    return {
+      mode: THEMES.LIGHT,
+      overrides: {
+        MuiTooltip: {
+          tooltip: {
+            fontSize: '1em',
+            color: '#6F43E7',
+            backgroundColor: '#ECE5FF',
+          },
+        },
+        MuiInputBase: {
+          input: {
+            '&::placeholder': {
+              opacity: 1,
+              color: colors.blueGrey[600],
+            },
+          },
+        },
+      },
+      palette: {
+        mode: 'light',
+        action: {
+          active: '#39256C',
+        },
+        background: {
+          default: '#FBFBFB',
+          dark: '#FBFBFB',
+          paper: colors.common.white,
+        },
+        primary: {
+          main: '#6F43E7',
+        },
+        secondary: {
+          main: colors.common.white,
+        },
+      },
+      shadows: softShadows,
+    };
+  }
+  return {
+    mode: THEMES.DARK,
+    overrides: {
+      MuiTooltip: {
+        tooltip: {
+          fontSize: '1em',
+          color: '#ECE5FF',
+          backgroundColor: '#6F43E7',
+        },
+      },
+    },
     palette: {
       mode: 'dark',
+      action: {
+        active: '#49AAA1',
+      },
       text: {
         secondary: 'rgba(255,255,255,0.9)',
       },
       background: {
-        default: '#262626',
+        default: '#1a1a1a',
         paper: '#262626',
         dark: '#1a1a1a',
       },
       primary: {
-        main: '#6e43e8',
+        main: '#6F43E7',
+        light: '#ECE5FF',
+        dark: '#39256C',
       },
+
       secondary: {
-        main: colors.common.white,
+        main: '#49AAA1',
       },
     },
     shadows: strongShadows,
-  },
-];
+  };
+};
 
-export const createMuiTheme = (config: ThemeConfig = {}): Theme => {
-  let themeOptions = themesOptions.find((t) => t.name === config.theme);
-
-  if (!themeOptions) {
-    console.warn(new Error(`The theme ${config.theme} is not valid`));
-    [themeOptions] = themesOptions;
-  }
-
-  let theme = createTheme(adaptV4Theme(_.merge({}, baseOptions, themeOptions)));
+const createCustomTheme = (config: ThemeConfig): Theme => {
+  const themeOptions = getDesignTokens(config.theme);
+  let customTheme = createTheme(_.merge({}, baseOptions, themeOptions));
 
   if (config.responsiveFontSizes) {
-    theme = responsiveFontSizes(theme);
+    customTheme = responsiveFontSizes(customTheme);
   }
 
-  return theme as Theme;
+  return customTheme as Theme;
 };
+
+export default createCustomTheme;

@@ -7,29 +7,12 @@ import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import moment from 'moment';
 import React from 'react';
 
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Certificate } from '../../shared/pb/api';
-import { Theme } from '../../shared/theme';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  item: {
-    padding: 0,
-  },
-  red: {
-    color: 'red',
-  },
-  black: {
-    color: theme.palette.text.primary,
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
-}));
 
 interface DetailViewDialogProps {
   open: boolean;
@@ -45,12 +28,10 @@ const DataPoint = ({
   children,
   title,
 }: React.PropsWithChildren<DataPointProps>) => {
-  const classes = useStyles();
-
   return (
     <Grid container alignItems="stretch" spacing={1}>
       <Grid item xs={4}>
-        <Typography className={classes.bold} variant="h6">
+        <Typography sx={{ fontWeight: 'bold' }} variant="h6">
           {title}
         </Typography>
       </Grid>
@@ -66,8 +47,6 @@ const DetailViewDialog = ({
   onClose,
   certInfo,
 }: DetailViewDialogProps): JSX.Element => {
-  const classes = useStyles();
-
   return (
     <Dialog
       open={open}
@@ -86,27 +65,27 @@ const DetailViewDialog = ({
             <Typography>{certInfo?.serial}</Typography>
           </DataPoint>
           <DataPoint title="Issuer">
-            <List classes={{ root: classes.item }}>
+            <List sx={{ padding: 0 }}>
               {certInfo?.issuer?.organization?.map((org) => (
-                <ListItem key={org} classes={{ root: classes.item }}>
+                <ListItem key={org} sx={{ padding: 0 }}>
                   <Typography>{org}</Typography>
                 </ListItem>
               ))}
             </List>
           </DataPoint>
           <DataPoint title="Subject">
-            <List classes={{ root: classes.item }}>
+            <List sx={{ padding: 0 }}>
               {certInfo?.subject?.organization?.map((org) => (
-                <ListItem key={org} classes={{ root: classes.item }}>
+                <ListItem key={org} sx={{ padding: 0 }}>
                   <Typography>{org}</Typography>
                 </ListItem>
               ))}
             </List>
           </DataPoint>
           <DataPoint title="DNS Names">
-            <List classes={{ root: classes.item }}>
+            <List sx={{ padding: 0 }}>
               {certInfo?.dnsNames?.map((dns_name) => (
-                <ListItem key={dns_name} classes={{ root: classes.item }}>
+                <ListItem key={dns_name} sx={{ padding: 0 }}>
                   <Typography>{dns_name}</Typography>
                 </ListItem>
               ))}

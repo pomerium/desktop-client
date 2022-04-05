@@ -1,19 +1,9 @@
 import React from 'react';
 import { SvgIcon } from '@mui/material';
 
-import makeStyles from '@mui/styles/makeStyles';
-
-const useStyles = makeStyles(() => ({
-  iconStyle: {
-    height: '20px',
-    width: '20px',
-  },
-}));
-
 const Connected = (): JSX.Element => {
-  const classes = useStyles();
   return (
-    <SvgIcon viewBox="0 0 20 20" className={classes.iconStyle}>
+    <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
       <path
         d="M8.65885 12.4015C8.51453 12.4153 8.36891 12.3996 8.23083 12.3554C8.09275 12.3112 7.96508 12.2395 7.85555 12.1445C7.74683 12.0442 7.66007 11.9225 7.60072 11.787C7.54138 11.6515 7.51074 11.5052 7.51074 11.3572C7.51074 11.2093 7.54138 11.063 7.60072 10.9275C7.66007 10.792 7.74683 10.6703 7.85555 10.57L10.576 7.86023C10.7806 7.65286 11.0591 7.53524 11.3504 7.53323C11.6416 7.53122 11.9217 7.64499 12.1291 7.84952C12.3365 8.05404 12.4541 8.33257 12.4561 8.62382C12.4581 8.91507 12.3443 9.19519 12.1398 9.40256L9.4193 12.1445C9.20873 12.3255 8.93607 12.4177 8.65885 12.4015Z"
         fill="#6F43E7"

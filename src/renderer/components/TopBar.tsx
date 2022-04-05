@@ -1,8 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { AppBar, Autocomplete, Grid, TextField, Toolbar } from '@mui/material';
-
-import makeStyles from '@mui/styles/makeStyles';
-
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 
 import { Search } from 'react-feather';
@@ -12,19 +9,9 @@ import Logo from '../icons/Logo';
 import { GET_ALL_RECORDS, VIEW } from '../../shared/constants';
 import { Record as ListenerRecord } from '../../shared/pb/api';
 
-const useStyles = makeStyles(() => ({
-  autocomplete: {
-    '& .MuiAutocomplete-popupIndicatorOpen': {
-      transform: 'none',
-    },
-  },
-}));
-
 const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
   const [connections, setConnections] = useState([] as ListenerRecord[]);
   const [filter, setFilter] = useState('');
-
-  const classes = useStyles();
 
   const handleChange = (_e, conn) => {
     if (conn?.id) {
@@ -66,7 +53,11 @@ const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
           <Grid item xs={3}>
             <Autocomplete
               id="search"
-              className={classes.autocomplete}
+              sx={{
+                '& .MuiAutocomplete-popupIndicatorOpen': {
+                  transform: 'none',
+                },
+              }}
               options={connections}
               filterOptions={filterOptions}
               getOptionLabel={(option: ListenerRecord) =>
