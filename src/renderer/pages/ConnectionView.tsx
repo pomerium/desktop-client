@@ -24,6 +24,7 @@ import StyledCard from '../components/StyledCard';
 import {
   DELETE,
   EDIT,
+  EXPORT,
   ExportFile,
   GET_RECORDS,
   LISTENER_LOG,
@@ -47,7 +48,9 @@ import {
 } from '../../shared/pb/api';
 import ExportJSON from '../icons/ExportJSON';
 import CertDetails from '../components/CertDetails';
-import ExportDialog from '../components/ExportDialog';
+import ExportDialog, {
+  IpcRendererEventListener,
+} from '../components/ExportDialog';
 
 type SimplifiedLog = {
   status: 'info' | 'error';
@@ -133,6 +136,27 @@ const ConnectionView = (): JSX.Element => {
 
     return { message, status, date };
   };
+
+  useEffect(() => {
+    const listener: IpcRendererEventListener = (_, args) => {
+      if (args.err) {
+        enqueueSnackbar(args.err.message, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
+      } else {
+        const blob = new Blob([args.data], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = args.filename.replace(/\s+/g, '_') + '.json';
+        link.click();
+      }
+    };
+    ipcRenderer.on(EXPORT, listener);
+    return () => {
+      ipcRenderer.removeListener(EXPORT, listener);
+    };
+  }, []);
 
   useEffect(() => {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
@@ -330,7 +354,7 @@ const ConnectionView = (): JSX.Element => {
               marginTop: 2,
               paddingLeft: 2,
               paddingRight: 2,
-              borderRadius: '16px',
+              borderRadius: 16,
               '&:before': {
                 display: 'none',
               },
@@ -404,7 +428,7 @@ const ConnectionView = (): JSX.Element => {
               marginTop: 2,
               paddingLeft: 2,
               paddingRight: 2,
-              borderRadius: '16px',
+              borderRadius: 16,
               '&:before': {
                 display: 'none',
               },

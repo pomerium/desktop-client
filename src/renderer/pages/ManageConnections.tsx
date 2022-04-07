@@ -20,6 +20,7 @@ import {
 } from '../../shared/pb/api';
 import {
   DELETE,
+  EXPORT,
   ExportFile,
   GET_ALL_RECORDS,
   GET_UNIQUE_TAGS,
@@ -29,7 +30,9 @@ import {
   TOAST_LENGTH,
   VIEW,
 } from '../../shared/constants';
-import ExportDialog from '../components/ExportDialog';
+import ExportDialog, {
+  IpcRendererEventListener,
+} from '../components/ExportDialog';
 import StyledCard from '../components/StyledCard';
 
 const ManageConnections = (): JSX.Element => {
@@ -46,6 +49,27 @@ const ManageConnections = (): JSX.Element => {
         .filter((id) => statuses[id]?.listening).length || 0
     );
   };
+
+  useEffect(() => {
+    const listener: IpcRendererEventListener = (_, args) => {
+      if (args.err) {
+        enqueueSnackbar(args.err.message, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
+      } else {
+        const blob = new Blob([args.data], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = args.filename.replace(/\s+/g, '_') + '.json';
+        link.click();
+      }
+    };
+    ipcRenderer.on(EXPORT, listener);
+    return () => {
+      ipcRenderer.removeListener(EXPORT, listener);
+    };
+  }, []);
 
   useEffect(() => {
     ipcRenderer.on(GET_UNIQUE_TAGS, (_, args) => {

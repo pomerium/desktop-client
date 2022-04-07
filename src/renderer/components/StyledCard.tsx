@@ -6,7 +6,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   padding: 2,
   marginTop: 2,
   marginBottom: 2,
-  borderRadius: '16px',
+  borderRadius: 16,
   offset: '0px, 1px',
 }));
 
