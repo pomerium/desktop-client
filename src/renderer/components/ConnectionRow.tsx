@@ -7,8 +7,8 @@ import {
   MenuItem,
   Menu,
   Tooltip,
+  Box,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { Copy, MoreVertical } from 'react-feather';
 import { clipboard, ipcRenderer } from 'electron';
 import { Link } from 'react-router-dom';
@@ -42,18 +42,6 @@ type ConnectionRowProps = {
   port: string;
 };
 
-const useStyles = makeStyles(() => ({
-  cursor: {
-    cursor: 'pointer',
-    '&:hover': {
-      color: '#6E43E8',
-    },
-  },
-  spacing: {
-    marginLeft: '5px',
-  },
-}));
-
 const ConnectionRow: React.FC<ConnectionRowProps> = ({
   folderName,
   connection,
@@ -62,7 +50,6 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
 }: ConnectionRowProps): JSX.Element => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [exportFile, setExportFile] = React.useState<ExportFile | null>(null);
-  const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
 
   const toggleMenu = (e) => {
@@ -165,17 +152,30 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
                   <Typography
                     variant="subtitle2"
                     onClick={copyAddress}
-                    className={classes.cursor}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': {
+                        color: '#6E43E8',
+                      },
+                    }}
                   >
                     {'Listening on ' + port}
                   </Typography>
                 </Tooltip>
-                <Tooltip title="Copy to Clipboard" className={classes.spacing}>
-                  <Copy
-                    size="14"
-                    onClick={copyAddress}
-                    className={classes.cursor}
-                  />
+                <Tooltip title="Copy to Clipboard">
+                  <Box
+                    sx={{
+                      padding: 0,
+                      margin: 0,
+                      marginLeft: '5px',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        color: '#6E43E8',
+                      },
+                    }}
+                  >
+                    <Copy size="14" onClick={copyAddress} />
+                  </Box>
                 </Tooltip>
               </>
             )}

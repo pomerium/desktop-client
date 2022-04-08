@@ -1,19 +1,9 @@
 import React from 'react';
 import { SvgIcon } from '@mui/material';
 
-import makeStyles from '@mui/styles/makeStyles';
-
-const useStyles = makeStyles(() => ({
-  iconStyle: {
-    height: '20px',
-    width: '20px',
-  },
-}));
-
 const OpenFolder = (): JSX.Element => {
-  const classes = useStyles();
   return (
-    <SvgIcon viewBox="0 0 20 20" className={classes.iconStyle}>
+    <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"

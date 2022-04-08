@@ -5,6 +5,7 @@ import {
   AccordionSummary,
   Box,
   Button,
+  CardContent,
   Checkbox,
   Chip,
   Container,
@@ -15,16 +16,15 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { AlertTriangle, ChevronDown, Info } from 'react-feather';
 import { useSnackbar } from 'notistack';
-import Card from '../components/Card';
-import { Theme } from '../../shared/theme';
+import StyledCard from '../components/StyledCard';
 import {
   DELETE,
   EDIT,
+  EXPORT,
   ExportFile,
   GET_RECORDS,
   LISTENER_LOG,
@@ -48,26 +48,9 @@ import {
 } from '../../shared/pb/api';
 import ExportJSON from '../icons/ExportJSON';
 import CertDetails from '../components/CertDetails';
-import ExportDialog from '../components/ExportDialog';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  titleGrid: {
-    paddingTop: theme.spacing(4),
-  },
-  accordion: {
-    backgroundColor: theme.palette.background.paper,
-    marginTop: theme.spacing(2),
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    borderRadius: '16px',
-    '&:before': {
-      display: 'none',
-    },
-  },
-  logGrid: {
-    borderTop: '1px solid #E3E3E3',
-  },
-}));
+import ExportDialog, {
+  IpcRendererEventListener,
+} from '../components/ExportDialog';
 
 type SimplifiedLog = {
   status: 'info' | 'error';
@@ -76,7 +59,6 @@ type SimplifiedLog = {
 };
 
 const ConnectionView = (): JSX.Element => {
-  const classes = useStyles();
   const [tags, setTags] = useState([] as Record['tags']);
   const [connection, setConnection] = useState({} as Connection);
   const [connected, setConnected] = useState(false);
@@ -156,6 +138,27 @@ const ConnectionView = (): JSX.Element => {
   };
 
   useEffect(() => {
+    const listener: IpcRendererEventListener = (_, args) => {
+      if (args.err) {
+        enqueueSnackbar(args.err.message, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
+      } else {
+        const blob = new Blob([args.data], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = args.filename.replace(/\s+/g, '_') + '.json';
+        link.click();
+      }
+    };
+    ipcRenderer.on(EXPORT, listener);
+    return () => {
+      ipcRenderer.removeListener(EXPORT, listener);
+    };
+  }, []);
+
+  useEffect(() => {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
@@ -224,7 +227,7 @@ const ConnectionView = (): JSX.Element => {
           onClose={() => setExportFile(null)}
         />
         <Container maxWidth={false}>
-          <Grid className={classes.titleGrid}>
+          <Grid sx={{ pt: 4 }}>
             <Grid container alignItems="flex-start">
               <Grid item xs={5}>
                 <Typography variant="h3" color="textPrimary">
@@ -302,48 +305,62 @@ const ConnectionView = (): JSX.Element => {
             </Grid>
           </Grid>
 
-          <Card>
-            <Grid container spacing={2}>
-              <Grid container item xs={12} alignItems="center">
-                <Grid item xs={4}>
-                  <Typography variant="h6">Destination URL</Typography>
+          <StyledCard>
+            <CardContent>
+              <Grid container spacing={2}>
+                <Grid container item xs={12} alignItems="center">
+                  <Grid item xs={4}>
+                    <Typography variant="h6">Destination URL</Typography>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography variant="subtitle2">
+                      {connection.remoteAddr}
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={8}>
-                  <Typography variant="subtitle2">
-                    {connection.remoteAddr}
-                  </Typography>
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+                <Grid container item xs={12} alignItems="center">
+                  <Grid item xs={4}>
+                    <Typography variant="h6">Listener Address</Typography>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography variant="subtitle2">
+                      {connectionPort || connection.listenAddr}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+                <Grid container item xs={12} alignItems="center">
+                  <Grid item xs={4}>
+                    <Typography variant="h6">Tags</Typography>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography variant="subtitle2">
+                      {tags?.join(', ')}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <Divider />
-              </Grid>
-              <Grid container item xs={12} alignItems="center">
-                <Grid item xs={4}>
-                  <Typography variant="h6">Listener Address</Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <Typography variant="subtitle2">
-                    {connectionPort || connection.listenAddr}
-                  </Typography>
-                </Grid>
-              </Grid>
-              <Grid item xs={12}>
-                <Divider />
-              </Grid>
-              <Grid container item xs={12} alignItems="center">
-                <Grid item xs={4}>
-                  <Typography variant="h6">Tags</Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <Typography variant="subtitle2">
-                    {tags?.join(', ')}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Card>
+            </CardContent>
+          </StyledCard>
 
-          <Accordion className={classes.accordion} square={false}>
+          <Accordion
+            sx={{
+              backgroundColor: 'background.paper',
+              marginTop: 2,
+              paddingLeft: 2,
+              paddingRight: 2,
+              borderRadius: 16,
+              '&:before': {
+                display: 'none',
+              },
+            }}
+            square={false}
+          >
             <AccordionSummary
               expandIcon={<ChevronDown />}
               aria-controls="advanced-settings-content"
@@ -405,7 +422,19 @@ const ConnectionView = (): JSX.Element => {
               </Grid>
             </AccordionDetails>
           </Accordion>
-          <Accordion className={classes.accordion} square={false}>
+          <Accordion
+            sx={{
+              backgroundColor: 'background.paper',
+              marginTop: 2,
+              paddingLeft: 2,
+              paddingRight: 2,
+              borderRadius: 16,
+              '&:before': {
+                display: 'none',
+              },
+            }}
+            square={false}
+          >
             <AccordionSummary
               expandIcon={<ChevronDown />}
               aria-controls="log-content"
@@ -512,7 +541,9 @@ const ConnectionView = (): JSX.Element => {
                     container
                     alignItems="center"
                     key={Math.random()}
-                    className={classes.logGrid}
+                    sx={{
+                      borderTop: '1px solid #E3E3E3',
+                    }}
                   >
                     <Grid item xs={2}>
                       {log.status === 'info' && (

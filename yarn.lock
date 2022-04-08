@@ -1339,6 +1339,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@fontsource/dm-sans@^4.5.6":
+  version "4.5.6"
+  resolved "https://registry.yarnpkg.com/@fontsource/dm-sans/-/dm-sans-4.5.6.tgz#4548fbd96eda9eb4bfb97726824ff1645a0c6972"
+  integrity sha512-nOOLeNgo6LAet2+EWrRrigZQclNsUeV92bUvK5VMjL3d+Ej4tmzcX1OkXXePG+KShFeLO9FJf+u7SUQYN+RFFw==
+
 "@grpc/grpc-js@^1.4.2":
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.4.2.tgz#273e9b81990b95fb9f3b043847e6861246a491a9"

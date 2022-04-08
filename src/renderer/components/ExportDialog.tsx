@@ -5,16 +5,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { useSnackbar } from 'notistack';
 
-import { EXPORT, ExportFile, TOAST_LENGTH } from '../../shared/constants';
+import { EXPORT, ExportFile } from '../../shared/constants';
 
-type IpcRendererEventListener = (
+export type IpcRendererEventListener = (
   event: IpcRendererEvent,
   ...args: any[]
 ) => void;
@@ -27,30 +26,7 @@ const ExportDialog = ({
   onClose,
   exportFile,
 }: ExportDialogProps): JSX.Element => {
-  const { enqueueSnackbar } = useSnackbar();
   const [includeTags, setIncludeTags] = useState(false);
-
-  useEffect(() => {
-    const listener: IpcRendererEventListener = (_, args) => {
-      if (args.err) {
-        enqueueSnackbar(args.err.message, {
-          variant: 'error',
-          autoHideDuration: TOAST_LENGTH,
-        });
-      } else {
-        const blob = new Blob([args.data], { type: 'application/json' });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = args.filename.replace(/\s+/g, '_') + '.json';
-        link.click();
-      }
-    };
-    ipcRenderer.on(EXPORT, listener);
-    return () => {
-      ipcRenderer.removeListener(EXPORT, listener);
-    };
-  }, []);
-
   const handleClickCancel = (evt: React.MouseEvent): void => {
     evt.preventDefault();
     onClose();
@@ -59,6 +35,7 @@ const ExportDialog = ({
   const handleClickConfirm = (evt: React.MouseEvent): void => {
     evt.preventDefault();
     ipcRenderer.send(EXPORT, { ...exportFile, includeTags });
+    onClose();
   };
 
   return (
