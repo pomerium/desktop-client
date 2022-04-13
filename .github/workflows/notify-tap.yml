@@ -13,9 +13,15 @@ jobs:
         with:
           repository: ${{ github.repository }}
 
+      - id: clean_version
+        run: |
+          echo "::set-output name=release::${VERSION#v}"
+        env:
+          VERSION: "${{ steps.get_version.outputs.release }}"
+
       - uses: peter-evans/repository-dispatch@v2
         with:
           repository: pomerium/homebrew-tap
           token: ${{ secrets.APPARITOR_GITHUB_TOKEN }}
           event-type: desktop-client-release
-          client-payload: '{ "version": "${{ steps.get_version.outputs.release }}" }'
+          client-payload: '{ "version": "${{ steps.clean_version.outputs.release }}" }'
