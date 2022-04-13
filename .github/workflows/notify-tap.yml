@@ -16,4 +16,4 @@ jobs:
           repository: pomerium/homebrew-tap
           token: ${{ secrets.APPARITOR_GITHUB_TOKEN }}
           event-type: desktop-client-release
-          client-payload: '{ "version": "${{ steps.get_version.outputs.version }}" }'
+          client-payload: '{ "version": "${{ steps.get_version.outputs.version-without-v }}" }'
