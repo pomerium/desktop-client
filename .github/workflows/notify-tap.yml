@@ -9,11 +9,13 @@ jobs:
 
     steps:
       - id: get_version
-        uses: battila7/get-version-action@v2
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: ${{ github.repository }}
 
       - uses: peter-evans/repository-dispatch@v2
         with:
           repository: pomerium/homebrew-tap
           token: ${{ secrets.APPARITOR_GITHUB_TOKEN }}
           event-type: desktop-client-release
-          client-payload: '{ "version": "${{ steps.get_version.outputs.version-without-v }}" }'
+          client-payload: '{ "version": "${{ steps.get_version.outputs.release }}" }'
