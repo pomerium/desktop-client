@@ -1,7 +1,5 @@
 on:
   release:
-  push:
-    branches: ["cdoxsey/homebrew"]
 
 jobs:
   notify-tap:
