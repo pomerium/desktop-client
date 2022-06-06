@@ -97,6 +97,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   };
 
   const copyAddress = () => {
+    setMenuAnchor(null);
     clipboard.writeText(port);
     enqueueSnackbar('Address Copied', {
       variant: 'success',
@@ -105,6 +106,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   };
 
   const toggleConnected = () => {
+    setMenuAnchor(null);
     ipcRenderer.send(UPDATE_LISTENERS, {
       connectionIds: [connection?.id || ''],
       connected: !connected,
