@@ -131,9 +131,11 @@ async function init(): Promise<void> {
   const cliProcess = cli.process;
   const { configClient, listenerClient } = cli;
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
+  if (process.platform !== 'darwin') {
+    // eslint-disable-next-line
+    new AppUpdater();
+  }
+
   installExtension(REDUX_DEVTOOLS)
     .then((name: string) => console.log(`Added Extension:  ${name}`))
     .catch((err: Error) => console.log('An error occurred: ', err));
