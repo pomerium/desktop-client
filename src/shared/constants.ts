@@ -7,8 +7,6 @@ export const prodDebug = process.env.DEBUG_PROD === 'true';
 export const TOAST_LENGTH = 2000;
 
 // Actions for the ipcMain and ipcRenderer messages
-export const CONNECTION_RESPONSE = 'connection-resp';
-export const CONNECTION_CLOSED = 'connection-close';
 export const DISCONNECT_ALL = 'disconnect-all';
 export const DISCONNECT = 'disconnect';
 export const UPDATE_LISTENERS = 'update_listeners';
@@ -27,7 +25,6 @@ export const DELETE = 'delete';
 export const DELETE_ALL = 'delete-all';
 export const DUPLICATE = 'duplicate';
 export const EXPORT = 'export';
-export const EXPORT_ALL = 'export-all';
 export const IMPORT = 'import';
 export interface QueryParams {
   connectionID: string;
