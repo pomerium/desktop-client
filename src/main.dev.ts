@@ -43,6 +43,7 @@ import {
   ExportFile,
   LISTENER_LOG,
   GET_ALL_RECORDS,
+  SET_AUTOSTART,
 } from './shared/constants';
 import Helper from './trayMenu/helper';
 import {
@@ -148,7 +149,15 @@ async function init(): Promise<void> {
     })
   );
 
-  const trayMenuHelper = new Helper([], {}, [], mainWindow, null);
+  const trayMenuHelper = new Helper(
+    [],
+    {},
+    [],
+    mainWindow,
+    null,
+    process.platform,
+    app.getLoginItemSettings().openAtLogin
+  );
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
     preloadWindow: true,
@@ -211,6 +220,13 @@ async function init(): Promise<void> {
         }
       );
     });
+
+    ipcMain.on(SET_AUTOSTART, (_evt, autostart: boolean) => {
+      app.setLoginItemSettings({ openAtLogin: autostart });
+      trayMenuHelper.setAutostart(autostart);
+      menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+    });
+
     ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
       const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
       configClient.getTags(GetTagsRequest, (err, res) => {

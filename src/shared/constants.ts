@@ -26,6 +26,8 @@ export const DELETE_ALL = 'delete-all';
 export const DUPLICATE = 'duplicate';
 export const EXPORT = 'export';
 export const IMPORT = 'import';
+export const SET_AUTOSTART = 'set-autostart';
+
 export interface QueryParams {
   connectionID: string;
 }

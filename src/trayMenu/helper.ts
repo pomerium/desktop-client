@@ -10,7 +10,7 @@ import {
 import { Menubar } from 'menubar';
 import path from 'path';
 import { getAssetPath, menuIconPath } from '../main/binaries';
-import { UPDATE_LISTENERS } from '../shared/constants';
+import { SET_AUTOSTART, UPDATE_LISTENERS } from '../shared/constants';
 import { ListenerStatus, Record } from '../shared/pb/api';
 
 export default class Helper {
@@ -24,19 +24,31 @@ export default class Helper {
 
   menu: Menubar | null;
 
+  os: string;
+
+  autostart: boolean;
+
   constructor(
     records: Record[],
     statuses: { [key: string]: ListenerStatus },
     tags: string[],
     appWindow: BrowserWindow | null,
-    menu: Menubar | null
+    menu: Menubar | null,
+    os: string,
+    autostart: boolean
   ) {
     this.records = records;
     this.statuses = statuses;
     this.appWindow = appWindow;
     this.menu = menu;
     this.tags = tags;
+    this.os = os;
+    this.autostart = autostart;
   }
+
+  setAutostart = (autostart: boolean) => {
+    this.autostart = autostart;
+  };
 
   setMenu = (menu: Menubar) => {
     this.menu = menu;
@@ -131,7 +143,7 @@ export default class Helper {
   };
 
   buildMenuTemplate = () => {
-    const { appWindow } = this;
+    const { appWindow, autostart } = this;
     const template: (MenuItemConstructorOptions | MenuItem)[] = [];
     template.push({
       label: 'Add Connection',
@@ -148,6 +160,22 @@ export default class Helper {
         appWindow?.show();
       },
     });
+
+    if (this.os === 'darwin' || this.os === 'win32') {
+      template.push({
+        label: 'Autostart',
+        checked: this.autostart,
+        click() {
+          ipcMain.emit(
+            SET_AUTOSTART,
+            {},
+            {
+              autostart: !autostart,
+            }
+          );
+        },
+      });
+    }
 
     template.push({
       type: 'separator',
