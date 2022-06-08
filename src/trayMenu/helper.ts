@@ -164,6 +164,7 @@ export default class Helper {
     if (this.os === 'darwin' || this.os === 'win32') {
       template.push({
         label: 'Autostart',
+        type: 'checkbox',
         checked: this.autostart,
         click() {
           ipcMain.emit(
