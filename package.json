@@ -285,7 +285,7 @@
     "regenerator-runtime": "^0.13.9",
     "source-map-support": "^0.5.19",
     "ts-proto": "^1.85.0",
-    "validator": "^13.6.0"
+    "validator": "^13.7.0"
   },
   "devEngines": {
     "node": ">=10.x",
