@@ -130,7 +130,7 @@ async function init(): Promise<void> {
   const cliProcess = cli.process;
   const { configClient, listenerClient } = cli;
 
-  if (process.platform !== 'darwin') {
+  if (process.platform === 'win32') {
     // eslint-disable-next-line
     new AppUpdater();
   }
