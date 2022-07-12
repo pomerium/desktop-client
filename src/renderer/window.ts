@@ -14,6 +14,7 @@ const createWindow = () => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
+      contextIsolation: false,
       nodeIntegration: true,
     },
   });
