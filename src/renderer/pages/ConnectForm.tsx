@@ -25,7 +25,6 @@ import { set } from 'lodash';
 import {
   GET_RECORDS,
   GET_UNIQUE_TAGS,
-  QueryParams,
   SAVE_RECORD,
   TOAST_LENGTH,
   VIEW,
@@ -91,7 +90,7 @@ const ConnectForm: FC<Props> = () => {
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
   };
-  const { connectionID }: QueryParams = useParams();
+  const { connectionID } = useParams();
   const { enqueueSnackbar } = useSnackbar();
   const certRef = React.useRef<HTMLInputElement>(null);
   const keyRef = React.useRef<HTMLInputElement>(null);

@@ -1,0 +1,16 @@
+import React, { FC } from 'react';
+import { Outlet } from 'react-router-dom';
+import TopBar from '../components/TopBar';
+import { Box } from '@mui/material';
+
+const Layout: FC = () => {
+  return (
+    <>
+      <TopBar />
+      <Outlet />
+      <Box mt={3} flexGrow={1} />
+    </>
+  );
+};
+
+export default Layout;

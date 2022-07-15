@@ -29,7 +29,6 @@ import {
   GET_RECORDS,
   LISTENER_LOG,
   LISTENER_STATUS,
-  QueryParams,
   TOAST_LENGTH,
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
@@ -71,7 +70,7 @@ const ConnectionView = (): JSX.Element => {
   const [showDetail, setShowDetail] = useState(false);
   const [exportFile, setExportFile] = useState<ExportFile | null>(null);
   const { enqueueSnackbar } = useSnackbar();
-  const { connectionID }: QueryParams = useParams();
+  const { connectionID } = useParams();
 
   const toggleMenu = (e) => {
     setMenuAnchor(e.currentTarget);
@@ -166,14 +165,18 @@ const ConnectionView = (): JSX.Element => {
           autoHideDuration: TOAST_LENGTH,
         });
       } else {
-        setConnected(!!args?.res?.listeners[connectionID]?.listening);
-        const listenAddr = args?.res?.listeners[connectionID]?.listenAddr;
+        setConnected(!!args?.res?.listeners[connectionID as string]?.listening);
+        const listenAddr =
+          args?.res?.listeners[connectionID as string]?.listenAddr;
         setConnectionPort(listenAddr || '');
-        if (args?.res?.listeners[connectionID]?.lastError) {
-          enqueueSnackbar(args?.res?.listeners[connectionID]?.lastError, {
-            variant: 'error',
-            autoHideDuration: TOAST_LENGTH,
-          });
+        if (args?.res?.listeners[connectionID as string]?.lastError) {
+          enqueueSnackbar(
+            args?.res?.listeners[connectionID as string]?.lastError,
+            {
+              variant: 'error',
+              autoHideDuration: TOAST_LENGTH,
+            }
+          );
         }
       }
     });
@@ -256,7 +259,7 @@ const ConnectionView = (): JSX.Element => {
                         filename: connection?.name || 'download',
                         selector: {
                           all: false,
-                          ids: [connectionID],
+                          ids: [connectionID as string],
                           tags: [],
                         },
                       })

@@ -1,6 +1,5 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { AppBar, Autocomplete, Grid, TextField, Toolbar } from '@mui/material';
-import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { Search } from 'react-feather';
 import { ipcRenderer } from 'electron';
@@ -8,8 +7,9 @@ import { createFilterOptions } from '@mui/material/useAutocomplete';
 import Logo from '../icons/Logo';
 import { GET_ALL_RECORDS, VIEW } from '../../shared/constants';
 import { Record as ListenerRecord } from '../../shared/pb/api';
+import TopTabs from './TopTabs';
 
-const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
+const TopBar: FC = () => {
   const [connections, setConnections] = useState([] as ListenerRecord[]);
   const [filter, setFilter] = useState('');
 
@@ -94,7 +94,7 @@ const TopBar: FC = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
           </Grid>
         </Grid>
       </Toolbar>
-      {children}
+      <TopTabs />
     </AppBar>
   );
 };
