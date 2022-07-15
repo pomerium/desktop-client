@@ -31,7 +31,7 @@ type FolderProps = {
   totalListeners: number;
   connectedListeners: number;
   connectionIds: string[];
-  children?: React.ReactNode;
+  children: React.ReactNode;
 };
 
 const TagFolderRow: React.FC<FolderProps> = ({

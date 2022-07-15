@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { AppBar, Autocomplete, Grid, TextField, Toolbar } from '@mui/material';
 import React, { FC, useEffect, useState } from 'react';
 

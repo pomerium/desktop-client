@@ -8,7 +8,7 @@ type VirtualFolderProps = {
   folderName: string;
   totalListeners: number;
   connectedListeners: number;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 };
 
 const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
