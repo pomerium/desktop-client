@@ -10,7 +10,6 @@
  */
 import 'core-js/stable';
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import * as grpc from '@grpc/grpc-js';
 import * as Sentry from '@sentry/electron';
 import log from 'electron-log';
@@ -131,14 +130,11 @@ async function init(): Promise<void> {
   const cliProcess = cli.process;
   const { configClient, listenerClient } = cli;
 
-  if (process.platform !== 'darwin') {
+  if (process.platform === 'win32') {
     // eslint-disable-next-line
     new AppUpdater();
   }
 
-  installExtension(REDUX_DEVTOOLS)
-    .then((name: string) => console.log(`Added Extension:  ${name}`))
-    .catch((err: Error) => console.log('An error occurred: ', err));
   mainWindow = createWindow();
   mainWindow?.loadURL(
     url.format({

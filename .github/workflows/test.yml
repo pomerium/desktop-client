@@ -20,7 +20,7 @@ jobs:
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
-          node-version: 15
+          node-version: 16.13.0
 
       - name: yarn install
         run: |
@@ -32,5 +32,4 @@ jobs:
         run: |
           yarn package
           yarn lint
-          yarn tsc
           yarn test

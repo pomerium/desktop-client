@@ -26,9 +26,6 @@ export const DELETE_ALL = 'delete-all';
 export const DUPLICATE = 'duplicate';
 export const EXPORT = 'export';
 export const IMPORT = 'import';
-export interface QueryParams {
-  connectionID: string;
-}
 
 export interface ExportFile {
   selector: Selector;
