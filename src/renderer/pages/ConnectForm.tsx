@@ -341,7 +341,7 @@ const ConnectForm: FC<Props> = () => {
             marginTop: 2,
             paddingLeft: 2,
             paddingRight: 2,
-            borderRadius: 16,
+            borderRadius: '16px',
             '&:before': {
               display: 'none',
             },
