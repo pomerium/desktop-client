@@ -1,7 +1,7 @@
 {
   "name": "pomerium-desktop",
   "productName": "pomerium-desktop",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
   "main": "./main.prod.js",
   "author": {
