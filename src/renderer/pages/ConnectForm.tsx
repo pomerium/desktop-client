@@ -292,7 +292,7 @@ const ConnectForm: FC<Props> = () => {
                   value={connection?.remoteAddr}
                   onChange={(evt): void => saveDestination(evt.target.value)}
                   variant="outlined"
-                  helperText="The remote address to connect to. Do not include a protocol. Example: mysql.example.com:3306"
+                  helperText="The remote address to connect to. Example: mysql.example.com:3306 or tcp+https://proxy.example.com/mysql.example.com:3306"
                 />
               </Grid>
               <Grid item xs={12}>
