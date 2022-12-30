@@ -366,7 +366,7 @@ const ConnectForm: FC<Props> = () => {
                   onChange={(evt): void => savePomeriumUrl(evt.target.value)}
                   variant="outlined"
                   autoFocus
-                  helperText="Location of Pomerium Service"
+                  helperText="URL of a Bastion host to use for the initial TLS connection"
                 />
               </Grid>
               <Grid item xs={12}>
