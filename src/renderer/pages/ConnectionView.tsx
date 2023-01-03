@@ -357,7 +357,7 @@ const ConnectionView = (): JSX.Element => {
               marginTop: 2,
               paddingLeft: 2,
               paddingRight: 2,
-              borderRadius: '16px',
+              borderRadius: 4,
               '&:before': {
                 display: 'none',
               },
@@ -431,7 +431,7 @@ const ConnectionView = (): JSX.Element => {
               marginTop: 2,
               paddingLeft: 2,
               paddingRight: 2,
-              borderRadius: '16px',
+              borderRadius: 4,
               '&:before': {
                 display: 'none',
               },

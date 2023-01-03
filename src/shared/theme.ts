@@ -21,7 +21,7 @@ export interface ThemeConfig {
 const baseOptions: ThemeOptions = {
   typography,
   shape: {
-    borderRadius: '16px',
+    borderRadius: 4,
   },
   components: {
     MuiCssBaseline: {
