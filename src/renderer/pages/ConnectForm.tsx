@@ -126,8 +126,9 @@ const ConnectForm: FC<Props> = () => {
         ids: [connectionID],
         tags: [],
       } as Selector);
+    } else {
+      setShowCertInput(true);
     }
-
     return function cleanup() {
       ipcRenderer.removeAllListeners(GET_RECORDS);
       ipcRenderer.removeAllListeners(GET_UNIQUE_TAGS);
@@ -341,7 +342,7 @@ const ConnectForm: FC<Props> = () => {
             marginTop: 2,
             paddingLeft: 2,
             paddingRight: 2,
-            borderRadius: '16px',
+            borderRadius: 4,
             '&:before': {
               display: 'none',
             },
