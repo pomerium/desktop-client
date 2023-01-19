@@ -324,6 +324,6 @@
     }
   },
   "pomeriumCli": {
-    "version": "v0.21.0-beta"
+    "version": "v0.21.0-rc1"
   }
 }
