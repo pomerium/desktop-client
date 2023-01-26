@@ -21,6 +21,11 @@ const TopBar: FC = () => {
   };
 
   const fetch = () => {
+    ipcRenderer.once(GET_ALL_RECORDS, (_e, args) => {
+      if (!args.err) {
+        setConnections(args.res.records);
+      }
+    });
     ipcRenderer.send(GET_ALL_RECORDS);
   };
 
@@ -32,16 +37,7 @@ const TopBar: FC = () => {
   });
 
   useEffect(() => {
-    ipcRenderer.on(GET_ALL_RECORDS, (_e, args) => {
-      if (!args.err) {
-        setConnections(args.res.records);
-      }
-    });
     fetch();
-
-    return function cleanup() {
-      ipcRenderer.removeAllListeners(GET_ALL_RECORDS);
-    };
   }, []);
 
   return (
