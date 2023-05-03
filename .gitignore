@@ -60,3 +60,5 @@ npm-debug.log.*
 src/meta.json
 
 /cli
+
+changelog.md
