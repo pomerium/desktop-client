@@ -7564,10 +7564,10 @@ memory-fs@^0.2.0:
   resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.2.0.tgz#f2bb25368bc121e391c2520de92969caee0a0290"
   integrity sha512-+y4mDxU4rvXXu5UDSGCGNiesFmwCHuefGMoPCO1WYucNYj7DsLqrFaa2fXVI0H+NNiPTwwzKwspn9yTZqUGqng==
 
-menubar@^9.0.5:
-  version "9.2.1"
-  resolved "https://registry.yarnpkg.com/menubar/-/menubar-9.2.1.tgz#eb378fb6c80a52639201f9f2fe8b5a6b49dc1c55"
-  integrity sha512-1uPyapxHHmQX0DswIXhXnIREXu7z0G0U6K0kQ4rRBsgucdUtQXoX7GK//59Cpz+fv2CM3VS4WVyGtAyJpHagsg==
+menubar@^9.3.0:
+  version "9.3.0"
+  resolved "https://registry.yarnpkg.com/menubar/-/menubar-9.3.0.tgz#a245be0cedbfeb3900d23a37e87a71d2a0f0c7a5"
+  integrity sha512-TC7R5YR+OKVfFIyGiZ+HkKmY0hMLhOseX6wN0DxWzzF1CNhZ2Tm3hMB6erc35jzBmrsMDghRm89dtSeY0VjmjQ==
   dependencies:
     electron-positioner "^4.1.0"
 
