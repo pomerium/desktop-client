@@ -31,7 +31,7 @@ jobs:
           yarn install
 
       - name: Import Apple CSC
-        uses: apple-actions/import-codesign-certs@v1
+        uses: apple-actions/import-codesign-certs@v2
         with:
           p12-file-base64: ${{ secrets.APPLE_APP_CSC }}
           p12-password: ${{ secrets.APPLE_APP_CSC_PASSWORD }}
