@@ -13,7 +13,7 @@ jobs:
 
       - id: clean_version
         run: |
-          echo "::set-output name=release::${VERSION#v}"
+          echo "release=${VERSION#v}" >> $GITHUB_OUTPUT
         env:
           VERSION: "${{ steps.get_version.outputs.release }}"
 
