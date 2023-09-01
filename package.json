@@ -278,7 +278,7 @@
     "menubar": "^9.0.5",
     "moment": "^2.29.2",
     "notistack": "^2.0.3",
-    "nth-check": "2.0.1",
+    "nth-check": "2.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.9",
