@@ -205,7 +205,7 @@
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "browserslist-config-erb": "^0.0.1",
     "chalk": "^4.1.2",
-    "concurrently": "^6.2.1",
+    "concurrently": "^8.2.1",
     "core-js": "^3.16.1",
     "cross-env": "^7.0.3",
     "css-loader": "^6.2.0",
