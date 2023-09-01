@@ -238,7 +238,7 @@
     "optimize-css-assets-webpack-plugin": "^6.0.1",
     "prettier": "^2.3.2",
     "react-refresh": "^0.14.0",
-    "react-test-renderer": "^17.0.2",
+    "react-test-renderer": "^18.2.0",
     "rimraf": "^3.0.2",
     "sass-loader": "^12.1.0",
     "style-loader": "^3.2.1",
