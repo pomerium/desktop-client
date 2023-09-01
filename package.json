@@ -272,7 +272,7 @@
     "electron-is-packaged": "^1.0.2",
     "electron-log": "^4.4.1",
     "electron-store": "^8.0.0",
-    "electron-updater": "^4.3.9",
+    "electron-updater": "^6.1.1",
     "history": "^5.0.0",
     "json-schema": "^0.4.0",
     "menubar": "^9.0.5",
