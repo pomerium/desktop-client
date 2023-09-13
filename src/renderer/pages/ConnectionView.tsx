@@ -14,6 +14,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Stack,
   Typography,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -406,20 +407,33 @@ const ConnectionView = (): JSX.Element => {
                     <Typography variant="h6">Client Certificate</Typography>
                   </Grid>
                   <Grid item xs={8}>
-                    {connection?.clientCert?.info && (
-                      <>
-                        <CertDetails
-                          open={showDetail}
-                          onClose={() => setShowDetail(false)}
-                          certInfo={connection?.clientCert?.info}
-                        />
-                        <Chip
-                          label="Details"
-                          color="primary"
-                          onClick={() => setShowDetail(true)}
-                        />
-                      </>
-                    )}
+                    <Stack alignItems="flex-start" spacing={1}>
+                      {connection?.clientCertIssuerCn && (
+                        <Typography variant="subtitle2">
+                          Search system trust store by issuer &ldquo;
+                          {connection.clientCertIssuerCn}&rdquo;
+                        </Typography>
+                      )}
+                      {connection?.clientCert?.info && (
+                        <Stack
+                          direction="row"
+                          alignItems="baseline"
+                          spacing={1}
+                        >
+                          <CertDetails
+                            open={showDetail}
+                            onClose={() => setShowDetail(false)}
+                            certInfo={connection?.clientCert?.info}
+                          />
+                          <Typography variant="subtitle2">File:</Typography>
+                          <Chip
+                            label="Details"
+                            color="primary"
+                            onClick={() => setShowDetail(true)}
+                          />
+                        </Stack>
+                      )}
+                    </Stack>
                   </Grid>
                 </Grid>
               </Grid>

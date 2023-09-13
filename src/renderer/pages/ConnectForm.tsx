@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CheckCircle, ChevronDown, Trash } from 'react-feather';
+import { CheckCircle, ChevronDown, ChevronRight, Trash } from 'react-feather';
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
 import { set } from 'lodash';
@@ -67,6 +67,44 @@ export const TextArea = styled(TextField)({
   },
 });
 
+const NestedAccordion = styled((props: AccordionProps) => (
+  <Accordion disableGutters elevation={0} {...props} />
+))(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  marginLeft: theme.spacing(2),
+  width: '100%',
+  '&:not(:last-child)': {
+    borderBottom: 0,
+  },
+  '&:before': {
+    display: 'none',
+  },
+}));
+
+const NestedAccordionSummary = styled((props: AccordionSummaryProps) => (
+  <AccordionSummary
+    expandIcon={<ChevronRight sx={{ fontSize: '0.9rem' }} />}
+    {...props}
+  />
+))(({ theme }) => ({
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, .05)'
+      : 'rgba(0, 0, 0, .03)',
+  flexDirection: 'row-reverse',
+  '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+    transform: 'rotate(90deg)',
+  },
+  '& .MuiAccordionSummary-content': {
+    marginLeft: theme.spacing(1),
+  },
+}));
+
+const NestedAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
+  borderTop: `1px solid ${theme.palette.divider}`,
+  paddingTop: theme.spacing(2),
+}));
+
 interface Props {
   onComplete?: () => void;
 }
@@ -79,6 +117,7 @@ const initialConnData: Connection = {
   disableTlsVerification: false,
   caCert: undefined,
   clientCert: undefined,
+  clientCertIssuerCn: undefined,
 };
 
 const ConnectForm: FC<Props> = () => {
@@ -92,6 +131,9 @@ const ConnectForm: FC<Props> = () => {
   };
   const { connectionID } = useParams();
   const { enqueueSnackbar } = useSnackbar();
+  const [clientCertPanel, setClientCertPanel] = React.useState<string | false>(
+    false
+  );
   const certRef = React.useRef<HTMLInputElement>(null);
   const keyRef = React.useRef<HTMLInputElement>(null);
   const [certText, setCertText] = useState('');
@@ -108,9 +150,15 @@ const ConnectForm: FC<Props> = () => {
         });
       } else if (args.res.records.length === 1) {
         setTags(args.res.records[0].tags || []);
-        setConnection(args.res.records[0].conn || initialConnData);
-        setOriginalConnection(args.res.records[0].conn || initialConnData);
-        setShowCertInput(!args.res.records[0].conn.clientCert);
+        const { conn } = args.res.records[0];
+        setConnection(conn || initialConnData);
+        setOriginalConnection(conn || initialConnData);
+        setShowCertInput(!conn.clientCert);
+        if (conn.clientCertIssuerCn) {
+          setClientCertPanel('store');
+        } else if (conn.clientCert) {
+          setClientCertPanel('file');
+        }
       }
     });
     ipcRenderer.once(GET_UNIQUE_TAGS, (_, args) => {
@@ -178,6 +226,13 @@ const ConnectForm: FC<Props> = () => {
     } else {
       ipcRenderer.send(VIEW_CONNECTION_LIST);
     }
+  };
+
+  const saveClientCertIssuerCn = (value: string): void => {
+    setConnection({
+      ...connection,
+      ...{ clientCertIssuerCn: value || undefined },
+    });
   };
 
   const saveCertText = (value: string): void => {
@@ -253,6 +308,12 @@ const ConnectForm: FC<Props> = () => {
     }
     return !!connection?.name && !!connection?.remoteAddr.trim();
   };
+
+  const handleClientCertPanel =
+    (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+      setClientCertPanel(newExpanded ? panel : false);
+    };
+
   return (
     <Container maxWidth={false}>
       <BeforeBackActionDialog
@@ -387,115 +448,159 @@ const ConnectForm: FC<Props> = () => {
                 </FormHelperText>
               </Grid>
 
-              {showCertInput && (
-                <Grid item xs={12}>
-                  <label htmlFor="cert-file">
-                    <input
-                      style={{ display: 'none' }}
-                      id="cert-file"
-                      ref={certRef}
-                      type="file"
-                      onChange={handleCertFile}
-                    />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      component="span"
-                    >
-                      Client Certificate from File
-                    </Button>
-                  </label>
-                </Grid>
-              )}
-              {showCertInput && (
-                <Grid item xs={12}>
-                  <Typography variant="body2">
-                    Client Certificate Text
+              <NestedAccordion
+                sx={{ mt: 2 }}
+                expanded={clientCertPanel === 'store'}
+                onChange={handleClientCertPanel('store')}
+              >
+                <NestedAccordionSummary>
+                  <Typography>
+                    Client certificate from system trust store
                   </Typography>
-                  <TextArea
+                </NestedAccordionSummary>
+                <NestedAccordionDetails>
+                  <TextField
                     fullWidth
-                    variant="filled"
-                    value={certText}
-                    multiline
-                    required={!!keyText}
-                    rows={5}
-                    placeholder="e.g. copy/paste the cert in PEM format"
-                    onChange={(evt): void => saveCertText(evt.target.value)}
-                    spellCheck={false}
+                    label="Issuer Common Name"
+                    value={connection?.clientCertIssuerCn || ''}
+                    onChange={(evt): void =>
+                      saveClientCertIssuerCn(evt.target.value)
+                    }
+                    variant="outlined"
+                    autoFocus
+                    helperText="Searches the system trust store for a client certificate issued by a certificate authority with the provided Common Name"
                   />
-                  <FormHelperText sx={{ pl: 2 }}>
-                    Add a Client Certificate with the File Selector or
-                    Copy/Paste to the Text Area. Key is required if the
-                    Certificate is present.
-                  </FormHelperText>
-                </Grid>
-              )}
-              {showCertInput && (
-                <Grid item xs={12}>
-                  <label htmlFor="key-file">
-                    <input
-                      style={{ display: 'none' }}
-                      id="key-file"
-                      ref={keyRef}
-                      type="file"
-                      onChange={handleKeyFile}
-                    />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      component="span"
-                    >
-                      Client Certificate Key from File
-                    </Button>
-                  </label>
-                </Grid>
-              )}
-              {showCertInput && (
-                <Grid item xs={12}>
-                  <Typography variant="body2">
-                    Client Certificate Key Text
-                  </Typography>
-                  <TextArea
-                    fullWidth
-                    variant="filled"
-                    value={keyText}
-                    required={!!certText}
-                    multiline
-                    rows={5}
-                    placeholder="e.g. copy/paste the key in PEM format"
-                    onChange={(evt): void => saveKeyText(evt.target.value)}
-                  />
-                  <FormHelperText sx={{ pl: 2 }}>
-                    Add a Client Certificate Key with the File Selector or
-                    Copy/Paste to the Text Area. Certificate is required if the
-                    Key is present.
-                  </FormHelperText>
-                </Grid>
-              )}
+                </NestedAccordionDetails>
+              </NestedAccordion>
 
-              {!showCertInput && (
-                <Grid item xs={12}>
-                  <CertDetails
-                    open={showDetail}
-                    onClose={() => setShowDetail(false)}
-                    certInfo={connection?.clientCert?.info}
-                  />
-                  <Typography variant="body2">Client Certificate</Typography>
-                  <Chip
-                    label="Details"
-                    color="primary"
-                    onClick={() => setShowDetail(true)}
-                  />
-                  <IconButton
-                    aria-label="delete"
-                    onClick={handleDeleteCert}
-                    color="primary"
-                    size="large"
-                  >
-                    <Trash />
-                  </IconButton>
-                </Grid>
-              )}
+              <NestedAccordion
+                sx={{ mb: 2 }}
+                expanded={clientCertPanel === 'file'}
+                onChange={handleClientCertPanel('file')}
+              >
+                <NestedAccordionSummary>
+                  <Typography>Client certificate from file</Typography>
+                </NestedAccordionSummary>
+                <NestedAccordionDetails>
+                  <Grid container spacing={2}>
+                    {showCertInput && (
+                      <Grid item xs={12}>
+                        <label htmlFor="cert-file">
+                          <input
+                            style={{ display: 'none' }}
+                            id="cert-file"
+                            ref={certRef}
+                            type="file"
+                            onChange={handleCertFile}
+                          />
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            component="span"
+                          >
+                            Client Certificate from File
+                          </Button>
+                        </label>
+                      </Grid>
+                    )}
+                    {showCertInput && (
+                      <Grid item xs={12}>
+                        <Typography variant="body2">
+                          Client Certificate Text
+                        </Typography>
+                        <TextArea
+                          fullWidth
+                          variant="filled"
+                          value={certText}
+                          multiline
+                          required={!!keyText}
+                          rows={5}
+                          placeholder="e.g. copy/paste the cert in PEM format"
+                          onChange={(evt): void =>
+                            saveCertText(evt.target.value)
+                          }
+                          spellCheck={false}
+                        />
+                        <FormHelperText sx={{ pl: 2 }}>
+                          Add a Client Certificate with the File Selector or
+                          Copy/Paste to the Text Area. Key is required if the
+                          Certificate is present.
+                        </FormHelperText>
+                      </Grid>
+                    )}
+                    {showCertInput && (
+                      <Grid item xs={12}>
+                        <label htmlFor="key-file">
+                          <input
+                            style={{ display: 'none' }}
+                            id="key-file"
+                            ref={keyRef}
+                            type="file"
+                            onChange={handleKeyFile}
+                          />
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            component="span"
+                          >
+                            Client Certificate Key from File
+                          </Button>
+                        </label>
+                      </Grid>
+                    )}
+                    {showCertInput && (
+                      <Grid item xs={12}>
+                        <Typography variant="body2">
+                          Client Certificate Key Text
+                        </Typography>
+                        <TextArea
+                          fullWidth
+                          variant="filled"
+                          value={keyText}
+                          required={!!certText}
+                          multiline
+                          rows={5}
+                          placeholder="e.g. copy/paste the key in PEM format"
+                          onChange={(evt): void =>
+                            saveKeyText(evt.target.value)
+                          }
+                        />
+                        <FormHelperText sx={{ pl: 2 }}>
+                          Add a Client Certificate Key with the File Selector or
+                          Copy/Paste to the Text Area. Certificate is required
+                          if the Key is present.
+                        </FormHelperText>
+                      </Grid>
+                    )}
+
+                    {!showCertInput && (
+                      <Grid item xs={12}>
+                        <CertDetails
+                          open={showDetail}
+                          onClose={() => setShowDetail(false)}
+                          certInfo={connection?.clientCert?.info}
+                        />
+                        <Typography variant="body2">
+                          Client Certificate
+                        </Typography>
+                        <Chip
+                          label="Details"
+                          color="primary"
+                          onClick={() => setShowDetail(true)}
+                        />
+                        <IconButton
+                          aria-label="delete"
+                          onClick={handleDeleteCert}
+                          color="primary"
+                          size="large"
+                        >
+                          <Trash />
+                        </IconButton>
+                      </Grid>
+                    )}
+                  </Grid>
+                </NestedAccordionDetails>
+              </NestedAccordion>
             </Grid>
           </AccordionDetails>
         </Accordion>

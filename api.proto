@@ -217,4 +217,6 @@ message Connection {
     bytes ca_cert = 6;
   }
   optional Certificate client_cert = 7;
+  // issuer Common Name to use when searching for a client certificate in the system trust store
+  optional string client_cert_issuer_cn = 8;
 }

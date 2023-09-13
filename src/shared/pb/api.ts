@@ -320,6 +320,8 @@ export interface Connection {
   disableTlsVerification: boolean | undefined;
   caCert: Uint8Array | undefined;
   clientCert?: Certificate | undefined;
+  /** issuer Common Name to use when searching for a client certificate in the system trust store */
+  clientCertIssuerCn?: string | undefined;
 }
 
 function createBaseRecord(): Record {
@@ -2256,6 +2258,7 @@ function createBaseConnection(): Connection {
     disableTlsVerification: undefined,
     caCert: undefined,
     clientCert: undefined,
+    clientCertIssuerCn: undefined,
   };
 }
 
@@ -2284,6 +2287,9 @@ export const Connection = {
     }
     if (message.clientCert !== undefined) {
       Certificate.encode(message.clientCert, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.clientCertIssuerCn !== undefined) {
+      writer.uint32(66).string(message.clientCertIssuerCn);
     }
     return writer;
   },
@@ -2316,6 +2322,9 @@ export const Connection = {
         case 7:
           message.clientCert = Certificate.decode(reader, reader.uint32());
           break;
+        case 8:
+          message.clientCertIssuerCn = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2341,6 +2350,9 @@ export const Connection = {
       clientCert: isSet(object.clientCert)
         ? Certificate.fromJSON(object.clientCert)
         : undefined,
+      clientCertIssuerCn: isSet(object.clientCertIssuerCn)
+        ? String(object.clientCertIssuerCn)
+        : undefined,
     };
   },
 
@@ -2362,6 +2374,8 @@ export const Connection = {
       (obj.clientCert = message.clientCert
         ? Certificate.toJSON(message.clientCert)
         : undefined);
+    message.clientCertIssuerCn !== undefined &&
+      (obj.clientCertIssuerCn = message.clientCertIssuerCn);
     return obj;
   },
 
@@ -2379,6 +2393,7 @@ export const Connection = {
       object.clientCert !== undefined && object.clientCert !== null
         ? Certificate.fromPartial(object.clientCert)
         : undefined;
+    message.clientCertIssuerCn = object.clientCertIssuerCn ?? undefined;
     return message;
   },
 };
