@@ -1,5 +1,4 @@
 /* eslint-disable */
-import Long from 'long';
 import {
   makeGenericClientConstructor,
   ChannelCredentials,
@@ -14,8 +13,9 @@ import {
   ClientReadableStream,
   ServiceError,
 } from '@grpc/grpc-js';
-import _m0 from 'protobufjs/minimal';
 import { Timestamp } from './google/protobuf/timestamp';
+import Long from 'long';
+import * as _m0 from 'protobufjs/minimal';
 
 export const protobufPackage = 'pomerium.cli';
 
@@ -96,8 +96,9 @@ export function exportRequest_FormatToJSON(
       return 'EXPORT_FORMAT_JSON_COMPACT';
     case ExportRequest_Format.EXPORT_FORMAT_JSON_PRETTY:
       return 'EXPORT_FORMAT_JSON_PRETTY';
+    case ExportRequest_Format.UNRECOGNIZED:
     default:
-      return 'UNKNOWN';
+      return 'UNRECOGNIZED';
   }
 }
 
@@ -231,8 +232,9 @@ export function connectionStatusUpdate_ConnectionStatusToJSON(
       return 'CONNECTION_STATUS_LISTENING';
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CLOSED:
       return 'CONNECTION_STATUS_CLOSED';
+    case ConnectionStatusUpdate_ConnectionStatus.UNRECOGNIZED:
     default:
-      return 'UNKNOWN';
+      return 'UNRECOGNIZED';
   }
 }
 
@@ -320,7 +322,9 @@ export interface Connection {
   clientCert?: Certificate | undefined;
 }
 
-const baseRecord: object = { tags: '' };
+function createBaseRecord(): Record {
+  return { id: undefined, tags: [], conn: undefined };
+}
 
 export const Record = {
   encode(
@@ -342,8 +346,7 @@ export const Record = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Record {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseRecord } as Record;
-    message.tags = [];
+    const message = createBaseRecord();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -365,24 +368,13 @@ export const Record = {
   },
 
   fromJSON(object: any): Record {
-    const message = { ...baseRecord } as Record;
-    message.tags = [];
-    if (object.id !== undefined && object.id !== null) {
-      message.id = String(object.id);
-    } else {
-      message.id = undefined;
-    }
-    if (object.tags !== undefined && object.tags !== null) {
-      for (const e of object.tags) {
-        message.tags.push(String(e));
-      }
-    }
-    if (object.conn !== undefined && object.conn !== null) {
-      message.conn = Connection.fromJSON(object.conn);
-    } else {
-      message.conn = undefined;
-    }
-    return message;
+    return {
+      id: isSet(object.id) ? String(object.id) : undefined,
+      tags: Array.isArray(object?.tags)
+        ? object.tags.map((e: any) => String(e))
+        : [],
+      conn: isSet(object.conn) ? Connection.fromJSON(object.conn) : undefined,
+    };
   },
 
   toJSON(message: Record): unknown {
@@ -398,25 +390,21 @@ export const Record = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Record>): Record {
-    const message = { ...baseRecord } as Record;
+  fromPartial<I extends Exact<DeepPartial<Record>, I>>(object: I): Record {
+    const message = createBaseRecord();
     message.id = object.id ?? undefined;
-    message.tags = [];
-    if (object.tags !== undefined && object.tags !== null) {
-      for (const e of object.tags) {
-        message.tags.push(e);
-      }
-    }
-    if (object.conn !== undefined && object.conn !== null) {
-      message.conn = Connection.fromPartial(object.conn);
-    } else {
-      message.conn = undefined;
-    }
+    message.tags = object.tags?.map((e) => e) || [];
+    message.conn =
+      object.conn !== undefined && object.conn !== null
+        ? Connection.fromPartial(object.conn)
+        : undefined;
     return message;
   },
 };
 
-const baseRecords: object = {};
+function createBaseRecords(): Records {
+  return { records: [] };
+}
 
 export const Records = {
   encode(
@@ -432,8 +420,7 @@ export const Records = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Records {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseRecords } as Records;
-    message.records = [];
+    const message = createBaseRecords();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -449,14 +436,11 @@ export const Records = {
   },
 
   fromJSON(object: any): Records {
-    const message = { ...baseRecords } as Records;
-    message.records = [];
-    if (object.records !== undefined && object.records !== null) {
-      for (const e of object.records) {
-        message.records.push(Record.fromJSON(e));
-      }
-    }
-    return message;
+    return {
+      records: Array.isArray(object?.records)
+        ? object.records.map((e: any) => Record.fromJSON(e))
+        : [],
+    };
   },
 
   toJSON(message: Records): unknown {
@@ -471,19 +455,16 @@ export const Records = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Records>): Records {
-    const message = { ...baseRecords } as Records;
-    message.records = [];
-    if (object.records !== undefined && object.records !== null) {
-      for (const e of object.records) {
-        message.records.push(Record.fromPartial(e));
-      }
-    }
+  fromPartial<I extends Exact<DeepPartial<Records>, I>>(object: I): Records {
+    const message = createBaseRecords();
+    message.records = object.records?.map((e) => Record.fromPartial(e)) || [];
     return message;
   },
 };
 
-const baseSelector: object = { all: false, ids: '', tags: '' };
+function createBaseSelector(): Selector {
+  return { all: false, ids: [], tags: [] };
+}
 
 export const Selector = {
   encode(
@@ -505,9 +486,7 @@ export const Selector = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Selector {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseSelector } as Selector;
-    message.ids = [];
-    message.tags = [];
+    const message = createBaseSelector();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -529,25 +508,15 @@ export const Selector = {
   },
 
   fromJSON(object: any): Selector {
-    const message = { ...baseSelector } as Selector;
-    message.ids = [];
-    message.tags = [];
-    if (object.all !== undefined && object.all !== null) {
-      message.all = Boolean(object.all);
-    } else {
-      message.all = false;
-    }
-    if (object.ids !== undefined && object.ids !== null) {
-      for (const e of object.ids) {
-        message.ids.push(String(e));
-      }
-    }
-    if (object.tags !== undefined && object.tags !== null) {
-      for (const e of object.tags) {
-        message.tags.push(String(e));
-      }
-    }
-    return message;
+    return {
+      all: isSet(object.all) ? Boolean(object.all) : false,
+      ids: Array.isArray(object?.ids)
+        ? object.ids.map((e: any) => String(e))
+        : [],
+      tags: Array.isArray(object?.tags)
+        ? object.tags.map((e: any) => String(e))
+        : [],
+    };
   },
 
   toJSON(message: Selector): unknown {
@@ -566,26 +535,18 @@ export const Selector = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Selector>): Selector {
-    const message = { ...baseSelector } as Selector;
+  fromPartial<I extends Exact<DeepPartial<Selector>, I>>(object: I): Selector {
+    const message = createBaseSelector();
     message.all = object.all ?? false;
-    message.ids = [];
-    if (object.ids !== undefined && object.ids !== null) {
-      for (const e of object.ids) {
-        message.ids.push(e);
-      }
-    }
-    message.tags = [];
-    if (object.tags !== undefined && object.tags !== null) {
-      for (const e of object.tags) {
-        message.tags.push(e);
-      }
-    }
+    message.ids = object.ids?.map((e) => e) || [];
+    message.tags = object.tags?.map((e) => e) || [];
     return message;
   },
 };
 
-const baseDeleteRecordsResponse: object = {};
+function createBaseDeleteRecordsResponse(): DeleteRecordsResponse {
+  return {};
+}
 
 export const DeleteRecordsResponse = {
   encode(
@@ -601,7 +562,7 @@ export const DeleteRecordsResponse = {
   ): DeleteRecordsResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseDeleteRecordsResponse } as DeleteRecordsResponse;
+    const message = createBaseDeleteRecordsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -614,8 +575,7 @@ export const DeleteRecordsResponse = {
   },
 
   fromJSON(_: any): DeleteRecordsResponse {
-    const message = { ...baseDeleteRecordsResponse } as DeleteRecordsResponse;
-    return message;
+    return {};
   },
 
   toJSON(_: DeleteRecordsResponse): unknown {
@@ -623,13 +583,17 @@ export const DeleteRecordsResponse = {
     return obj;
   },
 
-  fromPartial(_: DeepPartial<DeleteRecordsResponse>): DeleteRecordsResponse {
-    const message = { ...baseDeleteRecordsResponse } as DeleteRecordsResponse;
+  fromPartial<I extends Exact<DeepPartial<DeleteRecordsResponse>, I>>(
+    _: I
+  ): DeleteRecordsResponse {
+    const message = createBaseDeleteRecordsResponse();
     return message;
   },
 };
 
-const baseExportRequest: object = { removeTags: false, format: 0 };
+function createBaseExportRequest(): ExportRequest {
+  return { selector: undefined, removeTags: false, format: 0 };
+}
 
 export const ExportRequest = {
   encode(
@@ -651,7 +615,7 @@ export const ExportRequest = {
   decode(input: _m0.Reader | Uint8Array, length?: number): ExportRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseExportRequest } as ExportRequest;
+    const message = createBaseExportRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -673,23 +637,15 @@ export const ExportRequest = {
   },
 
   fromJSON(object: any): ExportRequest {
-    const message = { ...baseExportRequest } as ExportRequest;
-    if (object.selector !== undefined && object.selector !== null) {
-      message.selector = Selector.fromJSON(object.selector);
-    } else {
-      message.selector = undefined;
-    }
-    if (object.removeTags !== undefined && object.removeTags !== null) {
-      message.removeTags = Boolean(object.removeTags);
-    } else {
-      message.removeTags = false;
-    }
-    if (object.format !== undefined && object.format !== null) {
-      message.format = exportRequest_FormatFromJSON(object.format);
-    } else {
-      message.format = 0;
-    }
-    return message;
+    return {
+      selector: isSet(object.selector)
+        ? Selector.fromJSON(object.selector)
+        : undefined,
+      removeTags: isSet(object.removeTags) ? Boolean(object.removeTags) : false,
+      format: isSet(object.format)
+        ? exportRequest_FormatFromJSON(object.format)
+        : 0,
+    };
   },
 
   toJSON(message: ExportRequest): unknown {
@@ -704,20 +660,23 @@ export const ExportRequest = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<ExportRequest>): ExportRequest {
-    const message = { ...baseExportRequest } as ExportRequest;
-    if (object.selector !== undefined && object.selector !== null) {
-      message.selector = Selector.fromPartial(object.selector);
-    } else {
-      message.selector = undefined;
-    }
+  fromPartial<I extends Exact<DeepPartial<ExportRequest>, I>>(
+    object: I
+  ): ExportRequest {
+    const message = createBaseExportRequest();
+    message.selector =
+      object.selector !== undefined && object.selector !== null
+        ? Selector.fromPartial(object.selector)
+        : undefined;
     message.removeTags = object.removeTags ?? false;
     message.format = object.format ?? 0;
     return message;
   },
 };
 
-const baseGetTagsRequest: object = {};
+function createBaseGetTagsRequest(): GetTagsRequest {
+  return {};
+}
 
 export const GetTagsRequest = {
   encode(
@@ -730,7 +689,7 @@ export const GetTagsRequest = {
   decode(input: _m0.Reader | Uint8Array, length?: number): GetTagsRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseGetTagsRequest } as GetTagsRequest;
+    const message = createBaseGetTagsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -743,8 +702,7 @@ export const GetTagsRequest = {
   },
 
   fromJSON(_: any): GetTagsRequest {
-    const message = { ...baseGetTagsRequest } as GetTagsRequest;
-    return message;
+    return {};
   },
 
   toJSON(_: GetTagsRequest): unknown {
@@ -752,13 +710,17 @@ export const GetTagsRequest = {
     return obj;
   },
 
-  fromPartial(_: DeepPartial<GetTagsRequest>): GetTagsRequest {
-    const message = { ...baseGetTagsRequest } as GetTagsRequest;
+  fromPartial<I extends Exact<DeepPartial<GetTagsRequest>, I>>(
+    _: I
+  ): GetTagsRequest {
+    const message = createBaseGetTagsRequest();
     return message;
   },
 };
 
-const baseGetTagsResponse: object = { tags: '' };
+function createBaseGetTagsResponse(): GetTagsResponse {
+  return { tags: [] };
+}
 
 export const GetTagsResponse = {
   encode(
@@ -774,8 +736,7 @@ export const GetTagsResponse = {
   decode(input: _m0.Reader | Uint8Array, length?: number): GetTagsResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseGetTagsResponse } as GetTagsResponse;
-    message.tags = [];
+    const message = createBaseGetTagsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -791,14 +752,11 @@ export const GetTagsResponse = {
   },
 
   fromJSON(object: any): GetTagsResponse {
-    const message = { ...baseGetTagsResponse } as GetTagsResponse;
-    message.tags = [];
-    if (object.tags !== undefined && object.tags !== null) {
-      for (const e of object.tags) {
-        message.tags.push(String(e));
-      }
-    }
-    return message;
+    return {
+      tags: Array.isArray(object?.tags)
+        ? object.tags.map((e: any) => String(e))
+        : [],
+    };
   },
 
   toJSON(message: GetTagsResponse): unknown {
@@ -811,19 +769,18 @@ export const GetTagsResponse = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<GetTagsResponse>): GetTagsResponse {
-    const message = { ...baseGetTagsResponse } as GetTagsResponse;
-    message.tags = [];
-    if (object.tags !== undefined && object.tags !== null) {
-      for (const e of object.tags) {
-        message.tags.push(e);
-      }
-    }
+  fromPartial<I extends Exact<DeepPartial<GetTagsResponse>, I>>(
+    object: I
+  ): GetTagsResponse {
+    const message = createBaseGetTagsResponse();
+    message.tags = object.tags?.map((e) => e) || [];
     return message;
   },
 };
 
-const baseConfigData: object = {};
+function createBaseConfigData(): ConfigData {
+  return { data: new Uint8Array() };
+}
 
 export const ConfigData = {
   encode(
@@ -839,8 +796,7 @@ export const ConfigData = {
   decode(input: _m0.Reader | Uint8Array, length?: number): ConfigData {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseConfigData } as ConfigData;
-    message.data = new Uint8Array();
+    const message = createBaseConfigData();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -856,12 +812,11 @@ export const ConfigData = {
   },
 
   fromJSON(object: any): ConfigData {
-    const message = { ...baseConfigData } as ConfigData;
-    message.data = new Uint8Array();
-    if (object.data !== undefined && object.data !== null) {
-      message.data = bytesFromBase64(object.data);
-    }
-    return message;
+    return {
+      data: isSet(object.data)
+        ? bytesFromBase64(object.data)
+        : new Uint8Array(),
+    };
   },
 
   toJSON(message: ConfigData): unknown {
@@ -873,14 +828,18 @@ export const ConfigData = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<ConfigData>): ConfigData {
-    const message = { ...baseConfigData } as ConfigData;
+  fromPartial<I extends Exact<DeepPartial<ConfigData>, I>>(
+    object: I
+  ): ConfigData {
+    const message = createBaseConfigData();
     message.data = object.data ?? new Uint8Array();
     return message;
   },
 };
 
-const baseImportRequest: object = {};
+function createBaseImportRequest(): ImportRequest {
+  return { overrideTag: undefined, data: new Uint8Array() };
+}
 
 export const ImportRequest = {
   encode(
@@ -899,8 +858,7 @@ export const ImportRequest = {
   decode(input: _m0.Reader | Uint8Array, length?: number): ImportRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseImportRequest } as ImportRequest;
-    message.data = new Uint8Array();
+    const message = createBaseImportRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -919,17 +877,14 @@ export const ImportRequest = {
   },
 
   fromJSON(object: any): ImportRequest {
-    const message = { ...baseImportRequest } as ImportRequest;
-    message.data = new Uint8Array();
-    if (object.overrideTag !== undefined && object.overrideTag !== null) {
-      message.overrideTag = String(object.overrideTag);
-    } else {
-      message.overrideTag = undefined;
-    }
-    if (object.data !== undefined && object.data !== null) {
-      message.data = bytesFromBase64(object.data);
-    }
-    return message;
+    return {
+      overrideTag: isSet(object.overrideTag)
+        ? String(object.overrideTag)
+        : undefined,
+      data: isSet(object.data)
+        ? bytesFromBase64(object.data)
+        : new Uint8Array(),
+    };
   },
 
   toJSON(message: ImportRequest): unknown {
@@ -943,15 +898,19 @@ export const ImportRequest = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<ImportRequest>): ImportRequest {
-    const message = { ...baseImportRequest } as ImportRequest;
+  fromPartial<I extends Exact<DeepPartial<ImportRequest>, I>>(
+    object: I
+  ): ImportRequest {
+    const message = createBaseImportRequest();
     message.overrideTag = object.overrideTag ?? undefined;
     message.data = object.data ?? new Uint8Array();
     return message;
   },
 };
 
-const baseImportResponse: object = {};
+function createBaseImportResponse(): ImportResponse {
+  return {};
+}
 
 export const ImportResponse = {
   encode(
@@ -964,7 +923,7 @@ export const ImportResponse = {
   decode(input: _m0.Reader | Uint8Array, length?: number): ImportResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseImportResponse } as ImportResponse;
+    const message = createBaseImportResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -977,8 +936,7 @@ export const ImportResponse = {
   },
 
   fromJSON(_: any): ImportResponse {
-    const message = { ...baseImportResponse } as ImportResponse;
-    return message;
+    return {};
   },
 
   toJSON(_: ImportResponse): unknown {
@@ -986,16 +944,17 @@ export const ImportResponse = {
     return obj;
   },
 
-  fromPartial(_: DeepPartial<ImportResponse>): ImportResponse {
-    const message = { ...baseImportResponse } as ImportResponse;
+  fromPartial<I extends Exact<DeepPartial<ImportResponse>, I>>(
+    _: I
+  ): ImportResponse {
+    const message = createBaseImportResponse();
     return message;
   },
 };
 
-const baseListenerUpdateRequest: object = {
-  connectionIds: '',
-  connected: false,
-};
+function createBaseListenerUpdateRequest(): ListenerUpdateRequest {
+  return { connectionIds: [], connected: false };
+}
 
 export const ListenerUpdateRequest = {
   encode(
@@ -1017,8 +976,7 @@ export const ListenerUpdateRequest = {
   ): ListenerUpdateRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseListenerUpdateRequest } as ListenerUpdateRequest;
-    message.connectionIds = [];
+    const message = createBaseListenerUpdateRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1037,19 +995,12 @@ export const ListenerUpdateRequest = {
   },
 
   fromJSON(object: any): ListenerUpdateRequest {
-    const message = { ...baseListenerUpdateRequest } as ListenerUpdateRequest;
-    message.connectionIds = [];
-    if (object.connectionIds !== undefined && object.connectionIds !== null) {
-      for (const e of object.connectionIds) {
-        message.connectionIds.push(String(e));
-      }
-    }
-    if (object.connected !== undefined && object.connected !== null) {
-      message.connected = Boolean(object.connected);
-    } else {
-      message.connected = false;
-    }
-    return message;
+    return {
+      connectionIds: Array.isArray(object?.connectionIds)
+        ? object.connectionIds.map((e: any) => String(e))
+        : [],
+      connected: isSet(object.connected) ? Boolean(object.connected) : false,
+    };
   },
 
   toJSON(message: ListenerUpdateRequest): unknown {
@@ -1063,22 +1014,19 @@ export const ListenerUpdateRequest = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<ListenerUpdateRequest>
+  fromPartial<I extends Exact<DeepPartial<ListenerUpdateRequest>, I>>(
+    object: I
   ): ListenerUpdateRequest {
-    const message = { ...baseListenerUpdateRequest } as ListenerUpdateRequest;
-    message.connectionIds = [];
-    if (object.connectionIds !== undefined && object.connectionIds !== null) {
-      for (const e of object.connectionIds) {
-        message.connectionIds.push(e);
-      }
-    }
+    const message = createBaseListenerUpdateRequest();
+    message.connectionIds = object.connectionIds?.map((e) => e) || [];
     message.connected = object.connected ?? false;
     return message;
   },
 };
 
-const baseListenerStatus: object = { listening: false };
+function createBaseListenerStatus(): ListenerStatus {
+  return { listening: false, listenAddr: undefined, lastError: undefined };
+}
 
 export const ListenerStatus = {
   encode(
@@ -1100,7 +1048,7 @@ export const ListenerStatus = {
   decode(input: _m0.Reader | Uint8Array, length?: number): ListenerStatus {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseListenerStatus } as ListenerStatus;
+    const message = createBaseListenerStatus();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1122,23 +1070,13 @@ export const ListenerStatus = {
   },
 
   fromJSON(object: any): ListenerStatus {
-    const message = { ...baseListenerStatus } as ListenerStatus;
-    if (object.listening !== undefined && object.listening !== null) {
-      message.listening = Boolean(object.listening);
-    } else {
-      message.listening = false;
-    }
-    if (object.listenAddr !== undefined && object.listenAddr !== null) {
-      message.listenAddr = String(object.listenAddr);
-    } else {
-      message.listenAddr = undefined;
-    }
-    if (object.lastError !== undefined && object.lastError !== null) {
-      message.lastError = String(object.lastError);
-    } else {
-      message.lastError = undefined;
-    }
-    return message;
+    return {
+      listening: isSet(object.listening) ? Boolean(object.listening) : false,
+      listenAddr: isSet(object.listenAddr)
+        ? String(object.listenAddr)
+        : undefined,
+      lastError: isSet(object.lastError) ? String(object.lastError) : undefined,
+    };
   },
 
   toJSON(message: ListenerStatus): unknown {
@@ -1149,8 +1087,10 @@ export const ListenerStatus = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<ListenerStatus>): ListenerStatus {
-    const message = { ...baseListenerStatus } as ListenerStatus;
+  fromPartial<I extends Exact<DeepPartial<ListenerStatus>, I>>(
+    object: I
+  ): ListenerStatus {
+    const message = createBaseListenerStatus();
     message.listening = object.listening ?? false;
     message.listenAddr = object.listenAddr ?? undefined;
     message.lastError = object.lastError ?? undefined;
@@ -1158,7 +1098,9 @@ export const ListenerStatus = {
   },
 };
 
-const baseListenerStatusResponse: object = {};
+function createBaseListenerStatusResponse(): ListenerStatusResponse {
+  return { listeners: {} };
+}
 
 export const ListenerStatusResponse = {
   encode(
@@ -1180,8 +1122,7 @@ export const ListenerStatusResponse = {
   ): ListenerStatusResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseListenerStatusResponse } as ListenerStatusResponse;
-    message.listeners = {};
+    const message = createBaseListenerStatusResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1203,14 +1144,16 @@ export const ListenerStatusResponse = {
   },
 
   fromJSON(object: any): ListenerStatusResponse {
-    const message = { ...baseListenerStatusResponse } as ListenerStatusResponse;
-    message.listeners = {};
-    if (object.listeners !== undefined && object.listeners !== null) {
-      Object.entries(object.listeners).forEach(([key, value]) => {
-        message.listeners[key] = ListenerStatus.fromJSON(value);
-      });
-    }
-    return message;
+    return {
+      listeners: isObject(object.listeners)
+        ? Object.entries(object.listeners).reduce<{
+            [key: string]: ListenerStatus;
+          }>((acc, [key, value]) => {
+            acc[key] = ListenerStatus.fromJSON(value);
+            return acc;
+          }, {})
+        : {},
+    };
   },
 
   toJSON(message: ListenerStatusResponse): unknown {
@@ -1224,23 +1167,25 @@ export const ListenerStatusResponse = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<ListenerStatusResponse>
+  fromPartial<I extends Exact<DeepPartial<ListenerStatusResponse>, I>>(
+    object: I
   ): ListenerStatusResponse {
-    const message = { ...baseListenerStatusResponse } as ListenerStatusResponse;
-    message.listeners = {};
-    if (object.listeners !== undefined && object.listeners !== null) {
-      Object.entries(object.listeners).forEach(([key, value]) => {
-        if (value !== undefined) {
-          message.listeners[key] = ListenerStatus.fromPartial(value);
-        }
-      });
-    }
+    const message = createBaseListenerStatusResponse();
+    message.listeners = Object.entries(object.listeners ?? {}).reduce<{
+      [key: string]: ListenerStatus;
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = ListenerStatus.fromPartial(value);
+      }
+      return acc;
+    }, {});
     return message;
   },
 };
 
-const baseListenerStatusResponse_ListenersEntry: object = { key: '' };
+function createBaseListenerStatusResponse_ListenersEntry(): ListenerStatusResponse_ListenersEntry {
+  return { key: '', value: undefined };
+}
 
 export const ListenerStatusResponse_ListenersEntry = {
   encode(
@@ -1262,9 +1207,7 @@ export const ListenerStatusResponse_ListenersEntry = {
   ): ListenerStatusResponse_ListenersEntry {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseListenerStatusResponse_ListenersEntry,
-    } as ListenerStatusResponse_ListenersEntry;
+    const message = createBaseListenerStatusResponse_ListenersEntry();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1283,20 +1226,12 @@ export const ListenerStatusResponse_ListenersEntry = {
   },
 
   fromJSON(object: any): ListenerStatusResponse_ListenersEntry {
-    const message = {
-      ...baseListenerStatusResponse_ListenersEntry,
-    } as ListenerStatusResponse_ListenersEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = String(object.key);
-    } else {
-      message.key = '';
-    }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = ListenerStatus.fromJSON(object.value);
-    } else {
-      message.value = undefined;
-    }
-    return message;
+    return {
+      key: isSet(object.key) ? String(object.key) : '',
+      value: isSet(object.value)
+        ? ListenerStatus.fromJSON(object.value)
+        : undefined,
+    };
   },
 
   toJSON(message: ListenerStatusResponse_ListenersEntry): unknown {
@@ -1309,23 +1244,22 @@ export const ListenerStatusResponse_ListenersEntry = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<ListenerStatusResponse_ListenersEntry>
-  ): ListenerStatusResponse_ListenersEntry {
-    const message = {
-      ...baseListenerStatusResponse_ListenersEntry,
-    } as ListenerStatusResponse_ListenersEntry;
+  fromPartial<
+    I extends Exact<DeepPartial<ListenerStatusResponse_ListenersEntry>, I>
+  >(object: I): ListenerStatusResponse_ListenersEntry {
+    const message = createBaseListenerStatusResponse_ListenersEntry();
     message.key = object.key ?? '';
-    if (object.value !== undefined && object.value !== null) {
-      message.value = ListenerStatus.fromPartial(object.value);
-    } else {
-      message.value = undefined;
-    }
+    message.value =
+      object.value !== undefined && object.value !== null
+        ? ListenerStatus.fromPartial(object.value)
+        : undefined;
     return message;
   },
 };
 
-const baseStatusUpdatesRequest: object = { connectionId: '' };
+function createBaseStatusUpdatesRequest(): StatusUpdatesRequest {
+  return { connectionId: '' };
+}
 
 export const StatusUpdatesRequest = {
   encode(
@@ -1344,7 +1278,7 @@ export const StatusUpdatesRequest = {
   ): StatusUpdatesRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseStatusUpdatesRequest } as StatusUpdatesRequest;
+    const message = createBaseStatusUpdatesRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1360,13 +1294,11 @@ export const StatusUpdatesRequest = {
   },
 
   fromJSON(object: any): StatusUpdatesRequest {
-    const message = { ...baseStatusUpdatesRequest } as StatusUpdatesRequest;
-    if (object.connectionId !== undefined && object.connectionId !== null) {
-      message.connectionId = String(object.connectionId);
-    } else {
-      message.connectionId = '';
-    }
-    return message;
+    return {
+      connectionId: isSet(object.connectionId)
+        ? String(object.connectionId)
+        : '',
+    };
   },
 
   toJSON(message: StatusUpdatesRequest): unknown {
@@ -1376,14 +1308,25 @@ export const StatusUpdatesRequest = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<StatusUpdatesRequest>): StatusUpdatesRequest {
-    const message = { ...baseStatusUpdatesRequest } as StatusUpdatesRequest;
+  fromPartial<I extends Exact<DeepPartial<StatusUpdatesRequest>, I>>(
+    object: I
+  ): StatusUpdatesRequest {
+    const message = createBaseStatusUpdatesRequest();
     message.connectionId = object.connectionId ?? '';
     return message;
   },
 };
 
-const baseConnectionStatusUpdate: object = { id: '', status: 0 };
+function createBaseConnectionStatusUpdate(): ConnectionStatusUpdate {
+  return {
+    id: '',
+    peerAddr: undefined,
+    status: 0,
+    lastError: undefined,
+    authUrl: undefined,
+    ts: undefined,
+  };
+}
 
 export const ConnectionStatusUpdate = {
   encode(
@@ -1420,7 +1363,7 @@ export const ConnectionStatusUpdate = {
   ): ConnectionStatusUpdate {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseConnectionStatusUpdate } as ConnectionStatusUpdate;
+    const message = createBaseConnectionStatusUpdate();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1451,40 +1394,16 @@ export const ConnectionStatusUpdate = {
   },
 
   fromJSON(object: any): ConnectionStatusUpdate {
-    const message = { ...baseConnectionStatusUpdate } as ConnectionStatusUpdate;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = String(object.id);
-    } else {
-      message.id = '';
-    }
-    if (object.peerAddr !== undefined && object.peerAddr !== null) {
-      message.peerAddr = String(object.peerAddr);
-    } else {
-      message.peerAddr = undefined;
-    }
-    if (object.status !== undefined && object.status !== null) {
-      message.status = connectionStatusUpdate_ConnectionStatusFromJSON(
-        object.status
-      );
-    } else {
-      message.status = 0;
-    }
-    if (object.lastError !== undefined && object.lastError !== null) {
-      message.lastError = String(object.lastError);
-    } else {
-      message.lastError = undefined;
-    }
-    if (object.authUrl !== undefined && object.authUrl !== null) {
-      message.authUrl = String(object.authUrl);
-    } else {
-      message.authUrl = undefined;
-    }
-    if (object.ts !== undefined && object.ts !== null) {
-      message.ts = fromJsonTimestamp(object.ts);
-    } else {
-      message.ts = undefined;
-    }
-    return message;
+    return {
+      id: isSet(object.id) ? String(object.id) : '',
+      peerAddr: isSet(object.peerAddr) ? String(object.peerAddr) : undefined,
+      status: isSet(object.status)
+        ? connectionStatusUpdate_ConnectionStatusFromJSON(object.status)
+        : 0,
+      lastError: isSet(object.lastError) ? String(object.lastError) : undefined,
+      authUrl: isSet(object.authUrl) ? String(object.authUrl) : undefined,
+      ts: isSet(object.ts) ? fromJsonTimestamp(object.ts) : undefined,
+    };
   },
 
   toJSON(message: ConnectionStatusUpdate): unknown {
@@ -1501,10 +1420,10 @@ export const ConnectionStatusUpdate = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<ConnectionStatusUpdate>
+  fromPartial<I extends Exact<DeepPartial<ConnectionStatusUpdate>, I>>(
+    object: I
   ): ConnectionStatusUpdate {
-    const message = { ...baseConnectionStatusUpdate } as ConnectionStatusUpdate;
+    const message = createBaseConnectionStatusUpdate();
     message.id = object.id ?? '';
     message.peerAddr = object.peerAddr ?? undefined;
     message.status = object.status ?? 0;
@@ -1515,19 +1434,21 @@ export const ConnectionStatusUpdate = {
   },
 };
 
-const baseKeyUsage: object = {
-  digitalSignature: false,
-  contentCommitment: false,
-  keyEncipherment: false,
-  dataEncipherment: false,
-  keyAgreement: false,
-  certSign: false,
-  crlSign: false,
-  encipherOnly: false,
-  decipherOnly: false,
-  serverAuth: false,
-  clientAuth: false,
-};
+function createBaseKeyUsage(): KeyUsage {
+  return {
+    digitalSignature: false,
+    contentCommitment: false,
+    keyEncipherment: false,
+    dataEncipherment: false,
+    keyAgreement: false,
+    certSign: false,
+    crlSign: false,
+    encipherOnly: false,
+    decipherOnly: false,
+    serverAuth: false,
+    clientAuth: false,
+  };
+}
 
 export const KeyUsage = {
   encode(
@@ -1573,7 +1494,7 @@ export const KeyUsage = {
   decode(input: _m0.Reader | Uint8Array, length?: number): KeyUsage {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseKeyUsage } as KeyUsage;
+    const message = createBaseKeyUsage();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1619,75 +1540,33 @@ export const KeyUsage = {
   },
 
   fromJSON(object: any): KeyUsage {
-    const message = { ...baseKeyUsage } as KeyUsage;
-    if (
-      object.digitalSignature !== undefined &&
-      object.digitalSignature !== null
-    ) {
-      message.digitalSignature = Boolean(object.digitalSignature);
-    } else {
-      message.digitalSignature = false;
-    }
-    if (
-      object.contentCommitment !== undefined &&
-      object.contentCommitment !== null
-    ) {
-      message.contentCommitment = Boolean(object.contentCommitment);
-    } else {
-      message.contentCommitment = false;
-    }
-    if (
-      object.keyEncipherment !== undefined &&
-      object.keyEncipherment !== null
-    ) {
-      message.keyEncipherment = Boolean(object.keyEncipherment);
-    } else {
-      message.keyEncipherment = false;
-    }
-    if (
-      object.dataEncipherment !== undefined &&
-      object.dataEncipherment !== null
-    ) {
-      message.dataEncipherment = Boolean(object.dataEncipherment);
-    } else {
-      message.dataEncipherment = false;
-    }
-    if (object.keyAgreement !== undefined && object.keyAgreement !== null) {
-      message.keyAgreement = Boolean(object.keyAgreement);
-    } else {
-      message.keyAgreement = false;
-    }
-    if (object.certSign !== undefined && object.certSign !== null) {
-      message.certSign = Boolean(object.certSign);
-    } else {
-      message.certSign = false;
-    }
-    if (object.crlSign !== undefined && object.crlSign !== null) {
-      message.crlSign = Boolean(object.crlSign);
-    } else {
-      message.crlSign = false;
-    }
-    if (object.encipherOnly !== undefined && object.encipherOnly !== null) {
-      message.encipherOnly = Boolean(object.encipherOnly);
-    } else {
-      message.encipherOnly = false;
-    }
-    if (object.decipherOnly !== undefined && object.decipherOnly !== null) {
-      message.decipherOnly = Boolean(object.decipherOnly);
-    } else {
-      message.decipherOnly = false;
-    }
-    if (object.serverAuth !== undefined && object.serverAuth !== null) {
-      message.serverAuth = Boolean(object.serverAuth);
-    } else {
-      message.serverAuth = false;
-    }
-    if (object.clientAuth !== undefined && object.clientAuth !== null) {
-      message.clientAuth = Boolean(object.clientAuth);
-    } else {
-      message.clientAuth = false;
-    }
-    return message;
+    return {
+      digitalSignature: isSet(object.digitalSignature)
+        ? Boolean(object.digitalSignature)
+        : false,
+      contentCommitment: isSet(object.contentCommitment)
+        ? Boolean(object.contentCommitment)
+        : false,
+      keyEncipherment: isSet(object.keyEncipherment)
+        ? Boolean(object.keyEncipherment)
+        : false,
+      dataEncipherment: isSet(object.dataEncipherment)
+        ? Boolean(object.dataEncipherment)
+        : false,
+      keyAgreement: isSet(object.keyAgreement)
+        ? Boolean(object.keyAgreement)
+        : false,
+      certSign: isSet(object.certSign) ? Boolean(object.certSign) : false,
+      crlSign: isSet(object.crlSign) ? Boolean(object.crlSign) : false,
+      encipherOnly: isSet(object.encipherOnly)
+        ? Boolean(object.encipherOnly)
+        : false,
+      decipherOnly: isSet(object.decipherOnly)
+        ? Boolean(object.decipherOnly)
+        : false,
+      serverAuth: isSet(object.serverAuth) ? Boolean(object.serverAuth) : false,
+      clientAuth: isSet(object.clientAuth) ? Boolean(object.clientAuth) : false,
+    };
   },
 
   toJSON(message: KeyUsage): unknown {
@@ -1713,8 +1592,8 @@ export const KeyUsage = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<KeyUsage>): KeyUsage {
-    const message = { ...baseKeyUsage } as KeyUsage;
+  fromPartial<I extends Exact<DeepPartial<KeyUsage>, I>>(object: I): KeyUsage {
+    const message = createBaseKeyUsage();
     message.digitalSignature = object.digitalSignature ?? false;
     message.contentCommitment = object.contentCommitment ?? false;
     message.keyEncipherment = object.keyEncipherment ?? false;
@@ -1730,17 +1609,19 @@ export const KeyUsage = {
   },
 };
 
-const baseName: object = {
-  country: '',
-  organization: '',
-  organizationalUnit: '',
-  locality: '',
-  province: '',
-  streetAddress: '',
-  postalCode: '',
-  serialNumber: '',
-  commonName: '',
-};
+function createBaseName(): Name {
+  return {
+    country: [],
+    organization: [],
+    organizationalUnit: [],
+    locality: [],
+    province: [],
+    streetAddress: [],
+    postalCode: [],
+    serialNumber: '',
+    commonName: '',
+  };
+}
 
 export const Name = {
   encode(message: Name, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
@@ -1777,14 +1658,7 @@ export const Name = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Name {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseName } as Name;
-    message.country = [];
-    message.organization = [];
-    message.organizationalUnit = [];
-    message.locality = [];
-    message.province = [];
-    message.streetAddress = [];
-    message.postalCode = [];
+    const message = createBaseName();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1824,63 +1698,33 @@ export const Name = {
   },
 
   fromJSON(object: any): Name {
-    const message = { ...baseName } as Name;
-    message.country = [];
-    message.organization = [];
-    message.organizationalUnit = [];
-    message.locality = [];
-    message.province = [];
-    message.streetAddress = [];
-    message.postalCode = [];
-    if (object.country !== undefined && object.country !== null) {
-      for (const e of object.country) {
-        message.country.push(String(e));
-      }
-    }
-    if (object.organization !== undefined && object.organization !== null) {
-      for (const e of object.organization) {
-        message.organization.push(String(e));
-      }
-    }
-    if (
-      object.organizationalUnit !== undefined &&
-      object.organizationalUnit !== null
-    ) {
-      for (const e of object.organizationalUnit) {
-        message.organizationalUnit.push(String(e));
-      }
-    }
-    if (object.locality !== undefined && object.locality !== null) {
-      for (const e of object.locality) {
-        message.locality.push(String(e));
-      }
-    }
-    if (object.province !== undefined && object.province !== null) {
-      for (const e of object.province) {
-        message.province.push(String(e));
-      }
-    }
-    if (object.streetAddress !== undefined && object.streetAddress !== null) {
-      for (const e of object.streetAddress) {
-        message.streetAddress.push(String(e));
-      }
-    }
-    if (object.postalCode !== undefined && object.postalCode !== null) {
-      for (const e of object.postalCode) {
-        message.postalCode.push(String(e));
-      }
-    }
-    if (object.serialNumber !== undefined && object.serialNumber !== null) {
-      message.serialNumber = String(object.serialNumber);
-    } else {
-      message.serialNumber = '';
-    }
-    if (object.commonName !== undefined && object.commonName !== null) {
-      message.commonName = String(object.commonName);
-    } else {
-      message.commonName = '';
-    }
-    return message;
+    return {
+      country: Array.isArray(object?.country)
+        ? object.country.map((e: any) => String(e))
+        : [],
+      organization: Array.isArray(object?.organization)
+        ? object.organization.map((e: any) => String(e))
+        : [],
+      organizationalUnit: Array.isArray(object?.organizationalUnit)
+        ? object.organizationalUnit.map((e: any) => String(e))
+        : [],
+      locality: Array.isArray(object?.locality)
+        ? object.locality.map((e: any) => String(e))
+        : [],
+      province: Array.isArray(object?.province)
+        ? object.province.map((e: any) => String(e))
+        : [],
+      streetAddress: Array.isArray(object?.streetAddress)
+        ? object.streetAddress.map((e: any) => String(e))
+        : [],
+      postalCode: Array.isArray(object?.postalCode)
+        ? object.postalCode.map((e: any) => String(e))
+        : [],
+      serialNumber: isSet(object.serialNumber)
+        ? String(object.serialNumber)
+        : '',
+      commonName: isSet(object.commonName) ? String(object.commonName) : '',
+    };
   },
 
   toJSON(message: Name): unknown {
@@ -1926,76 +1770,46 @@ export const Name = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Name>): Name {
-    const message = { ...baseName } as Name;
-    message.country = [];
-    if (object.country !== undefined && object.country !== null) {
-      for (const e of object.country) {
-        message.country.push(e);
-      }
-    }
-    message.organization = [];
-    if (object.organization !== undefined && object.organization !== null) {
-      for (const e of object.organization) {
-        message.organization.push(e);
-      }
-    }
-    message.organizationalUnit = [];
-    if (
-      object.organizationalUnit !== undefined &&
-      object.organizationalUnit !== null
-    ) {
-      for (const e of object.organizationalUnit) {
-        message.organizationalUnit.push(e);
-      }
-    }
-    message.locality = [];
-    if (object.locality !== undefined && object.locality !== null) {
-      for (const e of object.locality) {
-        message.locality.push(e);
-      }
-    }
-    message.province = [];
-    if (object.province !== undefined && object.province !== null) {
-      for (const e of object.province) {
-        message.province.push(e);
-      }
-    }
-    message.streetAddress = [];
-    if (object.streetAddress !== undefined && object.streetAddress !== null) {
-      for (const e of object.streetAddress) {
-        message.streetAddress.push(e);
-      }
-    }
-    message.postalCode = [];
-    if (object.postalCode !== undefined && object.postalCode !== null) {
-      for (const e of object.postalCode) {
-        message.postalCode.push(e);
-      }
-    }
+  fromPartial<I extends Exact<DeepPartial<Name>, I>>(object: I): Name {
+    const message = createBaseName();
+    message.country = object.country?.map((e) => e) || [];
+    message.organization = object.organization?.map((e) => e) || [];
+    message.organizationalUnit = object.organizationalUnit?.map((e) => e) || [];
+    message.locality = object.locality?.map((e) => e) || [];
+    message.province = object.province?.map((e) => e) || [];
+    message.streetAddress = object.streetAddress?.map((e) => e) || [];
+    message.postalCode = object.postalCode?.map((e) => e) || [];
     message.serialNumber = object.serialNumber ?? '';
     message.commonName = object.commonName ?? '';
     return message;
   },
 };
 
-const baseCertificateInfo: object = {
-  version: 0,
-  serial: '',
-  dnsNames: '',
-  emailAddresses: '',
-  ipAddresses: '',
-  uris: '',
-  permittedDnsDomainsCritical: false,
-  permittedDnsDomains: '',
-  excludedDnsDomains: '',
-  permittedIpRanges: '',
-  excludedIpRanges: '',
-  permittedEmailAddresses: '',
-  excludedEmailAddresses: '',
-  permittedUriDomains: '',
-  excludedUriDomains: '',
-};
+function createBaseCertificateInfo(): CertificateInfo {
+  return {
+    version: 0,
+    serial: '',
+    issuer: undefined,
+    subject: undefined,
+    notBefore: undefined,
+    notAfter: undefined,
+    keyUsage: undefined,
+    dnsNames: [],
+    emailAddresses: [],
+    ipAddresses: [],
+    uris: [],
+    permittedDnsDomainsCritical: false,
+    permittedDnsDomains: [],
+    excludedDnsDomains: [],
+    permittedIpRanges: [],
+    excludedIpRanges: [],
+    permittedEmailAddresses: [],
+    excludedEmailAddresses: [],
+    permittedUriDomains: [],
+    excludedUriDomains: [],
+    error: undefined,
+  };
+}
 
 export const CertificateInfo = {
   encode(
@@ -2077,19 +1891,7 @@ export const CertificateInfo = {
   decode(input: _m0.Reader | Uint8Array, length?: number): CertificateInfo {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseCertificateInfo } as CertificateInfo;
-    message.dnsNames = [];
-    message.emailAddresses = [];
-    message.ipAddresses = [];
-    message.uris = [];
-    message.permittedDnsDomains = [];
-    message.excludedDnsDomains = [];
-    message.permittedIpRanges = [];
-    message.excludedIpRanges = [];
-    message.permittedEmailAddresses = [];
-    message.excludedEmailAddresses = [];
-    message.permittedUriDomains = [];
-    message.excludedUriDomains = [];
+    const message = createBaseCertificateInfo();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2169,159 +1971,69 @@ export const CertificateInfo = {
   },
 
   fromJSON(object: any): CertificateInfo {
-    const message = { ...baseCertificateInfo } as CertificateInfo;
-    message.dnsNames = [];
-    message.emailAddresses = [];
-    message.ipAddresses = [];
-    message.uris = [];
-    message.permittedDnsDomains = [];
-    message.excludedDnsDomains = [];
-    message.permittedIpRanges = [];
-    message.excludedIpRanges = [];
-    message.permittedEmailAddresses = [];
-    message.excludedEmailAddresses = [];
-    message.permittedUriDomains = [];
-    message.excludedUriDomains = [];
-    if (object.version !== undefined && object.version !== null) {
-      message.version = Number(object.version);
-    } else {
-      message.version = 0;
-    }
-    if (object.serial !== undefined && object.serial !== null) {
-      message.serial = String(object.serial);
-    } else {
-      message.serial = '';
-    }
-    if (object.issuer !== undefined && object.issuer !== null) {
-      message.issuer = Name.fromJSON(object.issuer);
-    } else {
-      message.issuer = undefined;
-    }
-    if (object.subject !== undefined && object.subject !== null) {
-      message.subject = Name.fromJSON(object.subject);
-    } else {
-      message.subject = undefined;
-    }
-    if (object.notBefore !== undefined && object.notBefore !== null) {
-      message.notBefore = fromJsonTimestamp(object.notBefore);
-    } else {
-      message.notBefore = undefined;
-    }
-    if (object.notAfter !== undefined && object.notAfter !== null) {
-      message.notAfter = fromJsonTimestamp(object.notAfter);
-    } else {
-      message.notAfter = undefined;
-    }
-    if (object.keyUsage !== undefined && object.keyUsage !== null) {
-      message.keyUsage = KeyUsage.fromJSON(object.keyUsage);
-    } else {
-      message.keyUsage = undefined;
-    }
-    if (object.dnsNames !== undefined && object.dnsNames !== null) {
-      for (const e of object.dnsNames) {
-        message.dnsNames.push(String(e));
-      }
-    }
-    if (object.emailAddresses !== undefined && object.emailAddresses !== null) {
-      for (const e of object.emailAddresses) {
-        message.emailAddresses.push(String(e));
-      }
-    }
-    if (object.ipAddresses !== undefined && object.ipAddresses !== null) {
-      for (const e of object.ipAddresses) {
-        message.ipAddresses.push(String(e));
-      }
-    }
-    if (object.uris !== undefined && object.uris !== null) {
-      for (const e of object.uris) {
-        message.uris.push(String(e));
-      }
-    }
-    if (
-      object.permittedDnsDomainsCritical !== undefined &&
-      object.permittedDnsDomainsCritical !== null
-    ) {
-      message.permittedDnsDomainsCritical = Boolean(
-        object.permittedDnsDomainsCritical
-      );
-    } else {
-      message.permittedDnsDomainsCritical = false;
-    }
-    if (
-      object.permittedDnsDomains !== undefined &&
-      object.permittedDnsDomains !== null
-    ) {
-      for (const e of object.permittedDnsDomains) {
-        message.permittedDnsDomains.push(String(e));
-      }
-    }
-    if (
-      object.excludedDnsDomains !== undefined &&
-      object.excludedDnsDomains !== null
-    ) {
-      for (const e of object.excludedDnsDomains) {
-        message.excludedDnsDomains.push(String(e));
-      }
-    }
-    if (
-      object.permittedIpRanges !== undefined &&
-      object.permittedIpRanges !== null
-    ) {
-      for (const e of object.permittedIpRanges) {
-        message.permittedIpRanges.push(String(e));
-      }
-    }
-    if (
-      object.excludedIpRanges !== undefined &&
-      object.excludedIpRanges !== null
-    ) {
-      for (const e of object.excludedIpRanges) {
-        message.excludedIpRanges.push(String(e));
-      }
-    }
-    if (
-      object.permittedEmailAddresses !== undefined &&
-      object.permittedEmailAddresses !== null
-    ) {
-      for (const e of object.permittedEmailAddresses) {
-        message.permittedEmailAddresses.push(String(e));
-      }
-    }
-    if (
-      object.excludedEmailAddresses !== undefined &&
-      object.excludedEmailAddresses !== null
-    ) {
-      for (const e of object.excludedEmailAddresses) {
-        message.excludedEmailAddresses.push(String(e));
-      }
-    }
-    if (
-      object.permittedUriDomains !== undefined &&
-      object.permittedUriDomains !== null
-    ) {
-      for (const e of object.permittedUriDomains) {
-        message.permittedUriDomains.push(String(e));
-      }
-    }
-    if (
-      object.excludedUriDomains !== undefined &&
-      object.excludedUriDomains !== null
-    ) {
-      for (const e of object.excludedUriDomains) {
-        message.excludedUriDomains.push(String(e));
-      }
-    }
-    if (object.error !== undefined && object.error !== null) {
-      message.error = String(object.error);
-    } else {
-      message.error = undefined;
-    }
-    return message;
+    return {
+      version: isSet(object.version) ? Number(object.version) : 0,
+      serial: isSet(object.serial) ? String(object.serial) : '',
+      issuer: isSet(object.issuer) ? Name.fromJSON(object.issuer) : undefined,
+      subject: isSet(object.subject)
+        ? Name.fromJSON(object.subject)
+        : undefined,
+      notBefore: isSet(object.notBefore)
+        ? fromJsonTimestamp(object.notBefore)
+        : undefined,
+      notAfter: isSet(object.notAfter)
+        ? fromJsonTimestamp(object.notAfter)
+        : undefined,
+      keyUsage: isSet(object.keyUsage)
+        ? KeyUsage.fromJSON(object.keyUsage)
+        : undefined,
+      dnsNames: Array.isArray(object?.dnsNames)
+        ? object.dnsNames.map((e: any) => String(e))
+        : [],
+      emailAddresses: Array.isArray(object?.emailAddresses)
+        ? object.emailAddresses.map((e: any) => String(e))
+        : [],
+      ipAddresses: Array.isArray(object?.ipAddresses)
+        ? object.ipAddresses.map((e: any) => String(e))
+        : [],
+      uris: Array.isArray(object?.uris)
+        ? object.uris.map((e: any) => String(e))
+        : [],
+      permittedDnsDomainsCritical: isSet(object.permittedDnsDomainsCritical)
+        ? Boolean(object.permittedDnsDomainsCritical)
+        : false,
+      permittedDnsDomains: Array.isArray(object?.permittedDnsDomains)
+        ? object.permittedDnsDomains.map((e: any) => String(e))
+        : [],
+      excludedDnsDomains: Array.isArray(object?.excludedDnsDomains)
+        ? object.excludedDnsDomains.map((e: any) => String(e))
+        : [],
+      permittedIpRanges: Array.isArray(object?.permittedIpRanges)
+        ? object.permittedIpRanges.map((e: any) => String(e))
+        : [],
+      excludedIpRanges: Array.isArray(object?.excludedIpRanges)
+        ? object.excludedIpRanges.map((e: any) => String(e))
+        : [],
+      permittedEmailAddresses: Array.isArray(object?.permittedEmailAddresses)
+        ? object.permittedEmailAddresses.map((e: any) => String(e))
+        : [],
+      excludedEmailAddresses: Array.isArray(object?.excludedEmailAddresses)
+        ? object.excludedEmailAddresses.map((e: any) => String(e))
+        : [],
+      permittedUriDomains: Array.isArray(object?.permittedUriDomains)
+        ? object.permittedUriDomains.map((e: any) => String(e))
+        : [],
+      excludedUriDomains: Array.isArray(object?.excludedUriDomains)
+        ? object.excludedUriDomains.map((e: any) => String(e))
+        : [],
+      error: isSet(object.error) ? String(object.error) : undefined,
+    };
   },
 
   toJSON(message: CertificateInfo): unknown {
     const obj: any = {};
-    message.version !== undefined && (obj.version = message.version);
+    message.version !== undefined &&
+      (obj.version = Math.round(message.version));
     message.serial !== undefined && (obj.serial = message.serial);
     message.issuer !== undefined &&
       (obj.issuer = message.issuer ? Name.toJSON(message.issuer) : undefined);
@@ -2405,131 +2117,52 @@ export const CertificateInfo = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<CertificateInfo>): CertificateInfo {
-    const message = { ...baseCertificateInfo } as CertificateInfo;
+  fromPartial<I extends Exact<DeepPartial<CertificateInfo>, I>>(
+    object: I
+  ): CertificateInfo {
+    const message = createBaseCertificateInfo();
     message.version = object.version ?? 0;
     message.serial = object.serial ?? '';
-    if (object.issuer !== undefined && object.issuer !== null) {
-      message.issuer = Name.fromPartial(object.issuer);
-    } else {
-      message.issuer = undefined;
-    }
-    if (object.subject !== undefined && object.subject !== null) {
-      message.subject = Name.fromPartial(object.subject);
-    } else {
-      message.subject = undefined;
-    }
+    message.issuer =
+      object.issuer !== undefined && object.issuer !== null
+        ? Name.fromPartial(object.issuer)
+        : undefined;
+    message.subject =
+      object.subject !== undefined && object.subject !== null
+        ? Name.fromPartial(object.subject)
+        : undefined;
     message.notBefore = object.notBefore ?? undefined;
     message.notAfter = object.notAfter ?? undefined;
-    if (object.keyUsage !== undefined && object.keyUsage !== null) {
-      message.keyUsage = KeyUsage.fromPartial(object.keyUsage);
-    } else {
-      message.keyUsage = undefined;
-    }
-    message.dnsNames = [];
-    if (object.dnsNames !== undefined && object.dnsNames !== null) {
-      for (const e of object.dnsNames) {
-        message.dnsNames.push(e);
-      }
-    }
-    message.emailAddresses = [];
-    if (object.emailAddresses !== undefined && object.emailAddresses !== null) {
-      for (const e of object.emailAddresses) {
-        message.emailAddresses.push(e);
-      }
-    }
-    message.ipAddresses = [];
-    if (object.ipAddresses !== undefined && object.ipAddresses !== null) {
-      for (const e of object.ipAddresses) {
-        message.ipAddresses.push(e);
-      }
-    }
-    message.uris = [];
-    if (object.uris !== undefined && object.uris !== null) {
-      for (const e of object.uris) {
-        message.uris.push(e);
-      }
-    }
+    message.keyUsage =
+      object.keyUsage !== undefined && object.keyUsage !== null
+        ? KeyUsage.fromPartial(object.keyUsage)
+        : undefined;
+    message.dnsNames = object.dnsNames?.map((e) => e) || [];
+    message.emailAddresses = object.emailAddresses?.map((e) => e) || [];
+    message.ipAddresses = object.ipAddresses?.map((e) => e) || [];
+    message.uris = object.uris?.map((e) => e) || [];
     message.permittedDnsDomainsCritical =
       object.permittedDnsDomainsCritical ?? false;
-    message.permittedDnsDomains = [];
-    if (
-      object.permittedDnsDomains !== undefined &&
-      object.permittedDnsDomains !== null
-    ) {
-      for (const e of object.permittedDnsDomains) {
-        message.permittedDnsDomains.push(e);
-      }
-    }
-    message.excludedDnsDomains = [];
-    if (
-      object.excludedDnsDomains !== undefined &&
-      object.excludedDnsDomains !== null
-    ) {
-      for (const e of object.excludedDnsDomains) {
-        message.excludedDnsDomains.push(e);
-      }
-    }
-    message.permittedIpRanges = [];
-    if (
-      object.permittedIpRanges !== undefined &&
-      object.permittedIpRanges !== null
-    ) {
-      for (const e of object.permittedIpRanges) {
-        message.permittedIpRanges.push(e);
-      }
-    }
-    message.excludedIpRanges = [];
-    if (
-      object.excludedIpRanges !== undefined &&
-      object.excludedIpRanges !== null
-    ) {
-      for (const e of object.excludedIpRanges) {
-        message.excludedIpRanges.push(e);
-      }
-    }
-    message.permittedEmailAddresses = [];
-    if (
-      object.permittedEmailAddresses !== undefined &&
-      object.permittedEmailAddresses !== null
-    ) {
-      for (const e of object.permittedEmailAddresses) {
-        message.permittedEmailAddresses.push(e);
-      }
-    }
-    message.excludedEmailAddresses = [];
-    if (
-      object.excludedEmailAddresses !== undefined &&
-      object.excludedEmailAddresses !== null
-    ) {
-      for (const e of object.excludedEmailAddresses) {
-        message.excludedEmailAddresses.push(e);
-      }
-    }
-    message.permittedUriDomains = [];
-    if (
-      object.permittedUriDomains !== undefined &&
-      object.permittedUriDomains !== null
-    ) {
-      for (const e of object.permittedUriDomains) {
-        message.permittedUriDomains.push(e);
-      }
-    }
-    message.excludedUriDomains = [];
-    if (
-      object.excludedUriDomains !== undefined &&
-      object.excludedUriDomains !== null
-    ) {
-      for (const e of object.excludedUriDomains) {
-        message.excludedUriDomains.push(e);
-      }
-    }
+    message.permittedDnsDomains =
+      object.permittedDnsDomains?.map((e) => e) || [];
+    message.excludedDnsDomains = object.excludedDnsDomains?.map((e) => e) || [];
+    message.permittedIpRanges = object.permittedIpRanges?.map((e) => e) || [];
+    message.excludedIpRanges = object.excludedIpRanges?.map((e) => e) || [];
+    message.permittedEmailAddresses =
+      object.permittedEmailAddresses?.map((e) => e) || [];
+    message.excludedEmailAddresses =
+      object.excludedEmailAddresses?.map((e) => e) || [];
+    message.permittedUriDomains =
+      object.permittedUriDomains?.map((e) => e) || [];
+    message.excludedUriDomains = object.excludedUriDomains?.map((e) => e) || [];
     message.error = object.error ?? undefined;
     return message;
   },
 };
 
-const baseCertificate: object = {};
+function createBaseCertificate(): Certificate {
+  return { cert: new Uint8Array(), key: undefined, info: undefined };
+}
 
 export const Certificate = {
   encode(
@@ -2551,8 +2184,7 @@ export const Certificate = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Certificate {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseCertificate } as Certificate;
-    message.cert = new Uint8Array();
+    const message = createBaseCertificate();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2574,20 +2206,15 @@ export const Certificate = {
   },
 
   fromJSON(object: any): Certificate {
-    const message = { ...baseCertificate } as Certificate;
-    message.cert = new Uint8Array();
-    if (object.cert !== undefined && object.cert !== null) {
-      message.cert = bytesFromBase64(object.cert);
-    }
-    if (object.key !== undefined && object.key !== null) {
-      message.key = bytesFromBase64(object.key);
-    }
-    if (object.info !== undefined && object.info !== null) {
-      message.info = CertificateInfo.fromJSON(object.info);
-    } else {
-      message.info = undefined;
-    }
-    return message;
+    return {
+      cert: isSet(object.cert)
+        ? bytesFromBase64(object.cert)
+        : new Uint8Array(),
+      key: isSet(object.key) ? bytesFromBase64(object.key) : undefined,
+      info: isSet(object.info)
+        ? CertificateInfo.fromJSON(object.info)
+        : undefined,
+    };
   },
 
   toJSON(message: Certificate): unknown {
@@ -2606,20 +2233,31 @@ export const Certificate = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Certificate>): Certificate {
-    const message = { ...baseCertificate } as Certificate;
+  fromPartial<I extends Exact<DeepPartial<Certificate>, I>>(
+    object: I
+  ): Certificate {
+    const message = createBaseCertificate();
     message.cert = object.cert ?? new Uint8Array();
     message.key = object.key ?? undefined;
-    if (object.info !== undefined && object.info !== null) {
-      message.info = CertificateInfo.fromPartial(object.info);
-    } else {
-      message.info = undefined;
-    }
+    message.info =
+      object.info !== undefined && object.info !== null
+        ? CertificateInfo.fromPartial(object.info)
+        : undefined;
     return message;
   },
 };
 
-const baseConnection: object = { remoteAddr: '' };
+function createBaseConnection(): Connection {
+  return {
+    name: undefined,
+    remoteAddr: '',
+    listenAddr: undefined,
+    pomeriumUrl: undefined,
+    disableTlsVerification: undefined,
+    caCert: undefined,
+    clientCert: undefined,
+  };
+}
 
 export const Connection = {
   encode(
@@ -2653,7 +2291,7 @@ export const Connection = {
   decode(input: _m0.Reader | Uint8Array, length?: number): Connection {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseConnection } as Connection;
+    const message = createBaseConnection();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2687,44 +2325,23 @@ export const Connection = {
   },
 
   fromJSON(object: any): Connection {
-    const message = { ...baseConnection } as Connection;
-    if (object.name !== undefined && object.name !== null) {
-      message.name = String(object.name);
-    } else {
-      message.name = undefined;
-    }
-    if (object.remoteAddr !== undefined && object.remoteAddr !== null) {
-      message.remoteAddr = String(object.remoteAddr);
-    } else {
-      message.remoteAddr = '';
-    }
-    if (object.listenAddr !== undefined && object.listenAddr !== null) {
-      message.listenAddr = String(object.listenAddr);
-    } else {
-      message.listenAddr = undefined;
-    }
-    if (object.pomeriumUrl !== undefined && object.pomeriumUrl !== null) {
-      message.pomeriumUrl = String(object.pomeriumUrl);
-    } else {
-      message.pomeriumUrl = undefined;
-    }
-    if (
-      object.disableTlsVerification !== undefined &&
-      object.disableTlsVerification !== null
-    ) {
-      message.disableTlsVerification = Boolean(object.disableTlsVerification);
-    } else {
-      message.disableTlsVerification = undefined;
-    }
-    if (object.caCert !== undefined && object.caCert !== null) {
-      message.caCert = bytesFromBase64(object.caCert);
-    }
-    if (object.clientCert !== undefined && object.clientCert !== null) {
-      message.clientCert = Certificate.fromJSON(object.clientCert);
-    } else {
-      message.clientCert = undefined;
-    }
-    return message;
+    return {
+      name: isSet(object.name) ? String(object.name) : undefined,
+      remoteAddr: isSet(object.remoteAddr) ? String(object.remoteAddr) : '',
+      listenAddr: isSet(object.listenAddr)
+        ? String(object.listenAddr)
+        : undefined,
+      pomeriumUrl: isSet(object.pomeriumUrl)
+        ? String(object.pomeriumUrl)
+        : undefined,
+      disableTlsVerification: isSet(object.disableTlsVerification)
+        ? Boolean(object.disableTlsVerification)
+        : undefined,
+      caCert: isSet(object.caCert) ? bytesFromBase64(object.caCert) : undefined,
+      clientCert: isSet(object.clientCert)
+        ? Certificate.fromJSON(object.clientCert)
+        : undefined,
+    };
   },
 
   toJSON(message: Connection): unknown {
@@ -2748,24 +2365,26 @@ export const Connection = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Connection>): Connection {
-    const message = { ...baseConnection } as Connection;
+  fromPartial<I extends Exact<DeepPartial<Connection>, I>>(
+    object: I
+  ): Connection {
+    const message = createBaseConnection();
     message.name = object.name ?? undefined;
     message.remoteAddr = object.remoteAddr ?? '';
     message.listenAddr = object.listenAddr ?? undefined;
     message.pomeriumUrl = object.pomeriumUrl ?? undefined;
     message.disableTlsVerification = object.disableTlsVerification ?? undefined;
     message.caCert = object.caCert ?? undefined;
-    if (object.clientCert !== undefined && object.clientCert !== null) {
-      message.clientCert = Certificate.fromPartial(object.clientCert);
-    } else {
-      message.clientCert = undefined;
-    }
+    message.clientCert =
+      object.clientCert !== undefined && object.clientCert !== null
+        ? Certificate.fromPartial(object.clientCert)
+        : undefined;
     return message;
   },
 };
 
 /** Config represents desktop client configuration */
+export type ConfigService = typeof ConfigService;
 export const ConfigService = {
   /** List returns records that match Selector */
   list: {
@@ -2982,9 +2601,11 @@ export const ConfigClient = makeGenericClientConstructor(
     credentials: ChannelCredentials,
     options?: Partial<ChannelOptions>
   ): ConfigClient;
+  service: typeof ConfigService;
 };
 
 /** Listener service controls listeners */
+export type ListenerService = typeof ListenerService;
 export const ListenerService = {
   /** Update alters connection status. */
   update: {
@@ -3123,6 +2744,7 @@ export const ListenerClient = makeGenericClientConstructor(
     credentials: ChannelCredentials,
     options?: Partial<ChannelOptions>
   ): ListenerClient;
+  service: typeof ListenerService;
 };
 
 declare var self: any | undefined;
@@ -3153,9 +2775,9 @@ const btoa: (bin: string) => string =
   ((bin) => globalThis.Buffer.from(bin, 'binary').toString('base64'));
 function base64FromBytes(arr: Uint8Array): string {
   const bin: string[] = [];
-  for (const byte of arr) {
+  arr.forEach((byte) => {
     bin.push(String.fromCharCode(byte));
-  }
+  });
   return btoa(bin.join(''));
 }
 
@@ -3167,6 +2789,7 @@ type Builtin =
   | number
   | boolean
   | undefined;
+
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
@@ -3176,6 +2799,14 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+export type Exact<P, I extends P> = P extends Builtin
+  ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & Record<
+        Exclude<keyof I, KeysOfUnion<P>>,
+        never
+      >;
 
 function toTimestamp(date: Date): Timestamp {
   const seconds = date.getTime() / 1_000;
@@ -3209,4 +2840,12 @@ function longToNumber(long: Long): number {
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any;
   _m0.configure();
+}
+
+function isObject(value: any): boolean {
+  return typeof value === 'object' && value !== null;
+}
+
+function isSet(value: any): boolean {
+  return value !== null && value !== undefined;
 }
