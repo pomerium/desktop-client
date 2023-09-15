@@ -181,11 +181,19 @@ export default class Helper {
     return Menu.buildFromTemplate(this.buildMenuTemplate());
   };
 
+  iconFile = (): string => {
+    switch (process.platform) {
+      case 'darwin':
+        return 'trayTemplate.png';
+      case 'win32':
+        return 'tray.ico';
+      default:
+        return '24x24.png';
+    }
+  };
+
   createTray = (): Tray => {
-    const icon =
-        process.platform === 'darwin' ? 'trayTemplate.png' :
-        process.platform === 'win32' ? 'tray.ico' : '24x24.png';
-    const tray = new Tray(getAssetPath('icons', icon));
+    const tray = new Tray(getAssetPath('icons', this.iconFile()));
     tray.setContextMenu(this.createContextMenu());
     return tray;
   };
