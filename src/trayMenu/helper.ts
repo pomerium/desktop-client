@@ -182,7 +182,10 @@ export default class Helper {
   };
 
   createTray = (): Tray => {
-    const tray = new Tray(getAssetPath('icons', '24x24.png'));
+    const icon =
+        process.platform === 'darwin' ? 'trayTemplate.png' :
+        process.platform === 'win32' ? 'tray.ico' : '24x24.png';
+    const tray = new Tray(getAssetPath('icons', icon));
     tray.setContextMenu(this.createContextMenu());
     return tray;
   };
