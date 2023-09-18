@@ -3,10 +3,12 @@ module.exports = {
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
+    // console output is fine for a Node.js application
+    'no-console': 'off',
     // cause sometimes concat is more readable
     'prefer-template': 'off',
     'react-hooks/exhaustive-deps': 'off',
-    'typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-explicit-any': ['warn', { ignoreRestArgs: true }],
   },
   parserOptions: {
     ecmaVersion: 2020,
