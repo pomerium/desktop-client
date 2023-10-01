@@ -199,7 +199,7 @@
     "@typescript-eslint/parser": "^4.29.1",
     "axios": "^0.21.2",
     "babel-eslint": "^10.1.0",
-    "babel-jest": "^27.0.6",
+    "babel-jest": "^29.7.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
