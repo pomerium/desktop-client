@@ -7,7 +7,7 @@ jobs:
 
     steps:
       - id: get_version
-        uses: pozetroninc/github-action-get-latest-release@master
+        uses: pozetroninc/github-action-get-latest-release@d1dafdb6e338bdab109e6afce581a01858680dfb
         with:
           repository: ${{ github.repository }}
 
@@ -15,9 +15,9 @@ jobs:
         run: |
           echo "release=${VERSION#v}" >> $GITHUB_OUTPUT
         env:
-          VERSION: "${{ steps.get_version.outputs.release }}"
+          VERSION: '${{ steps.get_version.outputs.release }}'
 
-      - uses: peter-evans/repository-dispatch@v2
+      - uses: peter-evans/repository-dispatch@bf47d102fdb849e755b0b0023ea3e81a44b6f570
         with:
           repository: pomerium/homebrew-tap
           token: ${{ secrets.APPARITOR_GITHUB_TOKEN }}

@@ -19,10 +19,10 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
 
       - name: Install Node, NPM and Yarn
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65
         with:
           node-version: 16.13.0
 
@@ -31,7 +31,7 @@ jobs:
           yarn install
 
       - name: Import Apple CSC
-        uses: apple-actions/import-codesign-certs@v1
+        uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
         with:
           p12-file-base64: ${{ secrets.APPLE_APP_CSC }}
           p12-password: ${{ secrets.APPLE_APP_CSC_PASSWORD }}
@@ -52,4 +52,3 @@ jobs:
           yarn release -l --arm64
           yarn release -l --x64
           yarn release -w
-
