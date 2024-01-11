@@ -39,7 +39,9 @@ jobs:
       - name: Set up Apple ID Credentials
         run: |
           mkdir ~/private_keys
-          echo "${{ secrets.APPLE_ID_KEY }}" > ~/private_keys/AuthKey_${{ secrets.APPLE_ID }}.p8
+          key_path=~/private_keys/AuthKey_${{ secrets.APPLE_ID }}.p8
+          echo "${{ secrets.APPLE_ID_KEY }}" > "$key_path"
+          echo "APPLE_API_KEY_PATH=$key_path" >> "$GITHUB_ENV"
 
       - name: Release
         env:
