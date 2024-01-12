@@ -37,7 +37,8 @@ exports.default = async function notarizeMacos(context) {
     await notarize({
       appBundleId: build.appId,
       appPath: `${appOutDir}/${appName}.app`,
-      appleApiKey: process.env.APPLE_ID,
+      appleApiKey: process.env.APPLE_API_KEY_PATH,
+      appleApiKeyId: process.env.APPLE_ID,
       appleApiIssuer: process.env.APPLE_ID_KEY_ISSUER,
     });
   }
