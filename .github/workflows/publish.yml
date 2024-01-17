@@ -24,7 +24,7 @@ jobs:
       - name: Install Node, NPM and Yarn
         uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8
         with:
-          node-version: 16.13.0
+          node-version: 20.6.1
 
       - name: Install dependencies
         run: |
