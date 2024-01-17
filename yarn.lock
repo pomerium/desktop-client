@@ -3732,10 +3732,10 @@ braces@^3.0.2, braces@~3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-browserslist-config-erb@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/browserslist-config-erb/-/browserslist-config-erb-0.0.1.tgz#0a93648bbe11fac5b9fe555bf061f31980db64db"
-  integrity sha512-QQQzCXrYVVdSWxO0UuV+f2HGBt7xdGRRvgr49W1lcwoyXNpRQFVi5cTz8+B/rLHyBkWd4JbRFeTIKHAw7BpCBg==
+browserslist-config-erb@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/browserslist-config-erb/-/browserslist-config-erb-0.0.3.tgz#db7f06fe5b1ce2ab9f09e78ac4d5a9f572e188a4"
+  integrity sha512-y47DryCY92lxkKyRVMlaZvXAolIY7U33q9e4CS0MdWeJkoAht7OzsrkfdZFCBOP3H5q1EVUxS0L7VVsKM6gZCQ==
 
 browserslist@^4.0.0, browserslist@^4.14.5, browserslist@^4.16.6, browserslist@^4.20.3, browserslist@^4.21.10, browserslist@^4.22.2:
   version "4.22.2"
@@ -5939,12 +5939,7 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.6.tgz#022e9218c637f9f3fc9c35ab9c9193f05add60b2"
   integrity sha512-0sQoMh9s0BYsm+12Huy/rkKxVu4R1+r96YX5cG44rHV0pQ6iC3Q+mkoMFaGWObMFYQxCVT+ssG1ksneA2MI9KQ==
 
-follow-redirects@^1.0.0:
-  version "1.15.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
-  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
-
-follow-redirects@^1.15.4:
+follow-redirects@^1.0.0, follow-redirects@^1.15.4:
   version "1.15.5"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.5.tgz#54d4d6d062c0fa7d9d17feb008461550e3ba8020"
   integrity sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==
