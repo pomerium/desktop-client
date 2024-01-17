@@ -6183,6 +6183,11 @@ globby@^11.1.0:
     merge2 "^1.4.1"
     slash "^3.0.0"
 
+goober@^2.0.33:
+  version "2.1.14"
+  resolved "https://registry.yarnpkg.com/goober/-/goober-2.1.14.tgz#4a5c94fc34dc086a8e6035360ae1800005135acd"
+  integrity sha512-4UpC0NdGyAFqLNPnhCT2iHpza2q+RAY3GV85a/mRPdzyPQMsj0KmMMuetdIkzWRbJ+Hgau1EZztq8ImmiMGhsg==
+
 gopd@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/gopd/-/gopd-1.0.1.tgz#29ff76de69dac7489b7c0918a5788e56477c332c"
@@ -6346,7 +6351,7 @@ history@*, history@^5.0.0:
   dependencies:
     "@babel/runtime" "^7.7.6"
 
-hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.1, hoist-non-react-statics@^3.3.2:
+hoist-non-react-statics@^3.3.1, hoist-non-react-statics@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz#ece0acaf71d62c2969c2ec59feff42a4b1a85b45"
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
@@ -8259,13 +8264,13 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-notistack@^2.0.3:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/notistack/-/notistack-2.0.5.tgz#8eb53720453f6e02182cd0e6784ced630a7bb7e6"
-  integrity sha512-Ig2T1Muqkc1PaSQcEDrK7diKv6cBxw02Iq6uv074ySfgq524TV5lK41diAb6OSsaiWfp3aRt+T3+0MF8m2EcJQ==
+notistack@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/notistack/-/notistack-3.0.1.tgz#daf59888ab7e2c30a1fa8f71f9cba2978773236e"
+  integrity sha512-ntVZXXgSQH5WYfyU+3HfcXuKaapzAJ8fBLQ/G618rn3yvSzEbnOB8ZSOwhX+dAORy/lw+GC2N061JA0+gYWTVA==
   dependencies:
     clsx "^1.1.0"
-    hoist-non-react-statics "^3.3.0"
+    goober "^2.0.33"
 
 npm-bundled@^1.0.1:
   version "1.1.2"
@@ -9331,12 +9336,7 @@ regenerate@^1.4.2:
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.2.tgz#b9346d8827e8f5a32f7ba29637d398b69014848a"
   integrity sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A==
 
-regenerator-runtime@^0.13.9:
-  version "0.13.9"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.9.tgz#8925742a98ffd90814988d7566ad30ca3b263b52"
-  integrity sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==
-
-regenerator-runtime@^0.14.0:
+regenerator-runtime@^0.14.0, regenerator-runtime@^0.14.1:
   version "0.14.1"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.14.1.tgz#356ade10263f685dda125100cd862c1db895327f"
   integrity sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==
