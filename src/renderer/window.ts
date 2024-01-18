@@ -7,7 +7,7 @@ Sentry.init({
   dsn: 'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413',
 });
 
-const createWindow = () => {
+const createWindow = (): BrowserWindow | null => {
   const appWindow = new BrowserWindow({
     show: true,
     width: 1024,

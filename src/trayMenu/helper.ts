@@ -29,7 +29,7 @@ export default class Helper {
     statuses: { [key: string]: ListenerStatus },
     tags: string[],
     appWindow: BrowserWindow | null,
-    menu: Menubar | null
+    menu: Menubar | null,
   ) {
     this.records = records;
     this.statuses = statuses;
@@ -82,7 +82,7 @@ export default class Helper {
           {
             connectionIds: filtered.map((rec) => rec.id),
             connected: true,
-          }
+          },
         );
       },
     });
@@ -96,7 +96,7 @@ export default class Helper {
           {
             connectionIds: filtered.map((rec) => rec.id),
             connected: false,
-          }
+          },
         );
       },
     });
@@ -106,7 +106,6 @@ export default class Helper {
     });
 
     filtered.forEach((rec) => {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
       const that = this;
       const iconName = this.statuses[rec.id as string]?.listening
         ? 'connected.png'
@@ -122,7 +121,7 @@ export default class Helper {
             {
               connectionIds: [rec.id],
               connected: !that.statuses[rec.id as string]?.listening,
-            }
+            },
           );
         },
       });
@@ -155,7 +154,7 @@ export default class Helper {
 
     this.tags.forEach((tag) => {
       const conns = this.buildFolderSubmenu(
-        this.records.filter((rec) => rec.tags.includes(tag))
+        this.records.filter((rec) => rec.tags.includes(tag)),
       );
 
       template.push({

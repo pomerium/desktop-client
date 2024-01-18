@@ -47,11 +47,11 @@ export async function start(sentryDSN: string): Promise<CLI> {
 
   const configClient = new ConfigClient(
     grpcAddress,
-    ChannelCredentials.createInsecure()
+    ChannelCredentials.createInsecure(),
   );
   const listenerClient = new ListenerClient(
     grpcAddress,
-    ChannelCredentials.createInsecure()
+    ChannelCredentials.createInsecure(),
   );
 
   return { process, configClient, listenerClient };

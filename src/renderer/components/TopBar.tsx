@@ -62,7 +62,7 @@ const TopBar: FC = () => {
               }
               isOptionEqualToValue={(
                 option: ListenerRecord,
-                value: ListenerRecord
+                value: ListenerRecord,
               ) => {
                 return option.id === value.id;
               }}

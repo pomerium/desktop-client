@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { SvgIcon } from '@mui/material';
 
-const Edit = (): JSX.Element => {
+function Edit(): ReactElement {
   return (
     <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
       <path
@@ -10,5 +10,5 @@ const Edit = (): JSX.Element => {
       />
     </SvgIcon>
   );
-};
+}
 export default Edit;

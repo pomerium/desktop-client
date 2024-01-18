@@ -8,7 +8,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
 import moment from 'moment';
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
@@ -24,10 +24,10 @@ interface DataPointProps {
   title;
 }
 
-const DataPoint = ({
+function DataPoint({
   children,
   title,
-}: React.PropsWithChildren<DataPointProps>) => {
+}: React.PropsWithChildren<DataPointProps>) {
   return (
     <Grid container alignItems="stretch" spacing={1}>
       <Grid item xs={4}>
@@ -40,13 +40,13 @@ const DataPoint = ({
       </Grid>
     </Grid>
   );
-};
+}
 
-const DetailViewDialog = ({
+function DetailViewDialog({
   open,
   onClose,
   certInfo,
-}: DetailViewDialogProps): JSX.Element => {
+}: DetailViewDialogProps): ReactElement {
   return (
     <Dialog
       open={open}
@@ -84,9 +84,9 @@ const DetailViewDialog = ({
           </DataPoint>
           <DataPoint title="DNS Names">
             <List sx={{ padding: 0 }}>
-              {certInfo?.dnsNames?.map((dns_name) => (
-                <ListItem key={dns_name} sx={{ padding: 0 }}>
-                  <Typography>{dns_name}</Typography>
+              {certInfo?.dnsNames?.map((dnsName) => (
+                <ListItem key={dnsName} sx={{ padding: 0 }}>
+                  <Typography>{dnsName}</Typography>
                 </ListItem>
               ))}
             </List>
@@ -103,5 +103,5 @@ const DetailViewDialog = ({
       </DialogActions>
     </Dialog>
   );
-};
+}
 export default DetailViewDialog;

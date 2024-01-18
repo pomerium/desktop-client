@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import {
   Button,
   CardContent,
@@ -35,7 +35,7 @@ import ExportDialog, {
 } from '../components/ExportDialog';
 import StyledCard from '../components/StyledCard';
 
-const ManageConnections = (): JSX.Element => {
+function ManageConnections(): ReactElement {
   const [folderNames, setFolderNames] = useState([] as string[]);
   const [connections, setConnections] = useState([] as ListenerRecord[]);
   const [exportFile, setExportFile] = useState<ExportFile | null>(null);
@@ -102,7 +102,7 @@ const ManageConnections = (): JSX.Element => {
                 autoHideDuration: TOAST_LENGTH,
               });
             }
-          }
+          },
         );
         setStatuses((prevState) => {
           return {
@@ -164,7 +164,7 @@ const ManageConnections = (): JSX.Element => {
   }, []);
 
   const untagged = connections?.filter(
-    (connection) => !connection?.tags?.length
+    (connection) => !connection?.tags?.length,
   );
 
   return (
@@ -234,7 +234,7 @@ const ManageConnections = (): JSX.Element => {
           <CardContent>
             {folderNames.map((folderName) => {
               const folderConns = connections.filter(
-                (connection) => connection?.tags?.indexOf(folderName) >= 0
+                (connection) => connection?.tags?.indexOf(folderName) >= 0,
               );
               return (
                 <TagFolderRow
@@ -304,5 +304,5 @@ const ManageConnections = (): JSX.Element => {
       </Container>
     </>
   );
-};
+}
 export default ManageConnections;

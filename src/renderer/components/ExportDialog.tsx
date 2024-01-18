@@ -1,3 +1,4 @@
+/* eslint no-unused-vars: off */
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -5,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
@@ -22,10 +23,10 @@ type ExportDialogProps = {
   onClose: () => void;
   exportFile: ExportFile | null;
 };
-const ExportDialog = ({
+function ExportDialog({
   onClose,
   exportFile,
-}: ExportDialogProps): JSX.Element => {
+}: ExportDialogProps): ReactElement {
   const [includeTags, setIncludeTags] = useState(false);
   const handleClickCancel = (evt: React.MouseEvent): void => {
     evt.preventDefault();
@@ -73,5 +74,5 @@ const ExportDialog = ({
       </DialogActions>
     </Dialog>
   );
-};
+}
 export default ExportDialog;

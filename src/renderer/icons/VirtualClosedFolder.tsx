@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { SvgIcon } from '@mui/material';
 
-const VirtualClosedFolder = (): JSX.Element => {
+function VirtualClosedFolder(): ReactElement {
   return (
     <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
       <path
@@ -14,5 +14,5 @@ const VirtualClosedFolder = (): JSX.Element => {
       />
     </SvgIcon>
   );
-};
+}
 export default VirtualClosedFolder;

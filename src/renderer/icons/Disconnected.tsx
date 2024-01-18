@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { SvgIcon } from '@mui/material';
 
-const Disconnected = (): JSX.Element => {
+function Disconnected(): ReactElement {
   return (
     <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
       <path
@@ -23,5 +23,5 @@ const Disconnected = (): JSX.Element => {
       />
     </SvgIcon>
   );
-};
+}
 export default Disconnected;

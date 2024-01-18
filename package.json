@@ -288,6 +288,7 @@
     "regenerator-runtime": "^0.14.1",
     "source-map-support": "^0.5.19",
     "ts-proto": "^1.166.2",
+    "typescript-eslint": "^0.0.1-alpha.0",
     "validator": "^13.11.0"
   },
   "devEngines": {
