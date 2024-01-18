@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ReactElement } from 'react';
 import {
   Typography,
   Grid,
@@ -47,7 +47,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   connection,
   connected,
   port,
-}: ConnectionRowProps): JSX.Element => {
+}: ConnectionRowProps): ReactElement => {
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [exportFile, setExportFile] = React.useState<ExportFile | null>(null);
   const { enqueueSnackbar } = useSnackbar();

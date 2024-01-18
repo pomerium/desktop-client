@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { SvgIcon } from '@mui/material';
 
-const OpenFolder = (): JSX.Element => {
+function OpenFolder(): ReactElement {
   return (
     <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
       <path
@@ -16,5 +16,5 @@ const OpenFolder = (): JSX.Element => {
       />
     </SvgIcon>
   );
-};
+}
 export default OpenFolder;

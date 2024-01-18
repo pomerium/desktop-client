@@ -8,8 +8,13 @@
  * When running `yarn build` or `yarn build-main`, this file is compiled to
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
-import 'core-js/stable';
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  MessageBoxOptions,
+} from 'electron';
 import * as grpc from '@grpc/grpc-js';
 import * as Sentry from '@sentry/electron';
 import log from 'electron-log';
@@ -20,7 +25,6 @@ import path from 'path';
 import fs from 'fs';
 import contextMenu from 'electron-context-menu';
 import createWindow from './renderer/window';
-import 'regenerator-runtime/runtime';
 import {
   isDev,
   isProd,
@@ -101,7 +105,7 @@ const onUncaughtException = (() => {
       message:
         'If you would like to file a bug report please include the following Sentry Id: ' +
         sentryId,
-    } as Electron.MessageBoxOptions;
+    } as MessageBoxOptions;
 
     if ('spawnargs' in err) {
       msg.title = 'Incorrect CLI supplied.';
@@ -117,7 +121,7 @@ const onUncaughtException = (() => {
 process.on('uncaughtException', onUncaughtException);
 
 app.on('activate', async () => {
-  // On macOS it's common to re-create a window in the app when the
+  // On macOS, it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) mainWindow = createWindow();
 });
@@ -141,7 +145,7 @@ async function init(): Promise<void> {
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file:',
       slashes: true,
-    })
+    }),
   );
 
   const trayMenuHelper = new Helper([], {}, [], mainWindow, null);
@@ -204,7 +208,7 @@ async function init(): Promise<void> {
             trayMenuHelper.setRecords(res.records);
             menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
           }
-        }
+        },
       );
     });
     ipcMain.on(GET_UNIQUE_TAGS, (evt) => {
@@ -264,7 +268,7 @@ async function init(): Promise<void> {
             data: res?.data || [],
             filename: args.filename,
           });
-        }
+        },
       );
     });
     ipcMain.on(IMPORT, (evt) => {
@@ -279,7 +283,7 @@ async function init(): Promise<void> {
               } as ImportRequest,
               (err, res) => {
                 evt?.sender?.send(IMPORT, { err, res });
-              }
+              },
             );
           }
           return null;

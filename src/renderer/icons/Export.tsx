@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { SvgIcon } from '@mui/material';
 
-const Export = (): JSX.Element => {
+function Export(): ReactElement {
   return (
     <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
       <path
@@ -10,5 +10,5 @@ const Export = (): JSX.Element => {
       />
     </SvgIcon>
   );
-};
+}
 export default Export;

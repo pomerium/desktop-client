@@ -1,8 +1,8 @@
 import { SvgIcon } from '@mui/material';
 
-import React from 'react';
+import React, { ReactElement } from 'react';
 
-const ClosedFolder = (): JSX.Element => {
+function ClosedFolder(): ReactElement {
   return (
     <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
       <path
@@ -11,5 +11,5 @@ const ClosedFolder = (): JSX.Element => {
       />
     </SvgIcon>
   );
-};
+}
 export default ClosedFolder;

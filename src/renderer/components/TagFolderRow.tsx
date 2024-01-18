@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactElement } from 'react';
 import {
   Divider,
   Grid,
@@ -40,7 +40,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
   connectedListeners,
   connectionIds,
   children,
-}: PropsWithChildren<FolderProps>): JSX.Element => {
+}: PropsWithChildren<FolderProps>): ReactElement => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [confirmation, setConfirmation] =
     React.useState<ConfirmationDialogProps | null>(null);

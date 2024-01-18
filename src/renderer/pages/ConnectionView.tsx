@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -57,7 +57,7 @@ type SimplifiedLog = {
   date: string;
 };
 
-const ConnectionView = (): JSX.Element => {
+function ConnectionView(): ReactElement {
   const [tags, setTags] = useState([] as Record['tags']);
   const [connection, setConnection] = useState({} as Connection);
   const [connected, setConnected] = useState(false);
@@ -175,7 +175,7 @@ const ConnectionView = (): JSX.Element => {
             {
               variant: 'error',
               autoHideDuration: TOAST_LENGTH,
-            }
+            },
           );
         }
       }
@@ -575,5 +575,5 @@ const ConnectionView = (): JSX.Element => {
     );
   }
   return <></>;
-};
+}
 export default ConnectionView;

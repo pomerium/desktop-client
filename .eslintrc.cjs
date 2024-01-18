@@ -8,7 +8,16 @@ module.exports = {
     // cause sometimes concat is more readable
     'prefer-template': 'off',
     'react-hooks/exhaustive-deps': 'off',
-    '@typescript-eslint/no-explicit-any': ['warn', { ignoreRestArgs: true }],
+    'no-explicit-any': 'off',
+    'import/no-unresolved': 'off',
+    'import/extensions': 'off',
+    'react/function-component-definition': 'off',
+    'react/jsx-filename-extension': 'off',
+    'react/no-unstable-nested-components': 'off',
+    'class-methods-use-this': 'off',
+    'react/jsx-no-useless-fragment': 'off',
+    'no-unsafe-optional-chaining': 'off',
+    'no-promise-executor-return': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

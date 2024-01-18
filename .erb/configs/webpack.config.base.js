@@ -24,6 +24,10 @@ export default {
           },
         },
       },
+      {
+        test: /\.node$/,
+        loader: "node-loader",
+      },
     ],
   },
 

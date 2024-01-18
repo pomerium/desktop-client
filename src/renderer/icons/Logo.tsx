@@ -1,7 +1,7 @@
 import { SvgIcon } from '@mui/material';
-import React from 'react';
+import React, { ReactElement } from 'react';
 
-const Logo = (): JSX.Element => {
+function Logo(): ReactElement {
   return (
     <SvgIcon viewBox="0 0 161 28" sx={{ width: '161px', height: '28px' }}>
       <g clipPath="url(#clip0)">
@@ -74,5 +74,5 @@ const Logo = (): JSX.Element => {
       </defs>
     </SvgIcon>
   );
-};
+}
 export default Logo;

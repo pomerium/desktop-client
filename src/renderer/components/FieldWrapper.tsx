@@ -7,7 +7,7 @@ import {
   Tooltip,
   Box,
 } from '@mui/material';
-import React, { FC, ReactFragment, ReactNode } from 'react';
+import React, { FC, ReactElement, ReactFragment, ReactNode } from 'react';
 import { HelpCircle } from 'react-feather';
 
 type FieldWrapperProps = {
@@ -20,7 +20,7 @@ const FieldWrapper: FC<FieldWrapperProps> = ({
   label,
   description,
   children,
-}: FieldWrapperProps): JSX.Element => {
+}: FieldWrapperProps): ReactElement => {
   return (
     <Container maxWidth={false} disableGutters sx={{ p: 2 }}>
       <Grid container sx={{ mb: 1 }}>

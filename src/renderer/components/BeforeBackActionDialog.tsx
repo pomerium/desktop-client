@@ -5,7 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { ipcRenderer } from 'electron';
 import { VIEW_CONNECTION_LIST } from '../../shared/constants';
 
@@ -14,7 +14,7 @@ interface Props {
   onClose(): void;
 }
 
-const BeforeBackActionDialog = ({ open, onClose }: Props): JSX.Element => {
+function BeforeBackActionDialog({ open, onClose }: Props): ReactElement {
   const handleClickCancel = (evt: React.MouseEvent): void => {
     evt.preventDefault();
     onClose();
@@ -50,5 +50,5 @@ const BeforeBackActionDialog = ({ open, onClose }: Props): JSX.Element => {
       </DialogActions>
     </Dialog>
   );
-};
+}
 export default BeforeBackActionDialog;

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, ReactElement } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -20,7 +20,7 @@ const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
   text,
   onConfirm,
   onClose,
-}: ConfirmationDialogProps): JSX.Element => (
+}: ConfirmationDialogProps): ReactElement => (
   <Dialog open onClose={onClose}>
     <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
     <DialogContent>
