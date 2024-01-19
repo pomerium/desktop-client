@@ -177,7 +177,7 @@ function ConnectionView(): ReactElement {
             {
               variant: 'error',
               autoHideDuration: TOAST_LENGTH,
-            }
+            },
           );
         }
       }
@@ -224,8 +224,9 @@ function ConnectionView(): ReactElement {
     }
   }, [logs, errorFilter, infoFilter]);
 
-  const clientCertFiltersSummary =
-    getClientCertFiltersSummary(connection?.clientCertFromStore);
+  const clientCertFiltersSummary = getClientCertFiltersSummary(
+    connection?.clientCertFromStore,
+  );
 
   if (Object.keys(connection).length) {
     return (
@@ -417,7 +418,7 @@ function ConnectionView(): ReactElement {
                           Search OS certificate store
                           {clientCertFiltersSummary && (
                             <>
-                              <br/>({clientCertFiltersSummary})
+                              <br />({clientCertFiltersSummary})
                             </>
                           )}
                         </Typography>

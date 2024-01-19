@@ -11,7 +11,7 @@ import TextField from './TextField';
 interface Props {
   label: string;
   data: string | undefined;
-  onChange: (a: string | undefined) => void;
+  onChange: (filter: string | undefined) => void;
   disabled: boolean;
 }
 

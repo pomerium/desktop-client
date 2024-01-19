@@ -16,6 +16,8 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
+import { AccordionProps } from '@mui/material/Accordion';
+import { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import React, { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CheckCircle, ChevronDown, ChevronRight, Trash } from 'react-feather';
@@ -122,6 +124,17 @@ const initialConnData: Connection = {
   clientCertFromStore: undefined,
 };
 
+export function getClientCertFiltersSummary(c: ClientCertFromStore): string {
+  const filters = [];
+  if (c?.issuerFilter) {
+    filters.push('Issuer ' + c.issuerFilter);
+  }
+  if (c?.subjectFilter) {
+    filters.push('Subject ' + c.subjectFilter);
+  }
+  return filters.join(', ');
+}
+
 const ConnectForm: FC<Props> = () => {
   const [showBackWarning, setShowBackWarning] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
@@ -226,7 +239,7 @@ const ConnectForm: FC<Props> = () => {
     useState(false);
 
   const saveClientCertFromStore = (
-    value: ClientCertFromStore | undefined
+    value: ClientCertFromStore | undefined,
   ): void => {
     setConnection({
       ...connection,
@@ -251,8 +264,9 @@ const ConnectForm: FC<Props> = () => {
     });
   };
 
-  const clientCertFiltersSummary =
-    getClientCertFiltersSummary(connection?.clientCertFromStore);
+  const clientCertFiltersSummary = getClientCertFiltersSummary(
+    connection?.clientCertFromStore,
+  );
 
   const saveCertText = (value: string): void => {
     setCertText(value);
@@ -477,7 +491,7 @@ const ConnectForm: FC<Props> = () => {
                       color="primary"
                       onChange={(evt): void =>
                         saveClientCertFromStore(
-                          evt.target.checked ? {} : undefined
+                          evt.target.checked ? {} : undefined,
                         )
                       }
                     />
@@ -690,16 +704,5 @@ const ConnectForm: FC<Props> = () => {
     </Container>
   );
 };
-
-export function getClientCertFiltersSummary(c: ClientCertFromStore): string {
-  const filters = [];
-  if (c?.issuerFilter) {
-    filters.push( 'Issuer ' + c.issuerFilter);
-  }
-  if (c?.subjectFilter) {
-    filters.push( 'Subject ' + c.subjectFilter);
-  }
-  return filters.join(', ');
-}
 
 export default ConnectForm;
