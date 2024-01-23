@@ -202,6 +202,15 @@ message Certificate {
   optional CertificateInfo info = 3;
 }
 
+// ClientCertFromStore contains additional filters to apply when searching for
+// a client certificate in the system trust store. (This search will always
+// take into account any CA names from the TLS CertificateRequest message.)
+message ClientCertFromStore {
+  // filters based on a single name attribute (e.g. "CN=my cert" or "O=my org")
+  optional string issuer_filter = 1;
+  optional string subject_filter = 2;
+}
+
 // Connection
 message Connection {
   // name is a user friendly connection name that a user may define
@@ -217,4 +226,7 @@ message Connection {
     bytes ca_cert = 6;
   }
   optional Certificate client_cert = 7;
+  reserved 8; // unreleased client_cert_issuer_cn search criterion
+  // indicates to search the system trust store for a client certificate
+  optional ClientCertFromStore client_cert_from_store = 9;
 }

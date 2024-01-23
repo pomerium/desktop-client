@@ -14,6 +14,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Stack,
   Typography,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -50,6 +51,7 @@ import CertDetails from '../components/CertDetails';
 import ExportDialog, {
   IpcRendererEventListener,
 } from '../components/ExportDialog';
+import { getClientCertFiltersSummary } from './ConnectForm';
 
 type SimplifiedLog = {
   status: 'info' | 'error';
@@ -221,6 +223,10 @@ function ConnectionView(): ReactElement {
       setFilteredLogs(logs.filter((log) => log.status === 'info'));
     }
   }, [logs, errorFilter, infoFilter]);
+
+  const clientCertFiltersSummary = getClientCertFiltersSummary(
+    connection?.clientCertFromStore,
+  );
 
   if (Object.keys(connection).length) {
     return (
@@ -406,20 +412,37 @@ function ConnectionView(): ReactElement {
                     <Typography variant="h6">Client Certificate</Typography>
                   </Grid>
                   <Grid item xs={8}>
-                    {connection?.clientCert?.info && (
-                      <>
-                        <CertDetails
-                          open={showDetail}
-                          onClose={() => setShowDetail(false)}
-                          certInfo={connection?.clientCert?.info}
-                        />
-                        <Chip
-                          label="Details"
-                          color="primary"
-                          onClick={() => setShowDetail(true)}
-                        />
-                      </>
-                    )}
+                    <Stack alignItems="flex-start" spacing={1}>
+                      {connection?.clientCertFromStore !== undefined && (
+                        <Typography variant="subtitle2">
+                          Search OS certificate store
+                          {clientCertFiltersSummary && (
+                            <>
+                              <br />({clientCertFiltersSummary})
+                            </>
+                          )}
+                        </Typography>
+                      )}
+                      {connection?.clientCert?.info && (
+                        <Stack
+                          direction="row"
+                          alignItems="baseline"
+                          spacing={1}
+                        >
+                          <CertDetails
+                            open={showDetail}
+                            onClose={() => setShowDetail(false)}
+                            certInfo={connection?.clientCert?.info}
+                          />
+                          <Typography variant="subtitle2">File:</Typography>
+                          <Chip
+                            label="Details"
+                            color="primary"
+                            onClick={() => setShowDetail(true)}
+                          />
+                        </Stack>
+                      )}
+                    </Stack>
                   </Grid>
                 </Grid>
               </Grid>

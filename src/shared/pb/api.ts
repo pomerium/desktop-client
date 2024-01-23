@@ -307,6 +307,17 @@ export interface Certificate {
   info?: CertificateInfo | undefined;
 }
 
+/**
+ * ClientCertFromStore contains additional filters to apply when searching for
+ * a client certificate in the system trust store. (This search will always
+ * take into account any CA names from the TLS CertificateRequest message.)
+ */
+export interface ClientCertFromStore {
+  /** filters based on a single name attribute (e.g. "CN=my cert" or "O=my org") */
+  issuerFilter?: string | undefined;
+  subjectFilter?: string | undefined;
+}
+
 /** Connection */
 export interface Connection {
   /** name is a user friendly connection name that a user may define */
@@ -320,6 +331,8 @@ export interface Connection {
   disableTlsVerification: boolean | undefined;
   caCert: Uint8Array | undefined;
   clientCert?: Certificate | undefined;
+  /** indicates to search the system trust store for a client certificate */
+  clientCertFromStore?: ClientCertFromStore | undefined;
 }
 
 function createBaseRecord(): Record {
@@ -2247,6 +2260,75 @@ export const Certificate = {
   },
 };
 
+function createBaseClientCertFromStore(): ClientCertFromStore {
+  return { issuerFilter: undefined, subjectFilter: undefined };
+}
+
+export const ClientCertFromStore = {
+  encode(
+    message: ClientCertFromStore,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.issuerFilter !== undefined) {
+      writer.uint32(10).string(message.issuerFilter);
+    }
+    if (message.subjectFilter !== undefined) {
+      writer.uint32(18).string(message.subjectFilter);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ClientCertFromStore {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseClientCertFromStore();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.issuerFilter = reader.string();
+          break;
+        case 2:
+          message.subjectFilter = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ClientCertFromStore {
+    return {
+      issuerFilter: isSet(object.issuerFilter)
+        ? String(object.issuerFilter)
+        : undefined,
+      subjectFilter: isSet(object.subjectFilter)
+        ? String(object.subjectFilter)
+        : undefined,
+    };
+  },
+
+  toJSON(message: ClientCertFromStore): unknown {
+    const obj: any = {};
+    message.issuerFilter !== undefined &&
+      (obj.issuerFilter = message.issuerFilter);
+    message.subjectFilter !== undefined &&
+      (obj.subjectFilter = message.subjectFilter);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<ClientCertFromStore>, I>>(
+    object: I
+  ): ClientCertFromStore {
+    const message = createBaseClientCertFromStore();
+    message.issuerFilter = object.issuerFilter ?? undefined;
+    message.subjectFilter = object.subjectFilter ?? undefined;
+    return message;
+  },
+};
+
 function createBaseConnection(): Connection {
   return {
     name: undefined,
@@ -2256,6 +2338,7 @@ function createBaseConnection(): Connection {
     disableTlsVerification: undefined,
     caCert: undefined,
     clientCert: undefined,
+    clientCertFromStore: undefined,
   };
 }
 
@@ -2284,6 +2367,12 @@ export const Connection = {
     }
     if (message.clientCert !== undefined) {
       Certificate.encode(message.clientCert, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.clientCertFromStore !== undefined) {
+      ClientCertFromStore.encode(
+        message.clientCertFromStore,
+        writer.uint32(74).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -2316,6 +2405,12 @@ export const Connection = {
         case 7:
           message.clientCert = Certificate.decode(reader, reader.uint32());
           break;
+        case 9:
+          message.clientCertFromStore = ClientCertFromStore.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2341,6 +2436,9 @@ export const Connection = {
       clientCert: isSet(object.clientCert)
         ? Certificate.fromJSON(object.clientCert)
         : undefined,
+      clientCertFromStore: isSet(object.clientCertFromStore)
+        ? ClientCertFromStore.fromJSON(object.clientCertFromStore)
+        : undefined,
     };
   },
 
@@ -2362,6 +2460,10 @@ export const Connection = {
       (obj.clientCert = message.clientCert
         ? Certificate.toJSON(message.clientCert)
         : undefined);
+    message.clientCertFromStore !== undefined &&
+      (obj.clientCertFromStore = message.clientCertFromStore
+        ? ClientCertFromStore.toJSON(message.clientCertFromStore)
+        : undefined);
     return obj;
   },
 
@@ -2378,6 +2480,11 @@ export const Connection = {
     message.clientCert =
       object.clientCert !== undefined && object.clientCert !== null
         ? Certificate.fromPartial(object.clientCert)
+        : undefined;
+    message.clientCertFromStore =
+      object.clientCertFromStore !== undefined &&
+      object.clientCertFromStore !== null
+        ? ClientCertFromStore.fromPartial(object.clientCertFromStore)
         : undefined;
     return message;
   },
