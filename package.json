@@ -65,7 +65,8 @@
       "hardenedRuntime": true,
       "entitlements": "system_files/mac/common/entitlements.mac.plist",
       "entitlementsInherit": "system_files/mac/common/entitlements.mac.plist",
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "notarize": false
     },
     "dmg": {
       "sign": false,
