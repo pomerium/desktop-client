@@ -214,7 +214,7 @@
     "detect-port": "^1.5.1",
     "electron": "18.3.0",
     "electron-builder": "^24.13.3",
-    "electron-rebuild": "^2.3.2",
+    "electron-rebuild": "^3.0.0",
     "eslint": "^8.56.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.1.0",
