@@ -345,6 +345,205 @@ const ConnectForm: FC<Props> = () => {
   const clientCertFromStoreEnabled =
     connection?.clientCertFromStore !== undefined;
 
+  const manualClientCertSection = (
+    <>
+      {showCertInput && (
+        <Grid item xs={12}>
+          <label htmlFor="cert-file">
+            <input
+              style={{ display: 'none' }}
+              id="cert-file"
+              ref={certRef}
+              type="file"
+              onChange={handleCertFile}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              component="span"
+            >
+              Client Certificate from File
+            </Button>
+          </label>
+        </Grid>
+      )}
+      {showCertInput && (
+        <Grid item xs={12}>
+          <Typography variant="body2">
+            Client Certificate Text
+          </Typography>
+          <TextArea
+            fullWidth
+            variant="filled"
+            value={certText}
+            multiline
+            required={!!keyText}
+            rows={5}
+            placeholder="e.g. copy/paste the cert in PEM format"
+            onChange={(evt): void =>
+              saveCertText(evt.target.value)
+            }
+            spellCheck={false}
+          />
+          <FormHelperText sx={{ pl: 2 }}>
+            Add a Client Certificate with the File Selector or
+            Copy/Paste to the Text Area. Key is required if the
+            Certificate is present.
+          </FormHelperText>
+        </Grid>
+      )}
+      {showCertInput && (
+        <Grid item xs={12}>
+          <label htmlFor="key-file">
+            <input
+              style={{ display: 'none' }}
+              id="key-file"
+              ref={keyRef}
+              type="file"
+              onChange={handleKeyFile}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              component="span"
+            >
+              Client Certificate Key from File
+            </Button>
+          </label>
+        </Grid>
+      )}
+      {showCertInput && (
+        <Grid item xs={12}>
+          <Typography variant="body2">
+            Client Certificate Key Text
+          </Typography>
+          <TextArea
+            fullWidth
+            variant="filled"
+            value={keyText}
+            required={!!certText}
+            multiline
+            rows={5}
+            placeholder="e.g. copy/paste the key in PEM format"
+            onChange={(evt): void =>
+              saveKeyText(evt.target.value)
+            }
+          />
+          <FormHelperText sx={{ pl: 2 }}>
+            Add a Client Certificate Key with the File Selector or
+            Copy/Paste to the Text Area. Certificate is required
+            if the Key is present.
+          </FormHelperText>
+        </Grid>
+      )}
+
+      {!showCertInput && (
+        <Grid item xs={12}>
+          <CertDetails
+            open={showDetail}
+            onClose={() => setShowDetail(false)}
+            certInfo={connection?.clientCert?.info}
+          />
+          <Typography variant="body2">
+            Client Certificate
+          </Typography>
+          <Chip
+            label="Details"
+            color="primary"
+            onClick={() => setShowDetail(true)}
+          />
+          <IconButton
+            aria-label="delete"
+            onClick={handleDeleteCert}
+            color="primary"
+            size="large"
+          >
+            <Trash />
+          </IconButton>
+        </Grid>
+      )}
+    </>
+  );
+
+  let clientCertSection = manualClientCertSection;
+  const supportsClientCertFromStore =
+    process.platform === 'win32' || process.platform === 'darwin';
+  if (supportsClientCertFromStore) {
+    clientCertSection = (
+      <>
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={clientCertFromStoreEnabled}
+                color="primary"
+                onChange={(evt): void =>
+                  saveClientCertFromStore(
+                    evt.target.checked ? {} : undefined,
+                  )
+                }
+              />
+            }
+            label="Search OS certificate store"
+          />
+          <FormHelperText sx={{ pl: 2 }}>
+            Searches for a client certificate based on the trusted CA
+            names provided in the TLS connection handshake.
+          </FormHelperText>
+        </Grid>
+        <NestedAccordion
+          sx={{ mt: 2 }}
+          disabled={!clientCertFromStoreEnabled}
+          expanded={clientCertFiltersExpanded}
+          onChange={(evt, expanded) =>
+            setClientCertFiltersExpanded(expanded)
+          }
+        >
+          <NestedAccordionSummary>
+            <Typography>
+              Additional OS certificate store filters
+              {!clientCertFiltersExpanded && clientCertFiltersSummary && (
+                <>
+                  :<br />
+                  {clientCertFiltersSummary}
+                </>
+              )}
+            </Typography>
+          </NestedAccordionSummary>
+          <NestedAccordionDetails>
+            {clientCertFromStoreEnabled && (
+              <>
+                <CertFilter
+                  label="Issuer Name"
+                  data={connection?.clientCertFromStore?.issuerFilter}
+                  onChange={saveClientCertIssuerFilter}
+                  disabled={!clientCertFromStoreEnabled}
+                />
+                <CertFilter
+                  label="Subject Name"
+                  data={connection?.clientCertFromStore?.subjectFilter}
+                  onChange={saveClientCertSubjectFilter}
+                  disabled={!clientCertFromStoreEnabled}
+                />
+              </>
+            )}
+          </NestedAccordionDetails>
+        </NestedAccordion>
+
+        <NestedAccordion sx={{ my: 2 }}>
+          <NestedAccordionSummary>
+            <Typography>Set client certificate manually</Typography>
+          </NestedAccordionSummary>
+          <NestedAccordionDetails>
+            <Grid container spacing={2} sx={{ pt: 1 }}>
+              {manualClientCertSection}
+            </Grid>
+          </NestedAccordionDetails>
+        </NestedAccordion>
+      </>
+    );
+  }
+
   return (
     <Container maxWidth={false}>
       <BeforeBackActionDialog
@@ -483,189 +682,7 @@ const ConnectForm: FC<Props> = () => {
                   Client certificates
                 </Typography>
               </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={clientCertFromStoreEnabled}
-                      color="primary"
-                      onChange={(evt): void =>
-                        saveClientCertFromStore(
-                          evt.target.checked ? {} : undefined,
-                        )
-                      }
-                    />
-                  }
-                  label="Search OS certificate store"
-                />
-                <FormHelperText sx={{ pl: 2 }}>
-                  Searches for a client certificate based on the trusted CA
-                  names provided in the TLS connection handshake.
-                </FormHelperText>
-              </Grid>
-              <NestedAccordion
-                sx={{ mt: 2 }}
-                disabled={!clientCertFromStoreEnabled}
-                expanded={clientCertFiltersExpanded}
-                onChange={(evt, expanded) =>
-                  setClientCertFiltersExpanded(expanded)
-                }
-              >
-                <NestedAccordionSummary>
-                  <Typography>
-                    Additional OS certificate store filters
-                    {!clientCertFiltersExpanded && clientCertFiltersSummary && (
-                      <>
-                        :<br />
-                        {clientCertFiltersSummary}
-                      </>
-                    )}
-                  </Typography>
-                </NestedAccordionSummary>
-                <NestedAccordionDetails>
-                  {clientCertFromStoreEnabled && (
-                    <>
-                      <CertFilter
-                        label="Issuer Name"
-                        data={connection?.clientCertFromStore?.issuerFilter}
-                        onChange={saveClientCertIssuerFilter}
-                        disabled={!clientCertFromStoreEnabled}
-                      />
-                      <CertFilter
-                        label="Subject Name"
-                        data={connection?.clientCertFromStore?.subjectFilter}
-                        onChange={saveClientCertSubjectFilter}
-                        disabled={!clientCertFromStoreEnabled}
-                      />
-                    </>
-                  )}
-                </NestedAccordionDetails>
-              </NestedAccordion>
-
-              <NestedAccordion sx={{ my: 2 }}>
-                <NestedAccordionSummary>
-                  <Typography>Set client certificate manually</Typography>
-                </NestedAccordionSummary>
-                <NestedAccordionDetails>
-                  <Grid container spacing={2} sx={{ pt: 1 }}>
-                    {showCertInput && (
-                      <Grid item xs={12}>
-                        <label htmlFor="cert-file">
-                          <input
-                            style={{ display: 'none' }}
-                            id="cert-file"
-                            ref={certRef}
-                            type="file"
-                            onChange={handleCertFile}
-                          />
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            component="span"
-                          >
-                            Client Certificate from File
-                          </Button>
-                        </label>
-                      </Grid>
-                    )}
-                    {showCertInput && (
-                      <Grid item xs={12}>
-                        <Typography variant="body2">
-                          Client Certificate Text
-                        </Typography>
-                        <TextArea
-                          fullWidth
-                          variant="filled"
-                          value={certText}
-                          multiline
-                          required={!!keyText}
-                          rows={5}
-                          placeholder="e.g. copy/paste the cert in PEM format"
-                          onChange={(evt): void =>
-                            saveCertText(evt.target.value)
-                          }
-                          spellCheck={false}
-                        />
-                        <FormHelperText sx={{ pl: 2 }}>
-                          Add a Client Certificate with the File Selector or
-                          Copy/Paste to the Text Area. Key is required if the
-                          Certificate is present.
-                        </FormHelperText>
-                      </Grid>
-                    )}
-                    {showCertInput && (
-                      <Grid item xs={12}>
-                        <label htmlFor="key-file">
-                          <input
-                            style={{ display: 'none' }}
-                            id="key-file"
-                            ref={keyRef}
-                            type="file"
-                            onChange={handleKeyFile}
-                          />
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            component="span"
-                          >
-                            Client Certificate Key from File
-                          </Button>
-                        </label>
-                      </Grid>
-                    )}
-                    {showCertInput && (
-                      <Grid item xs={12}>
-                        <Typography variant="body2">
-                          Client Certificate Key Text
-                        </Typography>
-                        <TextArea
-                          fullWidth
-                          variant="filled"
-                          value={keyText}
-                          required={!!certText}
-                          multiline
-                          rows={5}
-                          placeholder="e.g. copy/paste the key in PEM format"
-                          onChange={(evt): void =>
-                            saveKeyText(evt.target.value)
-                          }
-                        />
-                        <FormHelperText sx={{ pl: 2 }}>
-                          Add a Client Certificate Key with the File Selector or
-                          Copy/Paste to the Text Area. Certificate is required
-                          if the Key is present.
-                        </FormHelperText>
-                      </Grid>
-                    )}
-
-                    {!showCertInput && (
-                      <Grid item xs={12}>
-                        <CertDetails
-                          open={showDetail}
-                          onClose={() => setShowDetail(false)}
-                          certInfo={connection?.clientCert?.info}
-                        />
-                        <Typography variant="body2">
-                          Client Certificate
-                        </Typography>
-                        <Chip
-                          label="Details"
-                          color="primary"
-                          onClick={() => setShowDetail(true)}
-                        />
-                        <IconButton
-                          aria-label="delete"
-                          onClick={handleDeleteCert}
-                          color="primary"
-                          size="large"
-                        >
-                          <Trash />
-                        </IconButton>
-                      </Grid>
-                    )}
-                  </Grid>
-                </NestedAccordionDetails>
-              </NestedAccordion>
+              {clientCertSection}
             </Grid>
           </AccordionDetails>
         </Accordion>
