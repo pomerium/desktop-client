@@ -357,11 +357,7 @@ const ConnectForm: FC<Props> = () => {
               type="file"
               onChange={handleCertFile}
             />
-            <Button
-              variant="contained"
-              color="primary"
-              component="span"
-            >
+            <Button variant="contained" color="primary" component="span">
               Client Certificate from File
             </Button>
           </label>
@@ -369,9 +365,7 @@ const ConnectForm: FC<Props> = () => {
       )}
       {showCertInput && (
         <Grid item xs={12}>
-          <Typography variant="body2">
-            Client Certificate Text
-          </Typography>
+          <Typography variant="body2">Client Certificate Text</Typography>
           <TextArea
             fullWidth
             variant="filled"
@@ -380,15 +374,12 @@ const ConnectForm: FC<Props> = () => {
             required={!!keyText}
             rows={5}
             placeholder="e.g. copy/paste the cert in PEM format"
-            onChange={(evt): void =>
-              saveCertText(evt.target.value)
-            }
+            onChange={(evt): void => saveCertText(evt.target.value)}
             spellCheck={false}
           />
           <FormHelperText sx={{ pl: 2 }}>
-            Add a Client Certificate with the File Selector or
-            Copy/Paste to the Text Area. Key is required if the
-            Certificate is present.
+            Add a Client Certificate with the File Selector or Copy/Paste to the
+            Text Area. Key is required if the Certificate is present.
           </FormHelperText>
         </Grid>
       )}
@@ -402,11 +393,7 @@ const ConnectForm: FC<Props> = () => {
               type="file"
               onChange={handleKeyFile}
             />
-            <Button
-              variant="contained"
-              color="primary"
-              component="span"
-            >
+            <Button variant="contained" color="primary" component="span">
               Client Certificate Key from File
             </Button>
           </label>
@@ -414,9 +401,7 @@ const ConnectForm: FC<Props> = () => {
       )}
       {showCertInput && (
         <Grid item xs={12}>
-          <Typography variant="body2">
-            Client Certificate Key Text
-          </Typography>
+          <Typography variant="body2">Client Certificate Key Text</Typography>
           <TextArea
             fullWidth
             variant="filled"
@@ -425,14 +410,11 @@ const ConnectForm: FC<Props> = () => {
             multiline
             rows={5}
             placeholder="e.g. copy/paste the key in PEM format"
-            onChange={(evt): void =>
-              saveKeyText(evt.target.value)
-            }
+            onChange={(evt): void => saveKeyText(evt.target.value)}
           />
           <FormHelperText sx={{ pl: 2 }}>
-            Add a Client Certificate Key with the File Selector or
-            Copy/Paste to the Text Area. Certificate is required
-            if the Key is present.
+            Add a Client Certificate Key with the File Selector or Copy/Paste to
+            the Text Area. Certificate is required if the Key is present.
           </FormHelperText>
         </Grid>
       )}
@@ -444,9 +426,7 @@ const ConnectForm: FC<Props> = () => {
             onClose={() => setShowDetail(false)}
             certInfo={connection?.clientCert?.info}
           />
-          <Typography variant="body2">
-            Client Certificate
-          </Typography>
+          <Typography variant="body2">Client Certificate</Typography>
           <Chip
             label="Details"
             color="primary"
@@ -478,26 +458,22 @@ const ConnectForm: FC<Props> = () => {
                 checked={clientCertFromStoreEnabled}
                 color="primary"
                 onChange={(evt): void =>
-                  saveClientCertFromStore(
-                    evt.target.checked ? {} : undefined,
-                  )
+                  saveClientCertFromStore(evt.target.checked ? {} : undefined)
                 }
               />
             }
             label="Search OS certificate store"
           />
           <FormHelperText sx={{ pl: 2 }}>
-            Searches for a client certificate based on the trusted CA
-            names provided in the TLS connection handshake.
+            Searches for a client certificate based on the trusted CA names
+            provided in the TLS connection handshake.
           </FormHelperText>
         </Grid>
         <NestedAccordion
           sx={{ mt: 2 }}
           disabled={!clientCertFromStoreEnabled}
           expanded={clientCertFiltersExpanded}
-          onChange={(evt, expanded) =>
-            setClientCertFiltersExpanded(expanded)
-          }
+          onChange={(evt, expanded) => setClientCertFiltersExpanded(expanded)}
         >
           <NestedAccordionSummary>
             <Typography>
