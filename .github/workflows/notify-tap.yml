@@ -7,7 +7,7 @@ jobs:
 
     steps:
       - id: get_version
-        uses: pozetroninc/github-action-get-latest-release@d1dafdb6e338bdab109e6afce581a01858680dfb
+        uses: pozetroninc/github-action-get-latest-release@2a61c339ea7ef0a336d1daa35ef0cb1418e7676c
         with:
           repository: ${{ github.repository }}
 
