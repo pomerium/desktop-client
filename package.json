@@ -4,7 +4,7 @@
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
   "scripts": {
     "download": "npx ts-node .erb/scripts/DownloadBinaries.ts",
-    "dev-setup": "git clone https://github.com/pomerium/cli && ln -s $(pwd)/cli/bin/pomerium-cli assets/bin/ && cd cli && make build",
+    "dev-setup": "git clone https://github.com/pomerium/cli && ln -s $(pwd)/cli/bin/pomerium-cli assets/bin/ && cd cli && make build && yarn metadata",
     "build-cli": "cd cli && git pull origin; make build",
     "metadata": "npx ts-node .erb/scripts/WriteMetadata.ts",
     "build": "concurrently \"yarn download\" \"yarn metadata\"&& concurrently \"yarn build:main\" \"yarn build:renderer\"",
