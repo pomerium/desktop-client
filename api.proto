@@ -85,7 +85,8 @@ service Listener {
   // StatusUpdates opens a stream to listen to connection status updates
   // a client has to subscribe and continuously
   // listen to the broadcasted updates
-  rpc StatusUpdates(StatusUpdatesRequest) returns (stream ConnectionStatusUpdate);
+  rpc StatusUpdates(StatusUpdatesRequest)
+      returns (stream ConnectionStatusUpdate);
 }
 
 message ListenerUpdateRequest {
@@ -211,10 +212,18 @@ message ClientCertFromStore {
   optional string subject_filter = 2;
 }
 
+enum Protocol {
+  UNKNOWN = 0;
+  TCP = 1;
+  UDP = 2;
+}
+
 // Connection
 message Connection {
   // name is a user friendly connection name that a user may define
   optional string name = 1;
+  // the protocol to use for the connection
+  optional Protocol protocol = 10;
   // remote_addr is a remote pomerium host:port
   string remote_addr = 2;
   // listen_address, if not provided, will assign a random port each time

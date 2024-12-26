@@ -19,6 +19,45 @@ import * as _m0 from 'protobufjs/minimal';
 
 export const protobufPackage = 'pomerium.cli';
 
+export enum Protocol {
+  UNKNOWN = 0,
+  TCP = 1,
+  UDP = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function protocolFromJSON(object: any): Protocol {
+  switch (object) {
+    case 0:
+    case 'UNKNOWN':
+      return Protocol.UNKNOWN;
+    case 1:
+    case 'TCP':
+      return Protocol.TCP;
+    case 2:
+    case 'UDP':
+      return Protocol.UDP;
+    case -1:
+    case 'UNRECOGNIZED':
+    default:
+      return Protocol.UNRECOGNIZED;
+  }
+}
+
+export function protocolToJSON(object: Protocol): string {
+  switch (object) {
+    case Protocol.UNKNOWN:
+      return 'UNKNOWN';
+    case Protocol.TCP:
+      return 'TCP';
+    case Protocol.UDP:
+      return 'UDP';
+    case Protocol.UNRECOGNIZED:
+    default:
+      return 'UNRECOGNIZED';
+  }
+}
+
 /** Record represents a single tunnel record in the configuration */
 export interface Record {
   /** if omitted, a new record would be created */
@@ -322,6 +361,8 @@ export interface ClientCertFromStore {
 export interface Connection {
   /** name is a user friendly connection name that a user may define */
   name?: string | undefined;
+  /** the protocol to use for the connection */
+  protocol?: Protocol | undefined;
   /** remote_addr is a remote pomerium host:port */
   remoteAddr: string;
   /** listen_address, if not provided, will assign a random port each time */
@@ -2332,6 +2373,7 @@ export const ClientCertFromStore = {
 function createBaseConnection(): Connection {
   return {
     name: undefined,
+    protocol: undefined,
     remoteAddr: '',
     listenAddr: undefined,
     pomeriumUrl: undefined,
@@ -2349,6 +2391,9 @@ export const Connection = {
   ): _m0.Writer {
     if (message.name !== undefined) {
       writer.uint32(10).string(message.name);
+    }
+    if (message.protocol !== undefined) {
+      writer.uint32(80).int32(message.protocol);
     }
     if (message.remoteAddr !== '') {
       writer.uint32(18).string(message.remoteAddr);
@@ -2387,6 +2432,9 @@ export const Connection = {
         case 1:
           message.name = reader.string();
           break;
+        case 10:
+          message.protocol = reader.int32() as any;
+          break;
         case 2:
           message.remoteAddr = reader.string();
           break;
@@ -2422,6 +2470,9 @@ export const Connection = {
   fromJSON(object: any): Connection {
     return {
       name: isSet(object.name) ? String(object.name) : undefined,
+      protocol: isSet(object.protocol)
+        ? protocolFromJSON(object.protocol)
+        : undefined,
       remoteAddr: isSet(object.remoteAddr) ? String(object.remoteAddr) : '',
       listenAddr: isSet(object.listenAddr)
         ? String(object.listenAddr)
@@ -2445,6 +2496,11 @@ export const Connection = {
   toJSON(message: Connection): unknown {
     const obj: any = {};
     message.name !== undefined && (obj.name = message.name);
+    message.protocol !== undefined &&
+      (obj.protocol =
+        message.protocol !== undefined
+          ? protocolToJSON(message.protocol)
+          : undefined);
     message.remoteAddr !== undefined && (obj.remoteAddr = message.remoteAddr);
     message.listenAddr !== undefined && (obj.listenAddr = message.listenAddr);
     message.pomeriumUrl !== undefined &&
@@ -2472,6 +2528,7 @@ export const Connection = {
   ): Connection {
     const message = createBaseConnection();
     message.name = object.name ?? undefined;
+    message.protocol = object.protocol ?? undefined;
     message.remoteAddr = object.remoteAddr ?? '';
     message.listenAddr = object.listenAddr ?? undefined;
     message.pomeriumUrl = object.pomeriumUrl ?? undefined;
