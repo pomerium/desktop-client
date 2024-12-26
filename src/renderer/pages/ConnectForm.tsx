@@ -246,7 +246,7 @@ const ConnectForm: FC<Props> = () => {
     useState(false);
 
   const saveClientCertFromStore = (
-    value: ClientCertFromStore | undefined
+    value: ClientCertFromStore | undefined,
   ): void => {
     setConnection({
       ...connection,
@@ -272,7 +272,7 @@ const ConnectForm: FC<Props> = () => {
   };
 
   const clientCertFiltersSummary = getClientCertFiltersSummary(
-    connection?.clientCertFromStore
+    connection?.clientCertFromStore,
   );
 
   const saveCertText = (value: string): void => {

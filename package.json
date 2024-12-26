@@ -311,7 +311,8 @@
         }
       }
     ],
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "all"
   },
   "renovate": {
     "extends": [
