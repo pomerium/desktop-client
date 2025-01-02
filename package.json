@@ -253,7 +253,7 @@
     "webpack": "^5.94.0",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^5.1.0",
+    "webpack-dev-server": "^4.15.2",
     "webpack-merge": "^5.10.0",
     "yarn-deduplicate": "^6.0.2"
   },
