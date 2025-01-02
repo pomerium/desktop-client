@@ -16,7 +16,7 @@ import {
   MessageBoxOptions,
 } from 'electron';
 import * as grpc from '@grpc/grpc-js';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { menubar } from 'menubar';

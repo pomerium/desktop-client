@@ -1,5 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 import { ChannelCredentials } from '@grpc/grpc-js';
 import { createServer } from 'net';
 
@@ -39,10 +39,14 @@ export async function start(sentryDSN: string): Promise<CLI> {
   });
   process.on('close', (code, signal) => {
     if (signal != null) return;
-    Sentry.captureEvent({
-      message: 'API process unexpectedly quit',
-      extra: { code },
-    });
+    if ((code || 0) > 0) {
+      // code == -2 when the child process didn't start at all,
+      // code == 0 when we close the child process
+      Sentry.captureEvent({
+        message: 'API process unexpectedly quit',
+        extra: { code },
+      });
+    }
   });
 
   const configClient = new ConfigClient(
