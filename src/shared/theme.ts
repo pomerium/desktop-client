@@ -9,9 +9,9 @@ import {
 } from '@mui/material/styles';
 import _ from 'lodash';
 
+import { THEMES } from './constants';
 import { softShadows, strongShadows } from './shadows';
 import typography from './typography';
-import { THEMES } from './constants';
 
 export interface ThemeConfig {
   responsiveFontSizes?: boolean;

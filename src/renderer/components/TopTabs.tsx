@@ -1,6 +1,7 @@
 import { AppBar, Grid, Tab, Tabs, Toolbar, Typography } from '@mui/material';
 import React, { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
+
 import metadata from '../../meta.json';
 
 function TopTabs(): ReactElement {

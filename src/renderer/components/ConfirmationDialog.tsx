@@ -1,4 +1,3 @@
-import React, { FC, ReactElement } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -7,6 +6,7 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
+import React, { FC, ReactElement } from 'react';
 
 export interface ConfirmationDialogProps {
   title: string;

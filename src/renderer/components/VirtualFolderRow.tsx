@@ -1,6 +1,7 @@
-import * as React from 'react';
 import { Typography, Grid, IconButton, Divider } from '@mui/material';
+import * as React from 'react';
 import { PropsWithChildren, ReactElement } from 'react';
+
 import VirtualClosedFolder from '../icons/VirtualClosedFolder';
 import VirtualOpenFolder from '../icons/VirtualOpenFolder';
 

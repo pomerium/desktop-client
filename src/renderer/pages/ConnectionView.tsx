@@ -1,4 +1,3 @@
-import React, { ReactElement, useEffect, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -17,11 +16,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { AlertTriangle, ChevronDown, Info } from 'react-feather';
 import { useSnackbar } from 'notistack';
-import StyledCard from '../components/StyledCard';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { AlertTriangle, ChevronDown, Info } from 'react-feather';
+import { useParams } from 'react-router-dom';
+
 import {
   DELETE,
   EDIT,
@@ -34,11 +34,6 @@ import {
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
-import Connected from '../icons/Connected';
-import Disconnected from '../icons/Disconnected';
-import Edit from '../icons/Edit';
-import Export from '../icons/Export';
-import Delete from '../icons/Delete';
 import {
   Connection,
   ConnectionStatusUpdate,
@@ -46,12 +41,18 @@ import {
   Record,
   Selector,
 } from '../../shared/pb/api';
-import ExportJSON from '../icons/ExportJSON';
 import CertDetails from '../components/CertDetails';
+import { getClientCertFiltersSummary } from '../components/ClientCertSelection';
 import ExportDialog, {
   IpcRendererEventListener,
 } from '../components/ExportDialog';
-import { getClientCertFiltersSummary } from '../components/ClientCertSelection';
+import StyledCard from '../components/StyledCard';
+import Connected from '../icons/Connected';
+import Delete from '../icons/Delete';
+import Disconnected from '../icons/Disconnected';
+import Edit from '../icons/Edit';
+import Export from '../icons/Export';
+import ExportJSON from '../icons/ExportJSON';
 
 type SimplifiedLog = {
   status: 'info' | 'error';

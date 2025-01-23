@@ -1,4 +1,3 @@
-import React, { ReactElement, useEffect, useState } from 'react';
 import {
   Button,
   CardContent,
@@ -6,18 +5,12 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import { Save, Plus, Upload } from 'react-feather';
-import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
-import TagFolderRow from '../components/TagFolderRow';
-import ConnectionRow from '../components/ConnectionRow';
-import VirtualFolderRow from '../components/VirtualFolderRow';
-import {
-  ListenerStatus,
-  Record as ListenerRecord,
-  Selector,
-} from '../../shared/pb/api';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { Save, Plus, Upload } from 'react-feather';
+import { Link } from 'react-router-dom';
+
 import {
   DELETE,
   EXPORT,
@@ -30,10 +23,18 @@ import {
   TOAST_LENGTH,
   VIEW,
 } from '../../shared/constants';
+import {
+  ListenerStatus,
+  Record as ListenerRecord,
+  Selector,
+} from '../../shared/pb/api';
+import ConnectionRow from '../components/ConnectionRow';
 import ExportDialog, {
   IpcRendererEventListener,
 } from '../components/ExportDialog';
 import StyledCard from '../components/StyledCard';
+import TagFolderRow from '../components/TagFolderRow';
+import VirtualFolderRow from '../components/VirtualFolderRow';
 
 function ManageConnections(): ReactElement {
   const [folderNames, setFolderNames] = useState([] as string[]);

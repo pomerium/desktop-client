@@ -9,6 +9,7 @@ import {
 } from 'electron';
 import { Menubar } from 'menubar';
 import path from 'path';
+
 import { getAssetPath, menuIconPath } from '../main/binaries';
 import { UPDATE_LISTENERS } from '../shared/constants';
 import { ListenerStatus, Record } from '../shared/pb/api';
