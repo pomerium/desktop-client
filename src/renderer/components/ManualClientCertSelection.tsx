@@ -1,5 +1,3 @@
-import React, { FC, useEffect, useState } from 'react';
-import { Connection } from '../../shared/pb/api';
 import {
   Button,
   Chip,
@@ -8,10 +6,13 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
-import TextArea from './TextArea';
-import CertDetails from './CertDetails';
-import { Trash } from 'react-feather';
 import { set } from 'lodash';
+import React, { FC, useEffect, useState } from 'react';
+import { Trash } from 'react-feather';
+
+import { Connection } from '../../shared/pb/api';
+import CertDetails from './CertDetails';
+import TextArea from './TextArea';
 
 export type ManualClientCertSelectionProps = {
   connection: Connection;

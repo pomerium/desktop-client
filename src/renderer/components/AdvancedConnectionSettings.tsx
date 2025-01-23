@@ -6,9 +6,10 @@ import {
   Typography,
 } from '@mui/material';
 import React, { FC } from 'react';
-import TextField from './TextField';
+
 import { Connection } from '../../shared/pb/api';
 import ClientCertSelection from './ClientCertSelection';
+import TextField from './TextField';
 
 export type AdvancedConnectionSettingsProps = {
   connection: Connection;

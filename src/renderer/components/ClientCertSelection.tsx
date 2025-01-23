@@ -1,6 +1,3 @@
-import React, { ChangeEvent, FC, useState } from 'react';
-import { ClientCertFromStore, Connection } from '../../shared/pb/api';
-import ManualClientCertSelection from './ManualClientCertSelection';
 import {
   FormControlLabel,
   FormHelperText,
@@ -8,10 +5,14 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import NestedAccordion from './NestedAccordion';
-import NestedAccordionSummary from './NestedAccordionSummary';
-import NestedAccordionDetails from './NestedAccordionDetails';
+import React, { FC, useState } from 'react';
+
+import { ClientCertFromStore, Connection } from '../../shared/pb/api';
 import CertFilter from './CertFilter';
+import ManualClientCertSelection from './ManualClientCertSelection';
+import NestedAccordion from './NestedAccordion';
+import NestedAccordionDetails from './NestedAccordionDetails';
+import NestedAccordionSummary from './NestedAccordionSummary';
 
 export function getClientCertFiltersSummary(c?: ClientCertFromStore): string {
   const filters: string[] = [];

@@ -10,11 +10,12 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import React, { FC, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { CheckCircle, ChevronDown } from 'react-feather';
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
+import React, { FC, useEffect, useState } from 'react';
+import { CheckCircle, ChevronDown } from 'react-feather';
+import { useParams } from 'react-router-dom';
+
 import {
   GET_RECORDS,
   GET_UNIQUE_TAGS,
@@ -23,12 +24,12 @@ import {
   VIEW,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
-import TextField from '../components/TextField';
-import StyledCard from '../components/StyledCard';
-import { formatTag } from '../../shared/validators';
 import { Connection, Record, Selector } from '../../shared/pb/api';
-import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
+import { formatTag } from '../../shared/validators';
 import AdvancedConnectionSettings from '../components/AdvancedConnectionSettings';
+import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
+import StyledCard from '../components/StyledCard';
+import TextField from '../components/TextField';
 
 interface Props {
   onComplete?: () => void;
