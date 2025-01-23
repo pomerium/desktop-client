@@ -1,5 +1,4 @@
 /* eslint global-require: off, no-console: off */
-
 /**
  * This module executes inside of electron's main process. You can start
  * electron renderer process from here and communicate with the other processes
@@ -8,6 +7,8 @@
  * When running `yarn build` or `yarn build-main`, this file is compiled to
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
+import * as grpc from '@grpc/grpc-js';
+import * as Sentry from '@sentry/electron/main';
 import {
   app,
   BrowserWindow,
@@ -15,15 +16,15 @@ import {
   ipcMain,
   MessageBoxOptions,
 } from 'electron';
-import * as grpc from '@grpc/grpc-js';
-import * as Sentry from '@sentry/electron/main';
+import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import { menubar } from 'menubar';
-import * as url from 'url';
-import path from 'path';
 import fs from 'fs';
-import contextMenu from 'electron-context-menu';
+import { menubar } from 'menubar';
+import path from 'path';
+import * as url from 'url';
+
+import { start } from './cli';
 import createWindow from './renderer/window';
 import {
   isDev,
@@ -47,7 +48,6 @@ import {
   LISTENER_LOG,
   GET_ALL_RECORDS,
 } from './shared/constants';
-import Helper from './trayMenu/helper';
 import {
   ConnectionStatusUpdate,
   ExportRequest,
@@ -58,7 +58,7 @@ import {
   Selector,
   StatusUpdatesRequest,
 } from './shared/pb/api';
-import { start } from './cli';
+import Helper from './trayMenu/helper';
 
 const SentryDSN =
   'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413';
@@ -279,7 +279,7 @@ async function init(): Promise<void> {
             const bytes = fs.readFileSync(response.filePaths[0], null);
             configClient.import(
               {
-                data: bytes,
+                data: bytes as unknown as Uint8Array,
               } as ImportRequest,
               (err, res) => {
                 evt?.sender?.send(IMPORT, { err, res });

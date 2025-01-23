@@ -1,6 +1,6 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import * as Sentry from '@sentry/electron/main';
 import { ChannelCredentials } from '@grpc/grpc-js';
+import * as Sentry from '@sentry/electron/main';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { createServer } from 'net';
 
 import { pomeriumCli } from './main/binaries';

@@ -5,6 +5,7 @@ import {
   BrowserWindow,
   MenuItemConstructorOptions,
 } from 'electron';
+
 import { isDev, prodDebug } from '../shared/constants';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {

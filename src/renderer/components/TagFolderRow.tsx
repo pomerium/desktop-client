@@ -1,5 +1,3 @@
-import * as React from 'react';
-import { PropsWithChildren, ReactElement } from 'react';
 import {
   Divider,
   Grid,
@@ -8,8 +6,11 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
-import { MoreVertical } from 'react-feather';
 import { ipcRenderer } from 'electron';
+import * as React from 'react';
+import { PropsWithChildren, ReactElement } from 'react';
+import { MoreVertical } from 'react-feather';
+
 import {
   CONNECT_ALL,
   DELETE_ALL,
@@ -18,9 +19,9 @@ import {
   ExportFile,
   UPDATE_LISTENERS,
 } from '../../shared/constants';
+import { ListenerUpdateRequest, Selector } from '../../shared/pb/api';
 import ClosedFolder from '../icons/ClosedFolder';
 import OpenFolder from '../icons/OpenFolder';
-import { ListenerUpdateRequest, Selector } from '../../shared/pb/api';
 import ConfirmationDialog, {
   ConfirmationDialogProps,
 } from './ConfirmationDialog';
