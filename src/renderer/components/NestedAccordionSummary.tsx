@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { AccordionSummary, AccordionSummaryProps, styled } from '@mui/material';
 import React from 'react';
 import { ChevronRight } from 'react-feather';

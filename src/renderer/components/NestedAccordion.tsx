@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { Accordion, AccordionProps, styled } from '@mui/material';
 import React from 'react';
 
