@@ -30,7 +30,7 @@ const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
     onChange(attribute + '=' + newValue);
   };
 
-  const valueInputRef = useRef(null);
+  const valueInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     valueInputRef.current?.focus();
   }, [attribute]);

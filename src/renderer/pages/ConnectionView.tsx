@@ -51,7 +51,7 @@ import CertDetails from '../components/CertDetails';
 import ExportDialog, {
   IpcRendererEventListener,
 } from '../components/ExportDialog';
-import { getClientCertFiltersSummary } from './ConnectForm';
+import { getClientCertFiltersSummary } from '../components/ClientCertSelection';
 
 type SimplifiedLog = {
   status: 'info' | 'error';
