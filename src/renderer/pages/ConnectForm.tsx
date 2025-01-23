@@ -44,6 +44,7 @@ import {
 import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
 import CertDetails from '../components/CertDetails';
 import CertFilter from '../components/CertFilter';
+import ManualClientCertSelection from '../components/ManualClientCertSelection';
 
 export const TextArea = styled(TextField)({
   '& div.MuiFilledInput-root': {
@@ -146,8 +147,6 @@ const ConnectForm: FC<Props> = () => {
   };
   const { connectionID } = useParams();
   const { enqueueSnackbar } = useSnackbar();
-  const certRef = React.useRef<HTMLInputElement>(null);
-  const keyRef = React.useRef<HTMLInputElement>(null);
   const [certText, setCertText] = useState('');
   const [keyText, setKeyText] = useState('');
   const [showCertInput, setShowCertInput] = useState(false);
@@ -284,24 +283,6 @@ const ConnectForm: FC<Props> = () => {
     });
   };
 
-  const handleCertFile = (evt) => {
-    const file = evt.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      saveCertText(e?.target?.result as string);
-    };
-    reader.readAsText(file);
-  };
-
-  const handleKeyFile = (evt) => {
-    const file = evt.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      saveKeyText(e?.target?.result as string);
-    };
-    reader.readAsText(file);
-  };
-
   const handleDeleteCert = () => {
     setConnection((oldConnection) => {
       oldConnection.clientCert = undefined;
@@ -348,75 +329,10 @@ const ConnectForm: FC<Props> = () => {
   const manualClientCertSection = (
     <>
       {showCertInput && (
-        <Grid item xs={12}>
-          <label htmlFor="cert-file">
-            <input
-              style={{ display: 'none' }}
-              id="cert-file"
-              ref={certRef}
-              type="file"
-              onChange={handleCertFile}
-            />
-            <Button variant="contained" color="primary" component="span">
-              Client Certificate from File
-            </Button>
-          </label>
-        </Grid>
-      )}
-      {showCertInput && (
-        <Grid item xs={12}>
-          <Typography variant="body2">Client Certificate Text</Typography>
-          <TextArea
-            fullWidth
-            variant="filled"
-            value={certText}
-            multiline
-            required={!!keyText}
-            rows={5}
-            placeholder="e.g. copy/paste the cert in PEM format"
-            onChange={(evt): void => saveCertText(evt.target.value)}
-            spellCheck={false}
-          />
-          <FormHelperText sx={{ pl: 2 }}>
-            Add a Client Certificate with the File Selector or Copy/Paste to the
-            Text Area. Key is required if the Certificate is present.
-          </FormHelperText>
-        </Grid>
-      )}
-      {showCertInput && (
-        <Grid item xs={12}>
-          <label htmlFor="key-file">
-            <input
-              style={{ display: 'none' }}
-              id="key-file"
-              ref={keyRef}
-              type="file"
-              onChange={handleKeyFile}
-            />
-            <Button variant="contained" color="primary" component="span">
-              Client Certificate Key from File
-            </Button>
-          </label>
-        </Grid>
-      )}
-      {showCertInput && (
-        <Grid item xs={12}>
-          <Typography variant="body2">Client Certificate Key Text</Typography>
-          <TextArea
-            fullWidth
-            variant="filled"
-            value={keyText}
-            required={!!certText}
-            multiline
-            rows={5}
-            placeholder="e.g. copy/paste the key in PEM format"
-            onChange={(evt): void => saveKeyText(evt.target.value)}
-          />
-          <FormHelperText sx={{ pl: 2 }}>
-            Add a Client Certificate Key with the File Selector or Copy/Paste to
-            the Text Area. Certificate is required if the Key is present.
-          </FormHelperText>
-        </Grid>
+        <ManualClientCertSelection
+          onChangeCert={saveCertText}
+          onChangeKey={saveKeyText}
+        />
       )}
 
       {!showCertInput && (

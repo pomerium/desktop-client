@@ -265,6 +265,7 @@
     "@emotion/styled": "^11.11.5",
     "@fontsource/dm-sans": "^5.0.20",
     "@grpc/grpc-js": "^1.9.15",
+    "@mui/icons-material": "^6.4.1",
     "@mui/lab": "^5.0.0-alpha.161",
     "@mui/material": "^5.15.5",
     "@mui/styles": "^5.15.5",

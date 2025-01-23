@@ -6,6 +6,7 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Save, Plus, Upload } from 'react-feather';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
@@ -34,6 +35,7 @@ import ExportDialog, {
   IpcRendererEventListener,
 } from '../components/ExportDialog';
 import StyledCard from '../components/StyledCard';
+import NewConnectionButton from '../components/NewConnectionButton';
 
 function ManageConnections(): ReactElement {
   const [folderNames, setFolderNames] = useState([] as string[]);
@@ -216,16 +218,7 @@ function ManageConnections(): ReactElement {
               )}
               {connections?.length > 0 && <Grid item xs={1} />}
               <Grid item>
-                <Button
-                  type="button"
-                  variant="contained"
-                  component={Link}
-                  to="/connectForm"
-                  color="primary"
-                  endIcon={<Plus />}
-                >
-                  New Connection
-                </Button>
+                <NewConnectionButton />
               </Grid>
             </Grid>
           </Grid>
