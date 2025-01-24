@@ -47,6 +47,9 @@ import {
   ExportFile,
   LISTENER_LOG,
   GET_ALL_RECORDS,
+  FETCH_ROUTES,
+  FetchRoutesResponseArgs,
+  GetRecordsResponseArgs,
 } from './shared/constants';
 import {
   ConnectionStatusUpdate,
@@ -57,6 +60,7 @@ import {
   Record as ListenerRecord,
   Selector,
   StatusUpdatesRequest,
+  FetchRoutesRequest,
 } from './shared/pb/api';
 import Helper from './trayMenu/helper';
 
@@ -175,10 +179,8 @@ async function init(): Promise<void> {
     ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
       const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
       configClient.list(selector, (err, res) => {
-        sendTo?.send(GET_RECORDS, {
-          err,
-          res,
-        });
+        const args: GetRecordsResponseArgs = { err, res };
+        sendTo?.send(GET_RECORDS, args);
         if (!err && res) {
           if (selector.all) {
             trayMenuHelper.setRecords(res.records);
@@ -200,10 +202,8 @@ async function init(): Promise<void> {
           tags: [],
         } as Selector,
         (err, res) => {
-          sendTo?.send(GET_ALL_RECORDS, {
-            err,
-            res,
-          });
+          const args: GetRecordsResponseArgs = { err, res };
+          sendTo?.send(GET_ALL_RECORDS, args);
           if (!err && res) {
             trayMenuHelper.setRecords(res.records);
             menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
@@ -336,6 +336,13 @@ async function init(): Promise<void> {
       });
       // empty function otherwise causes fatal error on cancel !!!
       updateStream.on('error', () => {});
+    });
+    ipcMain.on(FETCH_ROUTES, (evt, args) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      configClient.fetchRoutes(args as FetchRoutesRequest, (err, res) => {
+        const args: FetchRoutesResponseArgs = { err, res };
+        sendTo?.send(FETCH_ROUTES, args);
+      });
     });
     menu.app.on('web-contents-created', () => {
       contextMenu();

@@ -22,6 +22,7 @@ import SnackbarCloseButton from './renderer/components/SnackbarCloseButton';
 import ConnectForm from './renderer/pages/ConnectForm';
 import ConnectionView from './renderer/pages/ConnectionView';
 import Layout from './renderer/pages/Layout';
+import LoadForm from './renderer/pages/LoadForm';
 import ManageConnections from './renderer/pages/ManageConnections';
 import { THEMES } from './shared/constants';
 import createCustomTheme, { ThemeConfig } from './shared/theme';
@@ -74,6 +75,7 @@ const App: FC = () => {
                       element={<Navigate to="/manage" replace />}
                     />
                     <Route path="/manage" element={<ManageConnections />} />
+                    <Route path="/loadForm" element={<LoadForm />} />
                     <Route
                       path="/view_connection/:connectionID"
                       element={<ConnectionView />}

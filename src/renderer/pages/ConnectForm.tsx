@@ -1,9 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Autocomplete,
   Button,
   CardContent,
   Container,
@@ -13,7 +9,7 @@ import {
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
 import React, { FC, useEffect, useState } from 'react';
-import { CheckCircle, ChevronDown } from 'react-feather';
+import { CheckCircle } from 'react-feather';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -25,10 +21,11 @@ import {
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
 import { Connection, Record, Selector } from '../../shared/pb/api';
-import { formatTag } from '../../shared/validators';
 import AdvancedConnectionSettings from '../components/AdvancedConnectionSettings';
+import AdvancedSettingsAccordion from '../components/AdvancedSettingsAccordion';
 import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
 import StyledCard from '../components/StyledCard';
+import TagSelector from '../components/TagSelector';
 import TextField from '../components/TextField';
 
 interface Props {
@@ -51,7 +48,6 @@ const ConnectForm: FC<Props> = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [connection, setConnection] = useState(initialConnData);
   const [originalConnection, setOriginalConnection] = useState(initialConnData);
-  const [tagOptions, setTagOptions] = useState([] as string[]);
   const handleSubmit = (evt: React.FormEvent): void => {
     evt.preventDefault();
   };
@@ -72,12 +68,6 @@ const ConnectForm: FC<Props> = () => {
         setOriginalConnection(conn || initialConnData);
       }
     });
-    ipcRenderer.once(GET_UNIQUE_TAGS, (_, args) => {
-      if (args.tags && !args.err) {
-        setTagOptions(args.tags);
-      }
-    });
-    ipcRenderer.send(GET_UNIQUE_TAGS);
 
     if (connectionID) {
       ipcRenderer.send(GET_RECORDS, {
@@ -98,8 +88,6 @@ const ConnectForm: FC<Props> = () => {
       ...{ name: value || undefined },
     });
   };
-
-  const saveTags = (arr: string[]): void => setTags(arr.map(formatTag));
 
   const saveDestination = (value: string): void => {
     setConnection({
@@ -209,62 +197,18 @@ const ConnectForm: FC<Props> = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Autocomplete
-                  multiple
-                  id="tags-outlined"
-                  options={tagOptions}
-                  value={tags || []}
-                  onChange={(_, arr) => {
-                    saveTags(arr);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Tags..."
-                      placeholder="Tags"
-                      onKeyDown={(e) => {
-                        const element = e.target as HTMLInputElement;
-                        const { value } = element;
-                        if (e.key === 'Enter' && value.trim()) {
-                          saveTags(tags.concat(value));
-                        }
-                      }}
-                    />
-                  )}
-                />
+                <TagSelector tags={tags} onChangeTags={setTags} />
               </Grid>
             </Grid>
           </CardContent>
         </StyledCard>
 
-        <Accordion
-          sx={{
-            backgroundColor: 'background.paper',
-            marginTop: 2,
-            paddingLeft: 2,
-            paddingRight: 2,
-            borderRadius: 4,
-            '&:before': {
-              display: 'none',
-            },
-          }}
-          square={false}
-        >
-          <AccordionSummary
-            expandIcon={<ChevronDown />}
-            aria-controls="advanced-settings-content"
-            id="advanced-settings-header"
-          >
-            <Typography variant="h5">Advanced Settings</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <AdvancedConnectionSettings
-              connection={connection}
-              onChangeConnection={setConnection}
-            />
-          </AccordionDetails>
-        </Accordion>
+        <AdvancedSettingsAccordion>
+          <AdvancedConnectionSettings
+            connection={connection}
+            onChangeConnection={setConnection}
+          />
+        </AdvancedSettingsAccordion>
 
         <Grid
           container

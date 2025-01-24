@@ -142,6 +142,14 @@ export default class Helper {
     });
 
     template.push({
+      label: 'Load Connections',
+      click() {
+        appWindow?.webContents.send('redirectTo', '/loadForm');
+        appWindow?.show();
+      },
+    });
+
+    template.push({
       label: 'Manage Connections',
       click() {
         appWindow?.webContents.send('redirectTo', '/manage');
