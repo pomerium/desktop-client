@@ -340,7 +340,7 @@ async function init(): Promise<void> {
     ipcMain.on(FETCH_ROUTES, (evt, args) => {
       const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
       configClient.fetchRoutes(args as FetchRoutesRequest, (err, res) => {
-        const args: FetchRoutesResponseArgs = { err, res };
+        const out: FetchRoutesResponseArgs = { err, res };
         sendTo?.send(FETCH_ROUTES, args);
       });
     });

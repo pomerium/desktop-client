@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {
   Button,
@@ -42,6 +43,8 @@ const NewConnectionButton: FC = () => {
         navigate(`/connectForm`, {
           replace: true,
         });
+        break;
+      default:
         break;
     }
   };

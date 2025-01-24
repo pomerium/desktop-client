@@ -9,8 +9,7 @@ import {
 import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
 import React, { ReactElement, useEffect, useState } from 'react';
-import { Save, Plus, Upload } from 'react-feather';
-import { Link } from 'react-router-dom';
+import { Save, Upload } from 'react-feather';
 
 import {
   DELETE,

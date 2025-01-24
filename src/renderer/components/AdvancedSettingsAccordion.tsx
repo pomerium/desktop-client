@@ -7,7 +7,7 @@ import {
 import React, { FC } from 'react';
 import { ChevronDown } from 'react-feather';
 
-export type AdvancedSettingsAccordionProps = React.PropsWithChildren<{}>;
+export type AdvancedSettingsAccordionProps = React.PropsWithChildren;
 const AdvancedSettingsAccordion: FC<AdvancedSettingsAccordionProps> = ({
   children,
 }) => {
