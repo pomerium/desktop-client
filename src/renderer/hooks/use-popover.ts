@@ -9,7 +9,7 @@ interface PopoverController<T> {
   open: boolean;
 }
 
-export function usePopover<T = HTMLElement>(): PopoverController<T> {
+function usePopover<T = HTMLElement>(): PopoverController<T> {
   const anchorRef = useRef<T | null>(null);
   const [open, setOpen] = useState<boolean>(false);
 
@@ -33,3 +33,4 @@ export function usePopover<T = HTMLElement>(): PopoverController<T> {
     open,
   };
 }
+export default usePopover;

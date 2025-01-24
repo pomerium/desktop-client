@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { Autocomplete } from '@mui/material';
 import { ipcRenderer } from 'electron';
 import React, { FC, useEffect, useState } from 'react';

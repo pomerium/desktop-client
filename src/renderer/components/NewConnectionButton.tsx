@@ -14,7 +14,7 @@ import {
 import React, { FC, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { usePopover } from '../hooks/use-popover';
+import usePopover from '../hooks/use-popover';
 
 const NewConnectionButton: FC = () => {
   const popover = usePopover<HTMLButtonElement>();
@@ -94,9 +94,9 @@ const NewConnectionButton: FC = () => {
                   {options.map((option) => (
                     <MenuItem
                       key={option.key}
-                      onClick={(_event) => handleMenuItemClick(option.key)}
+                      onClick={() => handleMenuItemClick(option.key)}
                       sx={{ borderRadius: 1 }}
-                      divider={true}
+                      divider
                     >
                       <Stack
                         direction="row"

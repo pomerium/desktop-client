@@ -1,8 +1,5 @@
 module.exports = {
-  extends: [
-      'erb',
-      'plugin:@typescript-eslint/recommended',
-  ],
+  extends: ['erb', 'plugin:@typescript-eslint/recommended'],
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
@@ -24,6 +21,8 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-this-alias': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    'no-await-in-loop': 'off',
+    'no-continue': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

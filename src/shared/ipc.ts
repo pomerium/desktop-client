@@ -10,8 +10,8 @@ import {
 
 function invoke(name: string, ...args: any[]): Promise<any> {
   return new Promise((resolve, reject) => {
-    ipcRenderer.once(name, (_evt, args) => {
-      const { res, err } = args;
+    ipcRenderer.once(name, (_evt, result) => {
+      const { res, err } = result;
       if (err) {
         reject(err);
       } else {
