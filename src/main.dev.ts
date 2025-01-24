@@ -48,7 +48,6 @@ import {
   LISTENER_LOG,
   GET_ALL_RECORDS,
   FETCH_ROUTES,
-  FetchRoutesResponseArgs,
   GetRecordsResponseArgs,
 } from './shared/constants';
 import {

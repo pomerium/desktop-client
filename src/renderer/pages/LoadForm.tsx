@@ -96,7 +96,7 @@ async function reconcileConnections(
   await getAllRecords();
 }
 
-const LoadForm: FC = ({}) => {
+const LoadForm: FC = () => {
   const [serverUrl, setServerUrl] = useLocalStorage('LoadForm/serverUrl', '');
   const [connection, setConnection] = useLocalStorage(
     'LoadForm/connection',

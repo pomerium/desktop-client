@@ -53,11 +53,6 @@ export const THEMES = {
   DARK: 'DARK',
 };
 
-export interface FetchRoutesResponseArgs {
-  err?: ServiceError | null;
-  res?: FetchRoutesResponse;
-}
-
 export interface GetRecordsResponseArgs {
   err?: ServiceError | null;
   res?: Records;
