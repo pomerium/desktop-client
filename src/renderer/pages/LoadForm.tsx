@@ -13,7 +13,7 @@ import {
 import { ipcRenderer } from 'electron';
 import { defaults, isEqual } from 'lodash';
 import { enqueueSnackbar } from 'notistack';
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 
 import {
@@ -26,6 +26,7 @@ import {
   TOAST_LENGTH,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
+import { fetchRoutes, getAllRecords, saveRecord } from '../../shared/ipc';
 import {
   Connection,
   FetchRoutesRequest,
@@ -64,52 +65,47 @@ function portalRouteToRecord(
   );
 }
 
-function reconcileConnections(baseRecord: Record, portalRoutes: PortalRoute[]) {
-  ipcRenderer.once(GET_ALL_RECORDS, (_, args) => {
-    const { err, res }: GetRecordsResponseArgs = args;
-    if (err) {
-      enqueueSnackbar(err.message, {
-        variant: 'error',
-        autoHideDuration: TOAST_LENGTH,
+async function reconcileConnections(
+  baseRecord: Record,
+  portalRoutes: PortalRoute[],
+) {
+  const res = await getAllRecords();
+
+  const currentRecords = new Map<string, Record>(
+    res?.records
+      ?.filter((r) => r.source?.startsWith('portal-route-'))
+      ?.map((r) => [r.source || '', r]) || [],
+  );
+  const newRecords = new Map<string, Record>(
+    portalRoutes
+      ?.filter((pr) => pr.type === 'tcp' || pr.type === 'udp')
+      ?.map((pr) => portalRouteToRecord(baseRecord, pr))
+      ?.map((r) => [r.source || '', r]) || [],
+  );
+
+  // remove current records which have been deleted
+  for (const [k, r] of currentRecords) {
+    if (!newRecords.has(k)) {
+      ipcRenderer.send(DELETE, {
+        ids: [r.id],
       });
+    }
+  }
+
+  // add or update new records which have changed
+  for (const [k, r] of newRecords) {
+    const cr = currentRecords.get(k);
+    if (!cr) {
+      await saveRecord(r);
       return;
     }
-
-    const currentRecords = new Map<string, Record>(
-      res?.records
-        ?.filter((r) => r.source?.startsWith('portal-route-'))
-        ?.map((r) => [r.source || '', r]) || [],
-    );
-    const newRecords = new Map<string, Record>(
-      portalRoutes
-        ?.filter((pr) => pr.type === 'tcp' || pr.type === 'udp')
-        ?.map((pr) => portalRouteToRecord(baseRecord, pr))
-        ?.map((r) => [r.source || '', r]) || [],
-    );
-
-    // remove current records which have been deleted
-    for (const [k, r] of currentRecords) {
-      if (!newRecords.has(k)) {
-        ipcRenderer.send(DELETE, {
-          ids: [r.id],
-        });
-      }
+    const nr = defaults(r, cr);
+    if (!isEqual(nr, cr)) {
+      await saveRecord(nr);
     }
+  }
 
-    // add or update new records which have changed
-    for (const [k, r] of newRecords) {
-      const cr = currentRecords.get(k);
-      if (!cr) {
-        ipcRenderer.send(SAVE_RECORD, r);
-        return;
-      }
-      const nr = defaults(r, cr);
-      if (!isEqual(nr, cr)) {
-        ipcRenderer.send(SAVE_RECORD, nr);
-      }
-    }
-  });
-  ipcRenderer.send(GET_ALL_RECORDS);
+  await getAllRecords();
 }
 
 export type LoadFormProps = {};
@@ -125,6 +121,7 @@ const LoadForm: FC<LoadFormProps> = ({}) => {
     },
   );
   const [tags, setTags] = useLocalStorage('LoadForm/tags', (): string[] => []);
+  const [loading, setLoading] = useState(false);
 
   const onChangeUrl = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setServerUrl(evt.target.value);
@@ -136,33 +133,34 @@ const LoadForm: FC<LoadFormProps> = ({}) => {
   const onClickLoad = (evt: React.MouseEvent) => {
     evt.preventDefault();
 
-    if (serverUrl) {
-      const req: FetchRoutesRequest = {
-        serverUrl,
-        disableTlsVerification: connection.disableTlsVerification,
-        caCert: connection.caCert,
-        clientCert: connection.clientCert,
-        clientCertFromStore: connection.clientCertFromStore,
-      };
-      ipcRenderer.once(FETCH_ROUTES, (_, args) => {
-        const { err, res }: FetchRoutesResponseArgs = args;
-        if (err) {
-          enqueueSnackbar(err.message, {
-            variant: 'error',
-            autoHideDuration: TOAST_LENGTH,
+    (async () => {
+      try {
+        setLoading(true);
+        if (serverUrl) {
+          const res = await fetchRoutes({
+            serverUrl,
+            disableTlsVerification: connection.disableTlsVerification,
+            caCert: connection.caCert,
+            clientCert: connection.clientCert,
+            clientCertFromStore: connection.clientCertFromStore,
           });
-          return;
+          await reconcileConnections(
+            {
+              tags,
+              conn: connection,
+            },
+            res?.routes || [],
+          );
         }
-        reconcileConnections(
-          {
-            tags,
-            conn: connection,
-          },
-          res?.routes || [],
-        );
-      });
-      ipcRenderer.send(FETCH_ROUTES, req);
-    }
+      } catch (e) {
+        enqueueSnackbar(`${(e as any)?.message || e}`, {
+          variant: 'error',
+          autoHideDuration: TOAST_LENGTH,
+        });
+      } finally {
+        setLoading(false);
+      }
+    })();
   };
   const onSubmit = (evt: React.FormEvent) => {
     evt.preventDefault();
@@ -241,7 +239,7 @@ const LoadForm: FC<LoadFormProps> = ({}) => {
                 type="button"
                 variant="contained"
                 color="primary"
-                disabled={!serverUrl}
+                disabled={!serverUrl || loading}
                 onClick={onClickLoad}
               >
                 Load

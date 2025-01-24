@@ -32,7 +32,6 @@ const TagSelector: FC<TagSelectorProps> = ({ tags, onChangeTags }) => {
         options={tagOptions}
         value={tags || []}
         onChange={(_, arr) => {
-          console.log('CHANGE TAGS');
           saveTags(arr);
         }}
         renderInput={(params) => (
