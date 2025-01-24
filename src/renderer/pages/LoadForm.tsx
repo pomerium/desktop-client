@@ -1,5 +1,4 @@
 import {
-  Autocomplete,
   Button,
   CardContent,
   Container,
@@ -11,29 +10,18 @@ import {
   Typography,
 } from '@mui/material';
 import { ipcRenderer } from 'electron';
-import { defaults, isEqual } from 'lodash';
+import { defaultsDeep, isEqual } from 'lodash';
 import { enqueueSnackbar } from 'notistack';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 
 import {
   DELETE,
-  FETCH_ROUTES,
-  FetchRoutesResponseArgs,
-  GET_ALL_RECORDS,
-  GetRecordsResponseArgs,
-  SAVE_RECORD,
   TOAST_LENGTH,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
 import { fetchRoutes, getAllRecords, saveRecord } from '../../shared/ipc';
-import {
-  Connection,
-  FetchRoutesRequest,
-  PortalRoute,
-  Protocol,
-  Record,
-} from '../../shared/pb/api';
+import { Connection, PortalRoute, Protocol, Record } from '../../shared/pb/api';
 import AdvancedSettingsAccordion from '../components/AdvancedSettingsAccordion';
 import ClientCertSelection from '../components/ClientCertSelection';
 import StyledCard from '../components/StyledCard';
@@ -51,7 +39,7 @@ function portalRouteToRecord(
     from.pathname === '/' ? from.host : from.pathname.substring(1);
   const pomeriumUrl = from.pathname === '/' ? undefined : from.toString();
 
-  return defaults(
+  return defaultsDeep(
     {
       source: `portal-route-${portalRoute.id}`,
       conn: {
@@ -97,9 +85,9 @@ async function reconcileConnections(
     const cr = currentRecords.get(k);
     if (!cr) {
       await saveRecord(r);
-      return;
+      continue;
     }
-    const nr = defaults(r, cr);
+    const nr = defaultsDeep(r, cr);
     if (!isEqual(nr, cr)) {
       await saveRecord(nr);
     }
@@ -176,25 +164,27 @@ const LoadForm: FC<LoadFormProps> = ({}) => {
 
   return (
     <>
-      <Container maxWidth={false} sx={{ pt: 3 }}>
+      <Container maxWidth={false} sx={{ pt: 4 }}>
         <form onSubmit={onSubmit}>
-          <Stack spacing={3}>
+          <Stack spacing={2}>
             <Typography variant="h3" color="textPrimary">
               Load Connections
             </Typography>
             <StyledCard>
               <CardContent>
-                <TextField
-                  fullWidth
-                  required
-                  label="Pomerium URL"
-                  value={serverUrl}
-                  onChange={onChangeUrl}
-                  variant="outlined"
-                  autoFocus
-                  helperText="URL of a Pomerium Instance"
-                />
-                <TagSelector tags={tags} onChangeTags={setTags} />
+                <Stack spacing={2}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Pomerium URL"
+                    value={serverUrl}
+                    onChange={onChangeUrl}
+                    variant="outlined"
+                    autoFocus
+                    helperText="URL of a Pomerium Instance"
+                  />
+                  <TagSelector tags={tags} onChangeTags={setTags} />
+                </Stack>
               </CardContent>
             </StyledCard>
             <AdvancedSettingsAccordion>
