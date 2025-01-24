@@ -1,6 +1,6 @@
 import { ServiceError } from '@grpc/grpc-js';
 
-import { FetchRoutesResponse, Records, Selector } from './pb/api';
+import { Records, Selector } from './pb/api';
 
 export const isProd = process.env.NODE_ENV === 'production';
 export const isDev = process.env.NODE_ENV === 'development';
