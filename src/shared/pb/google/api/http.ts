@@ -407,7 +407,7 @@ export const Http = {
       object.fullyDecodeReservedExpansion !== null
     ) {
       message.fullyDecodeReservedExpansion = Boolean(
-        object.fullyDecodeReservedExpansion
+        object.fullyDecodeReservedExpansion,
       );
     } else {
       message.fullyDecodeReservedExpansion = false;
@@ -419,7 +419,7 @@ export const Http = {
     const obj: any = {};
     if (message.rules) {
       obj.rules = message.rules.map((e) =>
-        e ? HttpRule.toJSON(e) : undefined
+        e ? HttpRule.toJSON(e) : undefined,
       );
     } else {
       obj.rules = [];
@@ -448,7 +448,7 @@ const baseHttpRule: object = { selector: '', body: '', responseBody: '' };
 export const HttpRule = {
   encode(
     message: HttpRule,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.selector !== '') {
       writer.uint32(10).string(message.selector);
@@ -471,7 +471,7 @@ export const HttpRule = {
     if (message.custom !== undefined) {
       CustomHttpPattern.encode(
         message.custom,
-        writer.uint32(66).fork()
+        writer.uint32(66).fork(),
       ).ldelim();
     }
     if (message.body !== '') {
@@ -523,7 +523,7 @@ export const HttpRule = {
           break;
         case 11:
           message.additionalBindings.push(
-            HttpRule.decode(reader, reader.uint32())
+            HttpRule.decode(reader, reader.uint32()),
           );
           break;
         default:
@@ -610,7 +610,7 @@ export const HttpRule = {
       (obj.responseBody = message.responseBody);
     if (message.additionalBindings) {
       obj.additionalBindings = message.additionalBindings.map((e) =>
-        e ? HttpRule.toJSON(e) : undefined
+        e ? HttpRule.toJSON(e) : undefined,
       );
     } else {
       obj.additionalBindings = [];
@@ -651,7 +651,7 @@ const baseCustomHttpPattern: object = { kind: '', path: '' };
 export const CustomHttpPattern = {
   encode(
     message: CustomHttpPattern,
-    writer: _m0.Writer = _m0.Writer.create()
+    writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
     if (message.kind !== '') {
       writer.uint32(10).string(message.kind);
@@ -724,12 +724,12 @@ type Builtin =
 export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
-  : Partial<T>;
+    ? Array<DeepPartial<U>>
+    : T extends ReadonlyArray<infer U>
+      ? ReadonlyArray<DeepPartial<U>>
+      : T extends {}
+        ? { [K in keyof T]?: DeepPartial<T[K]> }
+        : Partial<T>;
 
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any;
