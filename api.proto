@@ -263,4 +263,5 @@ message Connection {
   reserved 8; // unreleased client_cert_issuer_cn search criterion
   // indicates to search the system trust store for a client certificate
   optional ClientCertFromStore client_cert_from_store = 9;
+  optional bool autostart = 11;
 }

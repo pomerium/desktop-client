@@ -351,6 +351,26 @@ async function init(): Promise<void> {
       cliProcess.kill('SIGINT');
       mainWindow?.close();
     });
+
+    // Auto-start connections marked with autostart flag
+    configClient.list({ all: true, ids: [], tags: [] }, (err, res) => {
+      if (!err && res) {
+        const autoStartIds = res.records
+          .filter((r) => r.conn && r.conn.autostart)
+          .map((r) => r.id);
+        if (autoStartIds.length > 0) {
+          listenerClient.update(
+            { connectionIds: autoStartIds, connected: true },
+            (err, res) => {
+              if (!err && res) {
+                trayMenuHelper.setStatuses(res.listeners);
+                menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+              }
+            },
+          );
+        }
+      }
+    });
   });
 }
 
