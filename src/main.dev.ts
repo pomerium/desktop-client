@@ -361,10 +361,11 @@ async function init(): Promise<void> {
         if (autoStartIds.length > 0) {
           listenerClient.update(
             { connectionIds: autoStartIds, connected: true },
-            (err, res) => {
-              if (!err && res) {
-                trayMenuHelper.setStatuses(res.listeners);
+            (updateErr, updateRes) => {
+              if (!updateErr && updateRes) {
+                trayMenuHelper.setStatuses(updateRes.listeners);
                 menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+                console.log('Auto-started connections:', autoStartIds);
               }
             },
           );

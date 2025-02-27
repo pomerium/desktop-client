@@ -209,7 +209,10 @@ const ConnectForm: FC<Props> = () => {
                       <Switch
                         checked={connection.autostart || false}
                         onChange={(evt) =>
-                          setConnection({ ...connection, autostart: evt.target.checked })
+                          setConnection({
+                            ...connection,
+                            autostart: evt.target.checked,
+                          })
                         }
                         color="primary"
                       />
