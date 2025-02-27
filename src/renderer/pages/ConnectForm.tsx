@@ -3,8 +3,10 @@ import {
   Button,
   CardContent,
   Container,
+  FormControlLabel,
   Grid,
   Stack,
+  Switch,
   Typography,
 } from '@mui/material';
 import { ipcRenderer } from 'electron';
@@ -42,6 +44,7 @@ const initialConnData: Connection = {
   caCert: undefined,
   clientCert: undefined,
   clientCertFromStore: undefined,
+  autostart: false,
 };
 
 const ConnectForm: FC<Props> = () => {
@@ -198,6 +201,23 @@ const ConnectForm: FC<Props> = () => {
                     onChange={(evt): void => saveLocal(evt.target.value)}
                     variant="outlined"
                     helperText="The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={connection.autostart || false}
+                        onChange={(evt) =>
+                          setConnection({
+                            ...connection,
+                            autostart: evt.target.checked,
+                          })
+                        }
+                        color="primary"
+                      />
+                    }
+                    label="Start connection at app launch"
                   />
                 </Grid>
                 <Grid item xs={12}>

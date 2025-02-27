@@ -400,6 +400,7 @@ export interface Connection {
   clientCert?: Certificate | undefined;
   /** indicates to search the system trust store for a client certificate */
   clientCertFromStore?: ClientCertFromStore | undefined;
+  autostart?: boolean | undefined;
 }
 
 function createBaseRecord(): Record {
@@ -3281,6 +3282,7 @@ function createBaseConnection(): Connection {
     caCert: undefined,
     clientCert: undefined,
     clientCertFromStore: undefined,
+    autostart: undefined,
   };
 }
 
@@ -3318,6 +3320,9 @@ export const Connection = {
         message.clientCertFromStore,
         writer.uint32(74).fork(),
       ).ldelim();
+    }
+    if (message.autostart !== undefined) {
+      writer.uint32(88).bool(message.autostart);
     }
     return writer;
   },
@@ -3396,6 +3401,13 @@ export const Connection = {
             reader.uint32(),
           );
           continue;
+        case 11:
+          if (tag !== 88) {
+            break;
+          }
+
+          message.autostart = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3429,6 +3441,9 @@ export const Connection = {
         : undefined,
       clientCertFromStore: isSet(object.clientCertFromStore)
         ? ClientCertFromStore.fromJSON(object.clientCertFromStore)
+        : undefined,
+      autostart: isSet(object.autostart)
+        ? globalThis.Boolean(object.autostart)
         : undefined,
     };
   },
@@ -3464,6 +3479,9 @@ export const Connection = {
         message.clientCertFromStore,
       );
     }
+    if (message.autostart !== undefined) {
+      obj.autostart = message.autostart;
+    }
     return obj;
   },
 
@@ -3490,6 +3508,7 @@ export const Connection = {
       object.clientCertFromStore !== null
         ? ClientCertFromStore.fromPartial(object.clientCertFromStore)
         : undefined;
+    message.autostart = object.autostart ?? undefined;
     return message;
   },
 };
