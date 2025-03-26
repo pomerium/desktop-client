@@ -3,8 +3,12 @@ import {
   Button,
   CardContent,
   Container,
+  FormControl,
   FormControlLabel,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   Switch,
   Typography,
@@ -23,7 +27,7 @@ import {
   VIEW,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
-import { Connection, Record, Selector } from '../../shared/pb/api';
+import { Connection, Protocol, Record, Selector } from '../../shared/pb/api';
 import AdvancedConnectionSettings from '../components/AdvancedConnectionSettings';
 import AdvancedSettingsAccordion from '../components/AdvancedSettingsAccordion';
 import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
@@ -37,6 +41,7 @@ interface Props {
 
 const initialConnData: Connection = {
   name: undefined,
+  protocol: Protocol.TCP,
   remoteAddr: '',
   listenAddr: undefined,
   pomeriumUrl: undefined,
@@ -117,6 +122,14 @@ const ConnectForm: FC<Props> = () => {
     }
   };
 
+  const handleChangeProtocol = (evt: SelectChangeEvent) => {
+    setConnection((oldConnection) => {
+      oldConnection.protocol =
+        evt.target.value === 'UDP' ? Protocol.UDP : Protocol.TCP;
+      return oldConnection;
+    });
+  };
+
   const saveConnection = (): void => {
     const record = {
       tags,
@@ -181,6 +194,23 @@ const ConnectForm: FC<Props> = () => {
                     autoFocus
                     helperText="Name of the route."
                   />
+                </Grid>{' '}
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="protocol-label">Protocol</InputLabel>
+                    <Select
+                      labelId="protocol-label"
+                      id="demo-simple-select"
+                      value={
+                        connection?.protocol === Protocol.UDP ? 'UDP' : 'TCP'
+                      }
+                      label="Age"
+                      onChange={handleChangeProtocol}
+                    >
+                      <MenuItem value="TCP">TCP</MenuItem>
+                      <MenuItem value="UDP">UDP</MenuItem>
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
