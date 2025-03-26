@@ -1,4 +1,13 @@
+import {
+  CssBaseline,
+  ThemeProvider,
+  StyledEngineProvider,
+} from '@mui/material';
+import StylesProvider from '@mui/styles/StylesProvider';
+import jssPreset from '@mui/styles/jssPreset';
 import { ipcRenderer } from 'electron';
+import { create } from 'jss';
+import { SnackbarProvider } from 'notistack';
 import React, { FC, useEffect } from 'react';
 import {
   HashRouter,
@@ -9,22 +18,14 @@ import {
   Navigate,
 } from 'react-router-dom';
 
-import {
-  CssBaseline,
-  ThemeProvider,
-  StyledEngineProvider,
-} from '@mui/material';
-import jssPreset from '@mui/styles/jssPreset';
-import StylesProvider from '@mui/styles/StylesProvider';
-import { create } from 'jss';
-import { SnackbarProvider } from 'notistack';
-import ConnectForm from './renderer/pages/ConnectForm';
-import ManageConnections from './renderer/pages/ManageConnections';
-import ConnectionView from './renderer/pages/ConnectionView';
 import SnackbarCloseButton from './renderer/components/SnackbarCloseButton';
+import ConnectForm from './renderer/pages/ConnectForm';
+import ConnectionView from './renderer/pages/ConnectionView';
+import Layout from './renderer/pages/Layout';
+import LoadForm from './renderer/pages/LoadForm';
+import ManageConnections from './renderer/pages/ManageConnections';
 import { THEMES } from './shared/constants';
 import createCustomTheme, { ThemeConfig } from './shared/theme';
-import Layout from './renderer/pages/Layout';
 
 const RouteListener: FC = () => {
   const navigate = useNavigate();
@@ -74,6 +75,7 @@ const App: FC = () => {
                       element={<Navigate to="/manage" replace />}
                     />
                     <Route path="/manage" element={<ManageConnections />} />
+                    <Route path="/loadForm" element={<LoadForm />} />
                     <Route
                       path="/view_connection/:connectionID"
                       element={<ConnectionView />}

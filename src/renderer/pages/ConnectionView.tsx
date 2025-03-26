@@ -1,4 +1,3 @@
-import React, { ReactElement, useEffect, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -17,11 +16,12 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
-import { AlertTriangle, ChevronDown, Info } from 'react-feather';
 import { useSnackbar } from 'notistack';
-import StyledCard from '../components/StyledCard';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { AlertTriangle, ChevronDown, Info } from 'react-feather';
+import { useParams } from 'react-router-dom';
+
 import {
   DELETE,
   EDIT,
@@ -34,11 +34,6 @@ import {
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
-import Connected from '../icons/Connected';
-import Disconnected from '../icons/Disconnected';
-import Edit from '../icons/Edit';
-import Export from '../icons/Export';
-import Delete from '../icons/Delete';
 import {
   Connection,
   ConnectionStatusUpdate,
@@ -46,12 +41,18 @@ import {
   Record,
   Selector,
 } from '../../shared/pb/api';
-import ExportJSON from '../icons/ExportJSON';
 import CertDetails from '../components/CertDetails';
+import { getClientCertFiltersSummary } from '../components/ClientCertSelection';
 import ExportDialog, {
   IpcRendererEventListener,
 } from '../components/ExportDialog';
-import { getClientCertFiltersSummary } from './ConnectForm';
+import StyledCard from '../components/StyledCard';
+import Connected from '../icons/Connected';
+import Delete from '../icons/Delete';
+import Disconnected from '../icons/Disconnected';
+import Edit from '../icons/Edit';
+import Export from '../icons/Export';
+import ExportJSON from '../icons/ExportJSON';
 
 type SimplifiedLog = {
   status: 'info' | 'error';
@@ -235,364 +236,366 @@ function ConnectionView(): ReactElement {
           exportFile={exportFile}
           onClose={() => setExportFile(null)}
         />
-        <Container maxWidth={false}>
-          <Grid sx={{ pt: 4 }}>
-            <Grid container alignItems="flex-start">
-              <Grid item xs={5}>
-                <Typography variant="h3" color="textPrimary">
-                  {connection.name}
-                </Typography>
-              </Grid>
-              <Grid item xs={7} container justifyContent="flex-end">
-                <Grid item>
-                  <Button
-                    size="small"
-                    type="button"
-                    color="primary"
-                    onClick={() => ipcRenderer.send(EDIT, connectionID)}
-                    endIcon={<Edit />}
-                  >
-                    Edit
-                  </Button>
+        <Container maxWidth={false} sx={{ pt: 4 }}>
+          <Stack spacing={2}>
+            <Grid>
+              <Grid container alignItems="flex-start">
+                <Grid item xs={5}>
+                  <Typography variant="h3" color="textPrimary">
+                    {connection.name}
+                  </Typography>
                 </Grid>
-                <Grid item>
-                  <Button
-                    size="small"
-                    type="button"
-                    color="primary"
-                    onClick={() =>
-                      setExportFile({
-                        filename: connection?.name || 'download',
-                        selector: {
-                          all: false,
-                          ids: [connectionID as string],
-                          tags: [],
-                        },
-                      })
-                    }
-                    endIcon={<Export />}
-                  >
-                    Export
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button
-                    size="small"
-                    type="button"
-                    color="primary"
-                    onClick={deleteAndRedirect}
-                    endIcon={<Delete />}
-                  >
-                    Delete
-                  </Button>
-                </Grid>
-                <Grid item>
-                  {connected && (
+                <Grid item xs={7} container justifyContent="flex-end">
+                  <Grid item>
                     <Button
                       size="small"
                       type="button"
                       color="primary"
-                      onClick={() => toggleConnected()}
-                      endIcon={<Disconnected />}
+                      onClick={() => ipcRenderer.send(EDIT, connectionID)}
+                      endIcon={<Edit />}
                     >
-                      Disconnect
+                      Edit
                     </Button>
-                  )}
-                  {!connected && (
+                  </Grid>
+                  <Grid item>
                     <Button
                       size="small"
                       type="button"
                       color="primary"
-                      onClick={() => toggleConnected()}
-                      endIcon={<Connected />}
+                      onClick={() =>
+                        setExportFile({
+                          filename: connection?.name || 'download',
+                          selector: {
+                            all: false,
+                            ids: [connectionID as string],
+                            tags: [],
+                          },
+                        })
+                      }
+                      endIcon={<Export />}
                     >
-                      Connect
+                      Export
                     </Button>
-                  )}
+                  </Grid>
+                  <Grid item>
+                    <Button
+                      size="small"
+                      type="button"
+                      color="primary"
+                      onClick={deleteAndRedirect}
+                      endIcon={<Delete />}
+                    >
+                      Delete
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    {connected && (
+                      <Button
+                        size="small"
+                        type="button"
+                        color="primary"
+                        onClick={() => toggleConnected()}
+                        endIcon={<Disconnected />}
+                      >
+                        Disconnect
+                      </Button>
+                    )}
+                    {!connected && (
+                      <Button
+                        size="small"
+                        type="button"
+                        color="primary"
+                        onClick={() => toggleConnected()}
+                        endIcon={<Connected />}
+                      >
+                        Connect
+                      </Button>
+                    )}
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
 
-          <StyledCard>
-            <CardContent>
-              <Grid container spacing={2}>
-                <Grid container item xs={12} alignItems="center">
-                  <Grid item xs={4}>
-                    <Typography variant="h6">Destination URL</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="subtitle2">
-                      {connection.remoteAddr}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <Grid container item xs={12} alignItems="center">
-                  <Grid item xs={4}>
-                    <Typography variant="h6">Listener Address</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="subtitle2">
-                      {connectionPort || connection.listenAddr}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <Grid container item xs={12} alignItems="center">
-                  <Grid item xs={4}>
-                    <Typography variant="h6">Tags</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="subtitle2">
-                      {tags?.join(', ')}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </StyledCard>
-
-          <Accordion
-            sx={{
-              backgroundColor: 'background.paper',
-              marginTop: 2,
-              paddingLeft: 2,
-              paddingRight: 2,
-              borderRadius: 4,
-              '&:before': {
-                display: 'none',
-              },
-            }}
-            square={false}
-          >
-            <AccordionSummary
-              expandIcon={<ChevronDown />}
-              aria-controls="advanced-settings-content"
-              id="advanced-settings-header"
-            >
-              <Typography variant="h5">Advanced Settings</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid container item xs={12} alignItems="center">
-                  <Grid item xs={4}>
-                    <Typography variant="h6">
-                      Disable TLS Verification
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="subtitle2">
-                      {connection.disableTlsVerification ? 'Yes' : 'No'}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <Grid container item xs={12} alignItems="center">
-                  <Grid item xs={4}>
-                    <Typography variant="h6">Pomerium URL</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Typography variant="subtitle2">
-                      {connection.pomeriumUrl}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <Grid container item xs={12} alignItems="center">
-                  <Grid item xs={4}>
-                    <Typography variant="h6">Client Certificate</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Stack alignItems="flex-start" spacing={1}>
-                      {connection?.clientCertFromStore !== undefined && (
-                        <Typography variant="subtitle2">
-                          Search OS certificate store
-                          {clientCertFiltersSummary && (
-                            <>
-                              <br />({clientCertFiltersSummary})
-                            </>
-                          )}
-                        </Typography>
-                      )}
-                      {connection?.clientCert?.info && (
-                        <Stack
-                          direction="row"
-                          alignItems="baseline"
-                          spacing={1}
-                        >
-                          <CertDetails
-                            open={showDetail}
-                            onClose={() => setShowDetail(false)}
-                            certInfo={connection?.clientCert?.info}
-                          />
-                          <Typography variant="subtitle2">File:</Typography>
-                          <Chip
-                            label="Details"
-                            color="primary"
-                            onClick={() => setShowDetail(true)}
-                          />
-                        </Stack>
-                      )}
-                    </Stack>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Accordion
-            sx={{
-              backgroundColor: 'background.paper',
-              marginTop: 2,
-              paddingLeft: 2,
-              paddingRight: 2,
-              borderRadius: 4,
-              '&:before': {
-                display: 'none',
-              },
-            }}
-            square={false}
-          >
-            <AccordionSummary
-              expandIcon={<ChevronDown />}
-              aria-controls="log-content"
-              id="log-header"
-            >
-              <Grid container item alignItems="center">
-                <Grid item xs={9}>
-                  <Typography variant="h5">Logs</Typography>
-                </Grid>
-                {!!logs?.length && (
-                  <Grid item xs={3}>
-                    <Button
-                      size="small"
-                      type="button"
-                      color="primary"
-                      disabled={!filteredLogs?.length}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        exportLogs();
-                      }}
-                    >
-                      Export Logs
-                    </Button>
-                    <IconButton
-                      aria-controls="filter-menu"
-                      aria-haspopup="true"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleMenu(e);
-                      }}
-                      aria-label="Menu for filters/export"
-                      size="large"
-                    >
-                      <ExportJSON />
-                    </IconButton>
-                    <Menu
-                      id="filter-menu"
-                      anchorEl={menuAnchor}
-                      keepMounted
-                      open={Boolean(menuAnchor)}
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem
-                        key="errorFilter"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setErrorFilter(!errorFilter);
-                        }}
-                      >
-                        <Checkbox
-                          color="primary"
-                          checked={errorFilter}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            setErrorFilter(!errorFilter);
-                          }}
-                          value={errorFilter}
-                        />
-                        Error
-                      </MenuItem>
-                      <MenuItem
-                        key="infoFilter"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setInfoFilter(!infoFilter);
-                        }}
-                      >
-                        <Checkbox
-                          color="primary"
-                          checked={infoFilter}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            setInfoFilter(!infoFilter);
-                          }}
-                          value={infoFilter}
-                        />
-                        Info
-                      </MenuItem>
-                      <MenuItem key="exportToJSON">
-                        <Button
-                          size="small"
-                          type="button"
-                          color="primary"
-                          variant="contained"
-                          disabled={!filteredLogs?.length}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            exportLogs();
-                          }}
-                        >
-                          Export Logs
-                        </Button>
-                      </MenuItem>
-                    </Menu>
-                  </Grid>
-                )}
-              </Grid>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                {filteredLogs.map((log) => (
-                  <Grid
-                    item
-                    container
-                    alignItems="center"
-                    key={Math.random()}
-                    sx={{
-                      borderTop: '1px solid #E3E3E3',
-                    }}
-                  >
-                    <Grid item xs={2}>
-                      {log.status === 'info' && (
-                        <Info style={{ color: 'blue' }} />
-                      )}
-                      {log.status === 'error' && (
-                        <AlertTriangle style={{ color: 'orange' }} />
-                      )}
-                    </Grid>
+            <StyledCard>
+              <CardContent>
+                <Grid container spacing={2}>
+                  <Grid container item xs={12} alignItems="center">
                     <Grid item xs={4}>
-                      <Typography>{log.date}</Typography>
+                      <Typography variant="h6">Destination URL</Typography>
                     </Grid>
-                    <Grid item xs={6}>
-                      <Typography style={{ wordWrap: 'break-word' }}>
-                        {log.message}
+                    <Grid item xs={8}>
+                      <Typography variant="subtitle2">
+                        {connection.remoteAddr}
                       </Typography>
                     </Grid>
                   </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Box minHeight="20px" />
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                  <Grid container item xs={12} alignItems="center">
+                    <Grid item xs={4}>
+                      <Typography variant="h6">Listener Address</Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography variant="subtitle2">
+                        {connectionPort || connection.listenAddr}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                  <Grid container item xs={12} alignItems="center">
+                    <Grid item xs={4}>
+                      <Typography variant="h6">Tags</Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography variant="subtitle2">
+                        {tags?.join(', ')}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </StyledCard>
+
+            <Accordion
+              sx={{
+                backgroundColor: 'background.paper',
+                marginTop: 2,
+                paddingLeft: 2,
+                paddingRight: 2,
+                borderRadius: 4,
+                '&:before': {
+                  display: 'none',
+                },
+              }}
+              square={false}
+            >
+              <AccordionSummary
+                expandIcon={<ChevronDown />}
+                aria-controls="advanced-settings-content"
+                id="advanced-settings-header"
+              >
+                <Typography variant="h5">Advanced Settings</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <Grid container item xs={12} alignItems="center">
+                    <Grid item xs={4}>
+                      <Typography variant="h6">
+                        Disable TLS Verification
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography variant="subtitle2">
+                        {connection.disableTlsVerification ? 'Yes' : 'No'}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                  <Grid container item xs={12} alignItems="center">
+                    <Grid item xs={4}>
+                      <Typography variant="h6">Pomerium URL</Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography variant="subtitle2">
+                        {connection.pomeriumUrl}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                  <Grid container item xs={12} alignItems="center">
+                    <Grid item xs={4}>
+                      <Typography variant="h6">Client Certificate</Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Stack alignItems="flex-start" spacing={1}>
+                        {connection?.clientCertFromStore !== undefined && (
+                          <Typography variant="subtitle2">
+                            Search OS certificate store
+                            {clientCertFiltersSummary && (
+                              <>
+                                <br />({clientCertFiltersSummary})
+                              </>
+                            )}
+                          </Typography>
+                        )}
+                        {connection?.clientCert?.info && (
+                          <Stack
+                            direction="row"
+                            alignItems="baseline"
+                            spacing={1}
+                          >
+                            <CertDetails
+                              open={showDetail}
+                              onClose={() => setShowDetail(false)}
+                              certInfo={connection?.clientCert?.info}
+                            />
+                            <Typography variant="subtitle2">File:</Typography>
+                            <Chip
+                              label="Details"
+                              color="primary"
+                              onClick={() => setShowDetail(true)}
+                            />
+                          </Stack>
+                        )}
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              sx={{
+                backgroundColor: 'background.paper',
+                marginTop: 2,
+                paddingLeft: 2,
+                paddingRight: 2,
+                borderRadius: 4,
+                '&:before': {
+                  display: 'none',
+                },
+              }}
+              square={false}
+            >
+              <AccordionSummary
+                expandIcon={<ChevronDown />}
+                aria-controls="log-content"
+                id="log-header"
+              >
+                <Grid container item alignItems="center">
+                  <Grid item xs={9}>
+                    <Typography variant="h5">Logs</Typography>
+                  </Grid>
+                  {!!logs?.length && (
+                    <Grid item xs={3}>
+                      <Button
+                        size="small"
+                        type="button"
+                        color="primary"
+                        disabled={!filteredLogs?.length}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          exportLogs();
+                        }}
+                      >
+                        Export Logs
+                      </Button>
+                      <IconButton
+                        aria-controls="filter-menu"
+                        aria-haspopup="true"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleMenu(e);
+                        }}
+                        aria-label="Menu for filters/export"
+                        size="large"
+                      >
+                        <ExportJSON />
+                      </IconButton>
+                      <Menu
+                        id="filter-menu"
+                        anchorEl={menuAnchor}
+                        keepMounted
+                        open={Boolean(menuAnchor)}
+                        onClose={handleMenuClose}
+                      >
+                        <MenuItem
+                          key="errorFilter"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setErrorFilter(!errorFilter);
+                          }}
+                        >
+                          <Checkbox
+                            color="primary"
+                            checked={errorFilter}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              setErrorFilter(!errorFilter);
+                            }}
+                            value={errorFilter}
+                          />
+                          Error
+                        </MenuItem>
+                        <MenuItem
+                          key="infoFilter"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setInfoFilter(!infoFilter);
+                          }}
+                        >
+                          <Checkbox
+                            color="primary"
+                            checked={infoFilter}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              setInfoFilter(!infoFilter);
+                            }}
+                            value={infoFilter}
+                          />
+                          Info
+                        </MenuItem>
+                        <MenuItem key="exportToJSON">
+                          <Button
+                            size="small"
+                            type="button"
+                            color="primary"
+                            variant="contained"
+                            disabled={!filteredLogs?.length}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              exportLogs();
+                            }}
+                          >
+                            Export Logs
+                          </Button>
+                        </MenuItem>
+                      </Menu>
+                    </Grid>
+                  )}
+                </Grid>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  {filteredLogs.map((log) => (
+                    <Grid
+                      item
+                      container
+                      alignItems="center"
+                      key={Math.random()}
+                      sx={{
+                        borderTop: '1px solid #E3E3E3',
+                      }}
+                    >
+                      <Grid item xs={2}>
+                        {log.status === 'info' && (
+                          <Info style={{ color: 'blue' }} />
+                        )}
+                        {log.status === 'error' && (
+                          <AlertTriangle style={{ color: 'orange' }} />
+                        )}
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Typography>{log.date}</Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography style={{ wordWrap: 'break-word' }}>
+                          {log.message}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  ))}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+            <Box minHeight="20px" />
+          </Stack>
         </Container>
       </>
     );

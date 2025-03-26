@@ -9,6 +9,7 @@ import {
 } from 'electron';
 import { Menubar } from 'menubar';
 import path from 'path';
+
 import { getAssetPath, menuIconPath } from '../main/binaries';
 import { UPDATE_LISTENERS } from '../shared/constants';
 import { ListenerStatus, Record } from '../shared/pb/api';
@@ -136,6 +137,14 @@ export default class Helper {
       label: 'Add Connection',
       click() {
         appWindow?.webContents.send('redirectTo', '/connectForm');
+        appWindow?.show();
+      },
+    });
+
+    template.push({
+      label: 'Load Connections',
+      click() {
+        appWindow?.webContents.send('redirectTo', '/loadForm');
         appWindow?.show();
       },
     });

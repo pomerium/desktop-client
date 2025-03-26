@@ -1,5 +1,6 @@
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 import { BrowserWindow } from 'electron';
+
 import { getAssetPath } from '../main/binaries';
 import MenuBuilder from './menu';
 

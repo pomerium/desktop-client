@@ -1,5 +1,4 @@
 /* eslint global-require: off, no-console: off */
-
 /**
  * This module executes inside of electron's main process. You can start
  * electron renderer process from here and communicate with the other processes
@@ -8,6 +7,8 @@
  * When running `yarn build` or `yarn build-main`, this file is compiled to
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
+import * as grpc from '@grpc/grpc-js';
+import * as Sentry from '@sentry/electron/main';
 import {
   app,
   BrowserWindow,
@@ -15,15 +16,15 @@ import {
   ipcMain,
   MessageBoxOptions,
 } from 'electron';
-import * as grpc from '@grpc/grpc-js';
-import * as Sentry from '@sentry/electron';
+import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import { menubar } from 'menubar';
-import * as url from 'url';
-import path from 'path';
 import fs from 'fs';
-import contextMenu from 'electron-context-menu';
+import { menubar } from 'menubar';
+import path from 'path';
+import * as url from 'url';
+
+import { start } from './cli';
 import createWindow from './renderer/window';
 import {
   isDev,
@@ -46,8 +47,9 @@ import {
   ExportFile,
   LISTENER_LOG,
   GET_ALL_RECORDS,
+  FETCH_ROUTES,
+  GetRecordsResponseArgs,
 } from './shared/constants';
-import Helper from './trayMenu/helper';
 import {
   ConnectionStatusUpdate,
   ExportRequest,
@@ -57,8 +59,9 @@ import {
   Record as ListenerRecord,
   Selector,
   StatusUpdatesRequest,
+  FetchRoutesRequest,
 } from './shared/pb/api';
-import { start } from './cli';
+import Helper from './trayMenu/helper';
 
 const SentryDSN =
   'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413';
@@ -175,10 +178,8 @@ async function init(): Promise<void> {
     ipcMain.on(GET_RECORDS, (evt, selector: Selector) => {
       const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
       configClient.list(selector, (err, res) => {
-        sendTo?.send(GET_RECORDS, {
-          err,
-          res,
-        });
+        const args: GetRecordsResponseArgs = { err, res };
+        sendTo?.send(GET_RECORDS, args);
         if (!err && res) {
           if (selector.all) {
             trayMenuHelper.setRecords(res.records);
@@ -200,10 +201,8 @@ async function init(): Promise<void> {
           tags: [],
         } as Selector,
         (err, res) => {
-          sendTo?.send(GET_ALL_RECORDS, {
-            err,
-            res,
-          });
+          const args: GetRecordsResponseArgs = { err, res };
+          sendTo?.send(GET_ALL_RECORDS, args);
           if (!err && res) {
             trayMenuHelper.setRecords(res.records);
             menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
@@ -279,7 +278,7 @@ async function init(): Promise<void> {
             const bytes = fs.readFileSync(response.filePaths[0], null);
             configClient.import(
               {
-                data: bytes,
+                data: bytes as unknown as Uint8Array,
               } as ImportRequest,
               (err, res) => {
                 evt?.sender?.send(IMPORT, { err, res });
@@ -337,6 +336,12 @@ async function init(): Promise<void> {
       // empty function otherwise causes fatal error on cancel !!!
       updateStream.on('error', () => {});
     });
+    ipcMain.on(FETCH_ROUTES, (evt, args) => {
+      const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
+      configClient.fetchRoutes(args as FetchRoutesRequest, (err, res) => {
+        sendTo?.send(FETCH_ROUTES, { err, res });
+      });
+    });
     menu.app.on('web-contents-created', () => {
       contextMenu();
     });
@@ -345,6 +350,27 @@ async function init(): Promise<void> {
       updateStream?.cancel();
       cliProcess.kill('SIGINT');
       mainWindow?.close();
+    });
+
+    // Auto-start connections marked with autostart flag
+    configClient.list({ all: true, ids: [], tags: [] }, (err, res) => {
+      if (!err && res) {
+        const autoStartIds = res.records
+          .filter((r) => r.conn && r.conn.autostart)
+          .map((r) => r.id);
+        if (autoStartIds.length > 0) {
+          listenerClient.update(
+            { connectionIds: autoStartIds, connected: true },
+            (updateErr, updateRes) => {
+              if (!updateErr && updateRes) {
+                trayMenuHelper.setStatuses(updateRes.listeners);
+                menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
+                console.log('Auto-started connections:', autoStartIds);
+              }
+            },
+          );
+        }
+      }
     });
   });
 }

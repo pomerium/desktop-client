@@ -19,6 +19,8 @@ service Config {
   rpc Export(ExportRequest) returns (ConfigData);
   // Import imports previously serialized records
   rpc Import(ImportRequest) returns (ImportResponse);
+  // FetchRoutes fetches all the routes from the routes portal.
+  rpc FetchRoutes(FetchRoutesRequest) returns (FetchRoutesResponse);
 }
 
 // Record represents a single tunnel record in the configuration
@@ -28,6 +30,7 @@ message Record {
   repeated string tags = 2;
   // connection data may be omitted if i.e. just manipulating the tags data
   optional Connection conn = 3;
+  optional string source = 4;
 }
 
 message Records { repeated Record records = 1; }
@@ -104,6 +107,28 @@ message ListenerStatus {
 message ListenerStatusResponse { map<string, ListenerStatus> listeners = 1; }
 
 message StatusUpdatesRequest { string connection_id = 1; }
+
+message FetchRoutesRequest {
+  string server_url = 1;
+  oneof tls_options {
+    bool disable_tls_verification = 2;
+    bytes ca_cert = 3;
+  }
+  optional Certificate client_cert = 4;
+  optional ClientCertFromStore client_cert_from_store = 5;
+}
+
+message FetchRoutesResponse { repeated PortalRoute routes = 1; }
+
+message PortalRoute {
+  string id = 1;
+  string name = 2;
+  string type = 3;
+  string from = 4;
+  string description = 5;
+  optional string connect_command = 6;
+  string logo_url = 7;
+}
 
 // ConnectionStatusUpdates represent connection state changes
 message ConnectionStatusUpdate {
@@ -238,4 +263,5 @@ message Connection {
   reserved 8; // unreleased client_cert_issuer_cn search criterion
   // indicates to search the system trust store for a client certificate
   optional ClientCertFromStore client_cert_from_store = 9;
+  optional bool autostart = 11;
 }

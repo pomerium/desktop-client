@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useId, useRef } from 'react';
+
 import TextField from './TextField';
 
 interface Props {
@@ -30,7 +31,7 @@ const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
     onChange(attribute + '=' + newValue);
   };
 
-  const valueInputRef = useRef(null);
+  const valueInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     valueInputRef.current?.focus();
   }, [attribute]);

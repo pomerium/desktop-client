@@ -1,4 +1,3 @@
-import React, { ReactElement } from 'react';
 import {
   Typography,
   Grid,
@@ -9,10 +8,12 @@ import {
   Tooltip,
   Box,
 } from '@mui/material';
-import { Copy, MoreVertical } from 'react-feather';
 import { clipboard, ipcRenderer } from 'electron';
-import { Link } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import React, { ReactElement } from 'react';
+import { Copy, MoreVertical } from 'react-feather';
+import { Link } from 'react-router-dom';
+
 import {
   CONNECT,
   DELETE,
@@ -26,13 +27,13 @@ import {
   UPDATE_LISTENERS,
   VIEW,
 } from '../../shared/constants';
-import Connected from '../icons/Connected';
-import Disconnected from '../icons/Disconnected';
 import {
   ListenerUpdateRequest,
   Record as ListenerRecord,
   Connection,
 } from '../../shared/pb/api';
+import Connected from '../icons/Connected';
+import Disconnected from '../icons/Disconnected';
 import ExportDialog from './ExportDialog';
 
 type ConnectionRowProps = {

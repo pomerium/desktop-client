@@ -1,6 +1,7 @@
+import { Box } from '@mui/material';
 import React, { FC } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box } from '@mui/material';
+
 import TopBar from '../components/TopBar';
 
 const Layout: FC = () => {

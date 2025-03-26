@@ -1,8 +1,5 @@
 module.exports = {
-  extends: [
-      'erb',
-      'plugin:@typescript-eslint/recommended',
-  ],
+  extends: ['erb', 'plugin:@typescript-eslint/recommended'],
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
@@ -24,6 +21,12 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-this-alias': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    // because of how we do ipc we need to save routes one at a time, awaiting in a loop makes sense
+    'no-await-in-loop': 'off',
+    // continue is fine
+    'no-continue': 'off',
+    // eslint doesn't seem to understand for ... of
+    'no-restricted-syntax': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

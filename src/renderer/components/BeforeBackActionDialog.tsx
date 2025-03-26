@@ -5,8 +5,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
-import React, { ReactElement } from 'react';
 import { ipcRenderer } from 'electron';
+import React, { ReactElement } from 'react';
+
 import { VIEW_CONNECTION_LIST } from '../../shared/constants';
 
 interface Props {
