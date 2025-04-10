@@ -53,4 +53,4 @@ jobs:
           yarn release -m --x64
           yarn release -l --arm64
           yarn release -l --x64
-          yarn release -w
+          yarn release -w --x64
