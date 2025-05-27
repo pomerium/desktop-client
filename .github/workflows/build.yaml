@@ -1,0 +1,35 @@
+name: Build
+permissions:
+  contents: read
+on:
+  push:
+
+jobs:
+  build:
+    permissions:
+      contents: read 
+    runs-on: ubuntu-latest
+    container:
+      image: electronuserland/builder:wine
+      env:
+        ELECTRON_CACHE: "/root/.cache/electron"
+        ELECTRON_BUILDER_CACHE: "/root/.cache/electron-builder"
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install dependencies
+        run: |
+          yarn install
+
+      - name: build
+        run: |
+          git config --global --add safe.directory /__w/desktop-client/desktop-client
+          # mac requires dmg-builder, which doesn't get installed for some reason
+          #yarn package -m --arm64
+          #yarn package -m --x64
+          yarn package -l --arm64
+          yarn package -l --x64
+          # windows complains about home directory permissions. 
+          #yarn package -w --x64
