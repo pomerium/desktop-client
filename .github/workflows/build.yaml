@@ -8,12 +8,12 @@ jobs:
   build:
     permissions:
       contents: read 
-    runs-on: 
-      container:
-         image: electronuserland/builder:wine
-         env:
-           ELECTRON_CACHE: "/root/.cache/electron"
-           ELECTRON_BUILDER_CACHE: "/root/.cache/electron-builder"
+    runs-on: ubuntu-latest
+    container:
+      image: electronuserland/builder:wine
+      env:
+        ELECTRON_CACHE: "/root/.cache/electron"
+        ELECTRON_BUILDER_CACHE: "/root/.cache/electron-builder"
 
     steps:
       - name: Checkout git repo
