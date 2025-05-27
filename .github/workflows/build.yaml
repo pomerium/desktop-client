@@ -31,4 +31,5 @@ jobs:
           #yarn package -m --x64
           yarn package -l --arm64
           yarn package -l --x64
-          yarn package -w --x64
+          # windows complains about home directory permissions. 
+          #yarn package -w --x64
