@@ -26,8 +26,9 @@ jobs:
       - name: build
         run: |
           git config --global --add safe.directory /__w/desktop-client/desktop-client
-          yarn package -m --arm64
-          yarn package -m --x64
+          # mac requires dmg-builder, which doesn't get installed for some reason
+          #yarn package -m --arm64
+          #yarn package -m --x64
           yarn package -l --arm64
           yarn package -l --x64
           yarn package -w --x64
