@@ -31,6 +31,7 @@ const resolveDetails = (platform: string, arch: string) => {
       break;
     case 'darwin':
       details.platform = 'mac';
+      details.format = 'zip';
       break;
     default:
       break;
