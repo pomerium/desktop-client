@@ -243,6 +243,7 @@ export default merge(baseConfig, {
     port,
     compress: true,
     hot: 'only',
+    allowedHosts: 'all',
     headers: { 'Access-Control-Allow-Origin': '*' },
     static: {
       directory: path.resolve(__dirname, 'dist'),
@@ -251,7 +252,11 @@ export default merge(baseConfig, {
       verbose: true,
       disableDotRule: false,
     },
-    onBeforeSetupMiddleware: function (_) {
+    setupMiddlewares: (middlewares, devServer) => {
+      if (!devServer) {
+        throw new Error('webpack-dev-server is not defined');
+      }
+
       console.log('Starting Main Process...');
       spawn('npm', ['run', 'start:main'], {
         shell: true,
@@ -260,6 +265,8 @@ export default merge(baseConfig, {
       })
         .on('close', (code) => process.exit(code))
         .on('error', (spawnError) => console.error(spawnError));
+
+      return middlewares;
     },
     devMiddleware: {
       publicPath,
