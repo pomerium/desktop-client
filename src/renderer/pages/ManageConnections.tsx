@@ -18,16 +18,11 @@ import {
   GET_ALL_RECORDS,
   GET_UNIQUE_TAGS,
   IMPORT,
-  LISTENER_STATUS,
   SAVE_RECORD,
   TOAST_LENGTH,
   VIEW,
 } from '../../shared/constants';
-import {
-  ListenerStatus,
-  Record as ListenerRecord,
-  Selector,
-} from '../../shared/pb/api';
+import { ListenerStatus, Record as ListenerRecord } from '../../shared/pb/api';
 import ConnectionRow from '../components/ConnectionRow';
 import ExportDialog, {
   IpcRendererEventListener,
@@ -36,6 +31,10 @@ import NewConnectionButton from '../components/NewConnectionButton';
 import StyledCard from '../components/StyledCard';
 import TagFolderRow from '../components/TagFolderRow';
 import VirtualFolderRow from '../components/VirtualFolderRow';
+import {
+  registerConnectionDataListeners,
+  requestConnectionData,
+} from '../ipc/connectionData';
 
 function ManageConnections(): ReactElement {
   const [folderNames, setFolderNames] = useState([] as string[]);
@@ -74,46 +73,37 @@ function ManageConnections(): ReactElement {
   }, []);
 
   useEffect(() => {
-    ipcRenderer.on(GET_UNIQUE_TAGS, (_, args) => {
-      if (args.tags && !args.err) {
-        setFolderNames(args.tags);
-      }
-    });
-    ipcRenderer.on(GET_ALL_RECORDS, (_, args) => {
-      if (args.err) {
-        enqueueSnackbar(args.err.message, {
-          variant: 'error',
-          autoHideDuration: TOAST_LENGTH,
-        });
-      } else {
-        setConnections(args.res.records);
-      }
-    });
-    ipcRenderer.on(LISTENER_STATUS, (_, args) => {
-      if (args.err) {
-        enqueueSnackbar(args.err.message, {
-          variant: 'error',
-          autoHideDuration: TOAST_LENGTH,
-        });
-      } else {
-        Object.values(args.res.listeners as ListenerStatus[]).forEach(
-          ({ lastError }) => {
+    const teardownConnectionData = registerConnectionDataListeners(
+      ipcRenderer,
+      {
+        onRecords: (records) => {
+          setConnections(records);
+        },
+        onTags: (tags) => {
+          setFolderNames(tags);
+        },
+        onStatuses: (response) => {
+          Object.values(response.listeners).forEach(({ lastError }) => {
             if (lastError) {
               enqueueSnackbar(lastError, {
                 variant: 'error',
                 autoHideDuration: TOAST_LENGTH,
               });
             }
-          },
-        );
-        setStatuses((prevState) => {
-          return {
+          });
+          setStatuses((prevState) => ({
             ...prevState,
-            ...args.res.listeners,
-          };
-        });
-      }
-    });
+            ...response.listeners,
+          }));
+        },
+        onError: (message) => {
+          enqueueSnackbar(message, {
+            variant: 'error',
+            autoHideDuration: TOAST_LENGTH,
+          });
+        },
+      },
+    );
     ipcRenderer.on(DELETE, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
@@ -147,23 +137,15 @@ function ManageConnections(): ReactElement {
         ipcRenderer.send(VIEW, args.res.id);
       }
     });
-    ipcRenderer.send(LISTENER_STATUS, {
-      all: true,
-      ids: [],
-      tags: [],
-    } as Selector);
-    ipcRenderer.send(GET_UNIQUE_TAGS);
-    ipcRenderer.send(GET_ALL_RECORDS);
+    requestConnectionData(ipcRenderer);
 
     return function cleanup() {
-      ipcRenderer.removeAllListeners(GET_UNIQUE_TAGS);
-      ipcRenderer.removeAllListeners(GET_ALL_RECORDS);
-      ipcRenderer.removeAllListeners(LISTENER_STATUS);
+      teardownConnectionData();
       ipcRenderer.removeAllListeners(DELETE);
       ipcRenderer.removeAllListeners(IMPORT);
       ipcRenderer.removeAllListeners(SAVE_RECORD);
     };
-  }, []);
+  }, [enqueueSnackbar]);
 
   const untagged = connections?.filter(
     (connection) => !connection?.tags?.length,

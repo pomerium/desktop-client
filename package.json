@@ -139,7 +139,10 @@
   ],
   "homepage": "https://github.com/pomerium/desktop-client#readme",
   "jest": {
-    "testURL": "http://localhost/",
+    "testEnvironment": "node",
+    "testEnvironmentOptions": {
+      "url": "http://localhost/"
+    },
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/.erb/mocks/fileMock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy"
@@ -157,7 +160,13 @@
     ],
     "setupFiles": [
       "./.erb/scripts/CheckBuildsExist.js"
-    ]
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/src/package.json"
+    ],
+    "haste": {
+      "throwOnModuleCollision": false
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.26.8",
