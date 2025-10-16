@@ -145,7 +145,8 @@ function ManageConnections(): ReactElement {
       ipcRenderer.removeAllListeners(IMPORT);
       ipcRenderer.removeAllListeners(SAVE_RECORD);
     };
-  }, [enqueueSnackbar]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const untagged = connections?.filter(
     (connection) => !connection?.tags?.length,
