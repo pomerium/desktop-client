@@ -1,7 +1,15 @@
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
-import { dependencies } from '../../package.json';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { dependencies } = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf8')
+);
 
 if (dependencies) {
   const dependenciesKeys = Object.keys(dependencies);

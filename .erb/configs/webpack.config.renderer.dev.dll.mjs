@@ -4,10 +4,19 @@
 
 import webpack from 'webpack';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 import { merge } from 'webpack-merge';
-import baseConfig from './webpack.config.base';
-import { dependencies } from '../../package.json';
-import CheckNodeEnv from '../scripts/CheckNodeEnv';
+import baseConfig from './webpack.config.base.js';
+import rendererDevConfig from './webpack.config.renderer.dev.mjs';
+import CheckNodeEnv from '../scripts/CheckNodeEnv.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { dependencies } = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf8')
+);
 
 CheckNodeEnv('development');
 
@@ -27,7 +36,7 @@ export default merge(baseConfig, {
   /**
    * Use `module` from `webpack.config.renderer.dev.js`
    */
-  module: require('./webpack.config.renderer.dev.babel').default.module,
+  module: rendererDevConfig.module,
 
   entry: {
     renderer: Object.keys(dependencies || {}),

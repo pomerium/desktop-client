@@ -3,15 +3,19 @@
  */
 
 import path from 'path';
+import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import { merge } from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
-import baseConfig from './webpack.config.base';
-import CheckNodeEnv from '../scripts/CheckNodeEnv';
-import DeleteSourceMaps from '../scripts/DeleteSourceMaps';
+import baseConfig from './webpack.config.base.js';
+import CheckNodeEnv from '../scripts/CheckNodeEnv.js';
+import DeleteSourceMaps from '../scripts/DeleteSourceMaps.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 CheckNodeEnv('production');
 DeleteSourceMaps();

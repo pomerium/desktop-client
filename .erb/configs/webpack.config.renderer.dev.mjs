@@ -1,12 +1,16 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import webpack from 'webpack';
 import chalk from 'chalk';
 import { merge } from 'webpack-merge';
 import { spawn, execSync } from 'child_process';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
-import baseConfig from './webpack.config.base';
-import CheckNodeEnv from '../scripts/CheckNodeEnv';
+import baseConfig from './webpack.config.base.js';
+import CheckNodeEnv from '../scripts/CheckNodeEnv.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
@@ -15,27 +19,11 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const port = process.env.PORT || 1212;
-const publicPath = `http://localhost:${port}/dist`;
+const publicPath = `http://localhost:${port}/dist/`;
 const dllDir = path.join(__dirname, '../dll');
 const manifest = path.resolve(dllDir, 'renderer.json');
-const requiredByDLLConfig = module.parent.filename.includes(
-  'webpack.config.renderer.dev.dll'
-);
-
-/**
- * Warn if the DLL is not built
- */
-if (
-  !requiredByDLLConfig &&
-  !(fs.existsSync(dllDir) && fs.existsSync(manifest))
-) {
-  console.log(
-    chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "yarn build-dll"'
-    )
-  );
-  execSync('yarn build-dll');
-}
+// Skip DLL reference if DLL files don't exist yet (e.g., during postinstall)
+const requiredByDLLConfig = !(fs.existsSync(dllDir) && fs.existsSync(manifest));
 
 export default merge(baseConfig, {
   devtool: 'inline-source-map',
@@ -47,7 +35,7 @@ export default merge(baseConfig, {
   entry: [
     'core-js',
     'regenerator-runtime/runtime',
-    require.resolve('../../src/index.tsx'),
+    path.resolve(__dirname, '../../src/index.tsx'),
   ],
 
   output: {
@@ -57,18 +45,6 @@ export default merge(baseConfig, {
 
   module: {
     rules: [
-      {
-        test: /\.[jt]sx?$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: require.resolve('babel-loader'),
-            options: {
-              plugins: [require.resolve('react-refresh/babel')].filter(Boolean),
-            },
-          },
-        ],
-      },
       {
         test: /\.global\.css$/,
         use: [
@@ -201,13 +177,15 @@ export default merge(baseConfig, {
     ],
   },
   plugins: [
-    requiredByDLLConfig
-      ? null
-      : new webpack.DllReferencePlugin({
-          context: path.join(__dirname, '../dll'),
-          manifest: require(manifest),
-          sourceType: 'var',
-        }),
+    ...(requiredByDLLConfig
+      ? []
+      : [
+          new webpack.DllReferencePlugin({
+            context: path.join(__dirname, '../dll'),
+            manifest: JSON.parse(fs.readFileSync(manifest, 'utf8')),
+            sourceType: 'var',
+          }),
+        ]),
 
     new webpack.NoEmitOnErrorsPlugin(),
 
@@ -243,9 +221,10 @@ export default merge(baseConfig, {
     port,
     compress: true,
     hot: 'only',
+    allowedHosts: 'all',
     headers: { 'Access-Control-Allow-Origin': '*' },
     static: {
-      directory: path.resolve(__dirname, 'dist'),
+      directory: path.resolve(__dirname, '../../src/dist'),
     },
     historyApiFallback: {
       verbose: true,
