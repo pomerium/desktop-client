@@ -4,18 +4,18 @@
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
   "scripts": {
     "download": "npx tsx .erb/scripts/DownloadBinaries.ts",
-    "dev-setup": "git clone https://github.com/pomerium/cli && ln -s $(pwd)/cli/bin/pomerium-cli assets/bin/ && cd cli && make build && yarn metadata",
+    "dev-setup": "git clone https://github.com/pomerium/cli && ln -s $(pwd)/cli/bin/pomerium-cli assets/bin/ && cd cli && make build && npm run metadata",
     "build-cli": "cd cli && git pull origin; make build",
     "metadata": "npx tsx .erb/scripts/WriteMetadata.ts",
-    "build": "concurrently \"yarn download\" \"yarn metadata\"&& concurrently \"yarn build:main\" \"yarn build:renderer\"",
+    "build": "concurrently \"npm run download\" \"npm run metadata\"&& concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.mjs",
     "build:renderer": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.renderer.prod.mjs",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
-    "package": "yarn build && electron-builder build --publish never",
-    "release": "yarn build && electron-builder build --publish always",
-    "postinstall": "node .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.mjs && yarn-deduplicate yarn.lock",
-    "start": "node ./.erb/scripts/CheckPortInUse.js && cross-env yarn start:renderer",
+    "package": "npm run build && electron-builder build --publish never",
+    "release": "npm run build && electron-builder build --publish always",
+    "postinstall": "node .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.mjs",
+    "start": "node ./.erb/scripts/CheckPortInUse.js && cross-env npm run start:renderer",
     "start:main": "cross-env NODE_ENV=development NODE_OPTIONS='--import tsx' electron ./src/main.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development webpack serve --config ./.erb/configs/webpack.config.renderer.dev.mjs",
     "test": "jest --passWithNoTests ",
@@ -228,8 +228,7 @@
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.2",
-    "webpack-merge": "^5.10.0",
-    "yarn-deduplicate": "^6.0.2"
+    "webpack-merge": "^5.10.0"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -268,7 +267,7 @@
   "engines": {
     "node": ">=22.18",
     "npm": ">=10",
-    "yarn": ">=1.21.3"
+    "yarn": "YARN NO LONGER USED - use npm instead."
   },
   "browserslist": [],
   "prettier": {

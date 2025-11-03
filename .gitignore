@@ -63,3 +63,5 @@ src/meta.json
 /cli
 
 changelog.md
+
+yarn.lock

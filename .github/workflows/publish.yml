@@ -3,7 +3,7 @@ permissions:
   contents: read
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
 
 jobs:
   publish:
@@ -21,14 +21,14 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
 
-      - name: Install Node, NPM and Yarn
-        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "22"
 
       - name: Install dependencies
         run: |
-          yarn install
+          npm ci
 
       - name: Import Apple CSC
         uses: apple-actions/import-codesign-certs@95e84a1a18f2bdbc5c6ab9b7f4429372e4b13a8b
@@ -49,8 +49,8 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_KEY_ISSUER: ${{ secrets.APPLE_ID_KEY_ISSUER }}
         run: |
-          yarn release -m --arm64
-          yarn release -m --x64
-          yarn release -l --arm64
-          yarn release -l --x64
-          yarn release -w --x64
+          npm run release -m --arm64
+          npm run release -m --x64
+          npm run release -l --arm64
+          npm run release -l --x64
+          npm run release -w --x64
