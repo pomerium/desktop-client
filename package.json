@@ -16,7 +16,7 @@
     "release": "yarn build && electron-builder build --publish always",
     "postinstall": "node -r @babel/register .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.babel.js && yarn-deduplicate yarn.lock",
     "start": "node -r @babel/register ./.erb/scripts/CheckPortInUse.js && cross-env yarn start:renderer",
-    "start:main": "cross-env NODE_ENV=development electron -r tsx/register ./src/main.dev.ts",
+    "start:main": "cross-env NODE_ENV=development NODE_NO_WARNINGS=1 NODE_OPTIONS='--import tsx' electron ./src/main.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development webpack serve --config ./.erb/configs/webpack.config.renderer.dev.babel.js",
     "test": "jest --passWithNoTests ",
     "protoc": ".erb/scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && prettier --write ./src/shared/pb"
@@ -254,8 +254,8 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.94.0",
     "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^5.2.2",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.15.2",
     "webpack-merge": "^5.10.0",
     "yarn-deduplicate": "^6.0.2"
   },

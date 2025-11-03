@@ -37,7 +37,53 @@ if (
   execSync('yarn build-dll');
 }
 
-export default merge(baseConfig, {
+// Valid webpack-dev-server v5 properties only
+const validDevServerKeys = [
+  'allowedHosts', 'bonjour', 'client', 'compress', 'devMiddleware',
+  'headers', 'historyApiFallback', 'host', 'hot', 'ipc', 'liveReload',
+  'onListening', 'open', 'port', 'proxy', 'server', 'app',
+  'setupExitSignals', 'setupMiddlewares', 'static', 'watchFiles', 'webSocketServer'
+];
+
+const devServerConfig = {
+  port,
+  compress: true,
+  hot: 'only',
+  headers: { 'Access-Control-Allow-Origin': '*' },
+  static: {
+    directory: path.resolve(__dirname, 'dist'),
+  },
+  historyApiFallback: {
+    verbose: true,
+    disableDotRule: false,
+  },
+  setupMiddlewares: (middlewares, devServer) => {
+    console.log('Starting Main Process...');
+    spawn('npm', ['run', 'start:main'], {
+      shell: true,
+      env: process.env,
+      stdio: 'inherit',
+    })
+      .on('close', (code) => process.exit(code))
+      .on('error', (spawnError) => console.error(spawnError));
+    return middlewares;
+  },
+  devMiddleware: {
+    publicPath,
+  },
+};
+
+// Sanitize devServer config to remove any invalid properties
+const sanitizedDevServerConfig = Object.keys(devServerConfig).reduce((acc, key) => {
+  if (validDevServerKeys.includes(key)) {
+    acc[key] = devServerConfig[key];
+  } else {
+    console.log(`Removing invalid devServer property: ${key}`);
+  }
+  return acc;
+}, {});
+
+const config = merge(baseConfig, {
   devtool: 'inline-source-map',
 
   mode: 'development',
@@ -233,36 +279,11 @@ export default merge(baseConfig, {
 
     new ReactRefreshWebpackPlugin(),
   ],
-
-  node: {
-    __dirname: false,
-    __filename: false,
-  },
-
-  devServer: {
-    port,
-    compress: true,
-    hot: 'only',
-    headers: { 'Access-Control-Allow-Origin': '*' },
-    static: {
-      directory: path.resolve(__dirname, 'dist'),
-    },
-    historyApiFallback: {
-      verbose: true,
-      disableDotRule: false,
-    },
-    onBeforeSetupMiddleware: function (_) {
-      console.log('Starting Main Process...');
-      spawn('npm', ['run', 'start:main'], {
-        shell: true,
-        env: process.env,
-        stdio: 'inherit',
-      })
-        .on('close', (code) => process.exit(code))
-        .on('error', (spawnError) => console.error(spawnError));
-    },
-    devMiddleware: {
-      publicPath,
-    },
-  },
 });
+
+// Set devServer config separately to avoid webpack-merge contamination
+// Return a completely new object to prevent any property pollution
+export default {
+  ...config,
+  devServer: sanitizedDevServerConfig,
+};
