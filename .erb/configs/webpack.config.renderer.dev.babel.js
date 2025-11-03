@@ -37,13 +37,6 @@ if (
   execSync('yarn build-dll');
 }
 
-const validDevServerKeys = [
-  'allowedHosts', 'bonjour', 'client', 'compress', 'devMiddleware',
-  'headers', 'historyApiFallback', 'host', 'hot', 'ipc', 'liveReload',
-  'onListening', 'open', 'port', 'proxy', 'server', 'app',
-  'setupExitSignals', 'setupMiddlewares', 'static', 'watchFiles', 'webSocketServer'
-];
-
 const devServerConfig = {
   port,
   compress: true,
@@ -71,15 +64,6 @@ const devServerConfig = {
     publicPath,
   },
 };
-
-const sanitizedDevServerConfig = Object.keys(devServerConfig).reduce((acc, key) => {
-  if (validDevServerKeys.includes(key)) {
-    acc[key] = devServerConfig[key];
-  } else {
-    console.log(`Removing invalid devServer property: ${key}`);
-  }
-  return acc;
-}, {});
 
 const config = merge(baseConfig, {
   devtool: 'inline-source-map',
@@ -281,5 +265,5 @@ const config = merge(baseConfig, {
 
 export default {
   ...config,
-  devServer: sanitizedDevServerConfig,
+  devServer: devServerConfig,
 };
