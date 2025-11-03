@@ -19,7 +19,7 @@ jobs:
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
-          node-version: 20.6.1
+          node-version: "22"
 
       - name: yarn install
         run: |
