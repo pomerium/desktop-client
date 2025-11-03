@@ -296,8 +296,8 @@
     "validator": "^13.11.0"
   },
   "engines": {
-    "node": ">=16.13",
-    "npm": ">=6.x",
+    "node": ">=22.18",
+    "npm": ">=10",
     "yarn": ">=1.21.3"
   },
   "browserslist": [],
