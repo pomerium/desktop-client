@@ -7,9 +7,9 @@ import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import { merge } from 'webpack-merge';
-import baseConfig from './webpack.config.base';
-import DeleteSourceMaps from '../scripts/DeleteSourceMaps';
-import CheckNodeEnv from '../scripts/CheckNodeEnv';
+import baseConfig from './webpack.config.base.js';
+import DeleteSourceMaps from '../scripts/DeleteSourceMaps.js';
+import CheckNodeEnv from '../scripts/CheckNodeEnv.js';
 
 CheckNodeEnv('production');
 DeleteSourceMaps();
@@ -23,7 +23,7 @@ export default merge(baseConfig, {
   entry: './src/main.dev.ts',
 
   output: {
-    path: path.join(__dirname, '../../'),
+    path: path.join(import.meta.dirname, '../../'),
     filename: './src/main.prod.js',
   },
 

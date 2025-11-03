@@ -3,21 +3,21 @@
   "productName": "PomeriumDesktop",
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
   "scripts": {
-    "download": "npx ts-node .erb/scripts/DownloadBinaries.ts",
+    "download": "npx tsx .erb/scripts/DownloadBinaries.ts",
     "dev-setup": "git clone https://github.com/pomerium/cli && ln -s $(pwd)/cli/bin/pomerium-cli assets/bin/ && cd cli && make build && yarn metadata",
     "build-cli": "cd cli && git pull origin; make build",
-    "metadata": "npx ts-node .erb/scripts/WriteMetadata.ts",
+    "metadata": "npx tsx .erb/scripts/WriteMetadata.ts",
     "build": "concurrently \"yarn download\" \"yarn metadata\"&& concurrently \"yarn build:main\" \"yarn build:renderer\"",
-    "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.babel.js",
-    "build:renderer": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.renderer.prod.babel.js",
+    "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.mjs",
+    "build:renderer": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.renderer.prod.mjs",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "package": "yarn build && electron-builder build --publish never",
     "release": "yarn build && electron-builder build --publish always",
-    "postinstall": "node -r @babel/register .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.babel.js && yarn-deduplicate yarn.lock",
-    "start": "node -r @babel/register ./.erb/scripts/CheckPortInUse.js && cross-env yarn start:renderer",
-    "start:main": "cross-env NODE_ENV=development electron -r ./.erb/scripts/BabelRegister ./src/main.dev.ts",
-    "start:renderer": "cross-env NODE_ENV=development webpack serve --config ./.erb/configs/webpack.config.renderer.dev.babel.js",
+    "postinstall": "node .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.mjs && yarn-deduplicate yarn.lock",
+    "start": "node ./.erb/scripts/CheckPortInUse.js && cross-env yarn start:renderer",
+    "start:main": "cross-env NODE_ENV=development NODE_OPTIONS='--import tsx' electron ./src/main.dev.ts",
+    "start:renderer": "cross-env NODE_ENV=development webpack serve --config ./.erb/configs/webpack.config.renderer.dev.mjs",
     "test": "jest --passWithNoTests ",
     "protoc": ".erb/scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && prettier --write ./src/shared/pb"
   },
@@ -25,7 +25,7 @@
     "*.{js,jsx,ts,tsx}": [
       "cross-env NODE_ENV=development eslint --cache"
     ],
-    "{*.json,.{babelrc,eslintrc,prettierrc}}": [
+    "{*.json,.{eslintrc,prettierrc}}": [
       "prettier --ignore-path .eslintignore --parser json --write"
     ],
     "*.{css,scss}": [
@@ -160,29 +160,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.26.8",
-    "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/plugin-proposal-decorators": "^7.25.9",
-    "@babel/plugin-proposal-do-expressions": "^7.25.9",
-    "@babel/plugin-proposal-export-default-from": "^7.25.9",
-    "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
-    "@babel/plugin-proposal-function-bind": "^7.25.9",
-    "@babel/plugin-proposal-function-sent": "^7.25.9",
-    "@babel/plugin-proposal-json-strings": "^7.14.5",
-    "@babel/plugin-proposal-logical-assignment-operators": "^7.20.7",
-    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.14.5",
-    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
-    "@babel/plugin-proposal-pipeline-operator": "^7.26.7",
-    "@babel/plugin-proposal-throw-expressions": "^7.25.9",
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@babel/plugin-syntax-import-meta": "^7.10.4",
-    "@babel/plugin-transform-react-constant-elements": "^7.25.9",
-    "@babel/plugin-transform-react-inline-elements": "^7.25.9",
-    "@babel/plugin-transform-runtime": "^7.26.8",
-    "@babel/preset-env": "^7.26.8",
-    "@babel/preset-react": "^7.26.3",
-    "@babel/preset-typescript": "^7.26.0",
-    "@babel/register": "^7.25.9",
     "@electron/notarize": "^2.5.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
     "@testing-library/jest-dom": "^6.6.3",
@@ -201,11 +178,6 @@
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "axios": "^1.8.2",
-    "babel-eslint": "^10.1.0",
-    "babel-jest": "^29.7.0",
-    "babel-loader": "^9.2.1",
-    "babel-plugin-dev-expression": "^0.2.2",
-    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "browserslist-config-erb": "^0.0.3",
     "chalk": "^4.1.2",
     "concurrently": "^8.2.2",
@@ -216,6 +188,7 @@
     "electron": "35.7.5",
     "electron-builder": "^24.13.3",
     "electron-rebuild": "^3.0.0",
+    "esbuild-loader": "^4.4.0",
     "eslint": "^8.56.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.1.0",
@@ -247,21 +220,18 @@
     "style-loader": "^3.3.4",
     "tar-stream": "^3.1.7",
     "terser-webpack-plugin": "^5.3.11",
-    "ts-node": "^10.9.2",
+    "tsx": "^3.12.7",
     "typescript": "^5.3.3",
     "unzip-stream": "^0.3.2",
     "url-loader": "^4.1.1",
     "webpack": "^5.94.0",
     "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^5.2.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.2.2",
     "webpack-merge": "^5.10.0",
     "yarn-deduplicate": "^6.0.2"
   },
   "dependencies": {
-    "@babel/plugin-proposal-numeric-separator": "^7.14.5",
-    "@babel/plugin-proposal-private-methods": "^7.14.5",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/dm-sans": "^5.1.1",
@@ -296,8 +266,8 @@
     "validator": "^13.11.0"
   },
   "engines": {
-    "node": ">=16.13",
-    "npm": ">=6.x",
+    "node": ">=22.18",
+    "npm": ">=10",
     "yarn": ">=1.21.3"
   },
   "browserslist": [],
@@ -306,7 +276,6 @@
       {
         "files": [
           ".prettierrc",
-          ".babelrc",
           ".eslintrc"
         ],
         "options": {

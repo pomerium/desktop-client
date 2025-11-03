@@ -4,7 +4,9 @@
 
 import path from 'path';
 import webpack from 'webpack';
-import { dependencies as externals } from '../../src/package.json';
+import packageJson from '../../src/package.json' with { type: 'json' };
+
+const { dependencies: externals } = packageJson;
 
 export default {
   externals: [
@@ -15,13 +17,12 @@ export default {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.[jt]sx?$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
-          },
+        loader: 'esbuild-loader',
+        options: {
+          target: 'es2022',
+          jsx: 'automatic',
         },
       },
       {
@@ -32,7 +33,7 @@ export default {
   },
 
   output: {
-    path: path.join(__dirname, '../../src'),
+    path: path.join(import.meta.dirname, '../../src'),
     libraryTarget: 'commonjs2',
   },
 
@@ -41,7 +42,7 @@ export default {
    */
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
-    modules: [path.join(__dirname, '../src'), 'node_modules'],
+    modules: [path.join(import.meta.dirname, '../src'), 'node_modules'],
   },
 
   plugins: [

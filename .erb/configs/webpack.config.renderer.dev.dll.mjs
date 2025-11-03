@@ -5,16 +5,19 @@
 import webpack from 'webpack';
 import path from 'path';
 import { merge } from 'webpack-merge';
-import baseConfig from './webpack.config.base';
-import { dependencies } from '../../package.json';
-import CheckNodeEnv from '../scripts/CheckNodeEnv';
+import baseConfig from './webpack.config.base.js';
+import rendererDevConfig from './webpack.config.renderer.dev.mjs';
+import CheckNodeEnv from '../scripts/CheckNodeEnv.js';
+import packageJson from '../../package.json' with { type: 'json' };
+
+const { dependencies } = packageJson;
 
 CheckNodeEnv('development');
 
-const dist = path.join(__dirname, '../dll');
+const dist = path.join(import.meta.dirname, '../dll');
 
 export default merge(baseConfig, {
-  context: path.join(__dirname, '../..'),
+  context: path.join(import.meta.dirname, '../..'),
 
   devtool: 'eval',
 
@@ -27,7 +30,7 @@ export default merge(baseConfig, {
   /**
    * Use `module` from `webpack.config.renderer.dev.js`
    */
-  module: require('./webpack.config.renderer.dev.babel').default.module,
+  module: rendererDevConfig.module,
 
   entry: {
     renderer: Object.keys(dependencies || {}),
@@ -62,9 +65,9 @@ export default merge(baseConfig, {
     new webpack.LoaderOptionsPlugin({
       debug: true,
       options: {
-        context: path.join(__dirname, '../../src'),
+        context: path.join(import.meta.dirname, '../../src'),
         output: {
-          path: path.join(__dirname, '../dll'),
+          path: path.join(import.meta.dirname, '../dll'),
         },
       },
     }),
