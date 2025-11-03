@@ -1,12 +1,7 @@
-import * as Sentry from '@sentry/electron/main';
 import { BrowserWindow } from 'electron';
 
 import { getAssetPath } from '../main/binaries';
 import MenuBuilder from './menu';
-
-Sentry.init({
-  dsn: 'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413',
-});
 
 const createWindow = (): BrowserWindow | null => {
   const appWindow = new BrowserWindow({
