@@ -37,35 +37,7 @@ if (
   execSync('yarn build-dll');
 }
 
-const devServerConfig = {
-  port,
-  compress: true,
-  hot: 'only',
-  headers: { 'Access-Control-Allow-Origin': '*' },
-  static: {
-    directory: path.resolve(__dirname, 'dist'),
-  },
-  historyApiFallback: {
-    verbose: true,
-    disableDotRule: false,
-  },
-  setupMiddlewares: (middlewares, devServer) => {
-    console.log('Starting Main Process...');
-    spawn('npm', ['run', 'start:main'], {
-      shell: true,
-      env: process.env,
-      stdio: 'inherit',
-    })
-      .on('close', (code) => process.exit(code))
-      .on('error', (spawnError) => console.error(spawnError));
-    return middlewares;
-  },
-  devMiddleware: {
-    publicPath,
-  },
-};
-
-const config = merge(baseConfig, {
+export default merge(baseConfig, {
   devtool: 'inline-source-map',
 
   mode: 'development',
@@ -261,9 +233,37 @@ const config = merge(baseConfig, {
 
     new ReactRefreshWebpackPlugin(),
   ],
-});
 
-export default {
-  ...config,
-  devServer: devServerConfig,
-};
+  node: {
+    __dirname: false,
+    __filename: false,
+  },
+
+  devServer: {
+    port,
+    compress: true,
+    hot: 'only',
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    static: {
+      directory: path.resolve(__dirname, 'dist'),
+    },
+    historyApiFallback: {
+      verbose: true,
+      disableDotRule: false,
+    },
+    setupMiddlewares: (middlewares, devServer) => {
+      console.log('Starting Main Process...');
+      spawn('npm', ['run', 'start:main'], {
+        shell: true,
+        env: process.env,
+        stdio: 'inherit',
+      })
+        .on('close', (code) => process.exit(code))
+        .on('error', (spawnError) => console.error(spawnError));
+      return middlewares;
+    },
+    devMiddleware: {
+      publicPath,
+    },
+  },
+});
