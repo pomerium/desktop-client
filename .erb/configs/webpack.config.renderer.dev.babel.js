@@ -37,7 +37,6 @@ if (
   execSync('yarn build-dll');
 }
 
-// Valid webpack-dev-server v5 properties only
 const validDevServerKeys = [
   'allowedHosts', 'bonjour', 'client', 'compress', 'devMiddleware',
   'headers', 'historyApiFallback', 'host', 'hot', 'ipc', 'liveReload',
@@ -73,7 +72,6 @@ const devServerConfig = {
   },
 };
 
-// Sanitize devServer config to remove any invalid properties
 const sanitizedDevServerConfig = Object.keys(devServerConfig).reduce((acc, key) => {
   if (validDevServerKeys.includes(key)) {
     acc[key] = devServerConfig[key];
@@ -281,8 +279,6 @@ const config = merge(baseConfig, {
   ],
 });
 
-// Set devServer config separately to avoid webpack-merge contamination
-// Return a completely new object to prevent any property pollution
 export default {
   ...config,
   devServer: sanitizedDevServerConfig,
