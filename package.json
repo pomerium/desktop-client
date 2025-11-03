@@ -247,7 +247,6 @@
     "style-loader": "^3.3.4",
     "tar-stream": "^3.1.7",
     "terser-webpack-plugin": "^5.3.11",
-    "ts-node": "^10.9.2",
     "tsx": "^3.12.7",
     "typescript": "^5.3.3",
     "unzip-stream": "^0.3.2",

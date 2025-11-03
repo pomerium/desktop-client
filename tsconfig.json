@@ -23,12 +23,6 @@
     "allowJs": true,
     "noImplicitAny": false,
   },
-  "ts-node": {
-    "transpileOnly": true,
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  },
   "exclude": [
     "test",
     "release",
