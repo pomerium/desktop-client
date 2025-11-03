@@ -4,26 +4,20 @@
 
 import webpack from 'webpack';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
 import { merge } from 'webpack-merge';
 import baseConfig from './webpack.config.base.js';
 import rendererDevConfig from './webpack.config.renderer.dev.mjs';
 import CheckNodeEnv from '../scripts/CheckNodeEnv.js';
+import packageJson from '../../package.json' with { type: 'json' };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const { dependencies } = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf8')
-);
+const { dependencies } = packageJson;
 
 CheckNodeEnv('development');
 
-const dist = path.join(__dirname, '../dll');
+const dist = path.join(import.meta.dirname, '../dll');
 
 export default merge(baseConfig, {
-  context: path.join(__dirname, '../..'),
+  context: path.join(import.meta.dirname, '../..'),
 
   devtool: 'eval',
 
@@ -71,9 +65,9 @@ export default merge(baseConfig, {
     new webpack.LoaderOptionsPlugin({
       debug: true,
       options: {
-        context: path.join(__dirname, '../../src'),
+        context: path.join(import.meta.dirname, '../../src'),
         output: {
-          path: path.join(__dirname, '../dll'),
+          path: path.join(import.meta.dirname, '../dll'),
         },
       },
     }),

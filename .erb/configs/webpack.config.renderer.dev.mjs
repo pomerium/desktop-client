@@ -1,5 +1,4 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
 import fs from 'fs';
 import webpack from 'webpack';
 import chalk from 'chalk';
@@ -9,9 +8,6 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import baseConfig from './webpack.config.base.js';
 import CheckNodeEnv from '../scripts/CheckNodeEnv.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
 if (process.env.NODE_ENV === 'production') {
@@ -20,7 +16,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = process.env.PORT || 1212;
 const publicPath = `http://localhost:${port}/dist/`;
-const dllDir = path.join(__dirname, '../dll');
+const dllDir = path.join(import.meta.dirname, '../dll');
 const manifest = path.resolve(dllDir, 'renderer.json');
 // Skip DLL reference if DLL files don't exist yet (e.g., during postinstall)
 const requiredByDLLConfig = !(fs.existsSync(dllDir) && fs.existsSync(manifest));
@@ -35,7 +31,7 @@ export default merge(baseConfig, {
   entry: [
     'core-js',
     'regenerator-runtime/runtime',
-    path.resolve(__dirname, '../../src/index.tsx'),
+    path.resolve(import.meta.dirname, '../../src/index.tsx'),
   ],
 
   output: {
@@ -181,7 +177,7 @@ export default merge(baseConfig, {
       ? []
       : [
           new webpack.DllReferencePlugin({
-            context: path.join(__dirname, '../dll'),
+            context: path.join(import.meta.dirname, '../dll'),
             manifest: JSON.parse(fs.readFileSync(manifest, 'utf8')),
             sourceType: 'var',
           }),
@@ -224,7 +220,7 @@ export default merge(baseConfig, {
     allowedHosts: 'all',
     headers: { 'Access-Control-Allow-Origin': '*' },
     static: {
-      directory: path.resolve(__dirname, '../../src/dist'),
+      directory: path.resolve(import.meta.dirname, '../../src/dist'),
     },
     historyApiFallback: {
       verbose: true,

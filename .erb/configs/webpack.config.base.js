@@ -3,16 +3,10 @@
  */
 
 import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
 import webpack from 'webpack';
+import packageJson from '../../src/package.json' with { type: 'json' };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const { dependencies: externals } = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../../src/package.json'), 'utf8')
-);
+const { dependencies: externals } = packageJson;
 
 export default {
   externals: [
@@ -39,7 +33,7 @@ export default {
   },
 
   output: {
-    path: path.join(__dirname, '../../src'),
+    path: path.join(import.meta.dirname, '../../src'),
     libraryTarget: 'commonjs2',
   },
 
@@ -48,7 +42,7 @@ export default {
    */
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
-    modules: [path.join(__dirname, '../src'), 'node_modules'],
+    modules: [path.join(import.meta.dirname, '../src'), 'node_modules'],
   },
 
   plugins: [

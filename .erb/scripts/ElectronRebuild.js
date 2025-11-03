@@ -1,16 +1,11 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import fs from 'fs';
+import packageJson from '../../src/package.json' with { type: 'json' };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { dependencies } = packageJson;
 
-const { dependencies } = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../../src/package.json'), 'utf8')
-);
-
-const nodeModulesPath = path.join(__dirname, '../../src/node_modules');
+const nodeModulesPath = path.join(import.meta.dirname, '../../src/node_modules');
 
 if (
   Object.keys(dependencies || {}).length > 0 &&
@@ -23,7 +18,7 @@ if (
       ? electronRebuildCmd.replace(/\//g, '\\')
       : electronRebuildCmd;
   execSync(cmd, {
-    cwd: path.join(__dirname, '../../src'),
+    cwd: path.join(import.meta.dirname, '../../src'),
     stdio: 'inherit',
   });
 }
