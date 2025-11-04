@@ -3,7 +3,7 @@
 ## Get all the dependencies
 
 ```bash
-yarn
+npm install
 ```
 
 ## Development checkout of pomerium-cli
@@ -11,7 +11,7 @@ yarn
 ### Set up repo clone and symlink
 
 ```bash
-yarn dev-setup
+npm run dev-setup
 ```
 
 This will internally check out the default branch of `pomerium/cli`
@@ -27,7 +27,7 @@ This will internally check out the default branch of `pomerium/cli`
 To fetch branch updates and rebuild the cli binary
 
 ```bash
-yarn build-cli
+npm run build-cli
 ```
 
 ## Run a dev build
@@ -35,7 +35,7 @@ yarn build-cli
 Start the app in the `dev` environment:
 
 ```bash
-yarn start
+npm run start
 ```
 
 # Packaging for Production
@@ -43,5 +43,5 @@ yarn start
 To package apps for the local platform:
 
 ```bash
-yarn package
+npm run package
 ```
