@@ -49,8 +49,8 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_KEY_ISSUER: ${{ secrets.APPLE_ID_KEY_ISSUER }}
         run: |
-          npm run release -m --arm64
-          npm run release -m --x64
-          npm run release -l --arm64
-          npm run release -l --x64
-          npm run release -w --x64
+          npm run release -- -m --arm64
+          npm run release -- -m --x64
+          npm run release -- -l --arm64
+          npm run release -- -l --x64
+          npm run release -- -w --x64
