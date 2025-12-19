@@ -1,8 +1,10 @@
 name: Build
-permissions:
-  contents: read
+
 on:
   push:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -12,17 +14,17 @@ jobs:
     container:
       image: electronuserland/builder:wine
       env:
-        ELECTRON_CACHE: "/root/.cache/electron"
-        ELECTRON_BUILDER_CACHE: "/root/.cache/electron-builder"
+        ELECTRON_CACHE: '/root/.cache/electron'
+        ELECTRON_BUILDER_CACHE: '/root/.cache/electron-builder'
 
     steps:
-      - name: Checkout git repo
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
-          node-version: "22"
+          node-version-file: .tool-versions
 
       - name: Install dependencies
         run: |
