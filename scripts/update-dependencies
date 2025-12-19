@@ -3,6 +3,15 @@ set -euo pipefail
 
 _project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)/.."
 
+require-command() {
+	local _command="${1?"command is required"}"
+
+	if ! command -v "$_command" >/dev/null 2>&1; then
+		echo "$_command is required"
+		exit 1
+	fi
+}
+
 update-tools() {
 	pushd "$_project_root"
 
