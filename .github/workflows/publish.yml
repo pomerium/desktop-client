@@ -1,9 +1,11 @@
 name: Publish
-permissions:
-  contents: read
+
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
+
+permissions:
+  contents: read
 
 jobs:
   publish:
@@ -18,13 +20,13 @@ jobs:
         os: [macos-latest]
 
     steps:
-      - name: Checkout git repo
+      - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
-      - name: Setup Node.js
-        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f
+      - name: Setup Node
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
-          node-version: "22"
+          node-version-file: .tool-versions
 
       - name: Install dependencies
         run: |
