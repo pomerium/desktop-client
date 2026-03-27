@@ -7,7 +7,8 @@ import {
 } from '@mui/material';
 import React, { FC, useState } from 'react';
 
-import { ClientCertFromStore, Connection } from '../../shared/pb/api';
+import { platform } from '../../shared/electron';
+import { ClientCertFromStore, Connection } from '../../shared/pb/types';
 import CertFilter from './CertFilter';
 import ManualClientCertSelection from './ManualClientCertSelection';
 import NestedAccordion from './NestedAccordion';
@@ -73,7 +74,7 @@ const ClientCertSelection: FC<ClientCertSelectionProps> = ({
   };
 
   const supportsClientCertFromStore =
-    process.platform === 'win32' || process.platform === 'darwin';
+    platform === 'win32' || platform === 'darwin';
   if (!supportsClientCertFromStore) {
     return (
       <ManualClientCertSelection

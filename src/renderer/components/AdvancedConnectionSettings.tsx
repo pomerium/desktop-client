@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import React, { FC } from 'react';
 
-import { Connection } from '../../shared/pb/api';
+import { Connection } from '../../shared/pb/types';
 import ClientCertSelection from './ClientCertSelection';
 import TextField from './TextField';
 

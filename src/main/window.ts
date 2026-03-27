@@ -1,6 +1,7 @@
 import { BrowserWindow } from 'electron';
+import { join } from 'path';
 
-import { getAssetPath } from '../main/binaries';
+import { getAssetPath } from './binaries';
 import MenuBuilder from './menu';
 
 const createWindow = (): BrowserWindow | null => {
@@ -10,8 +11,10 @@ const createWindow = (): BrowserWindow | null => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      contextIsolation: false,
-      nodeIntegration: true,
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
+      preload: join(__dirname, '../preload/index.js'),
     },
   });
 

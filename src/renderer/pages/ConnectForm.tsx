@@ -13,7 +13,6 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
 import React, { FC, useEffect, useState } from 'react';
 import { CheckCircle } from 'react-feather';
@@ -27,7 +26,8 @@ import {
   VIEW,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
-import { Connection, Protocol, Record, Selector } from '../../shared/pb/api';
+import { ipcRenderer } from '../../shared/electron';
+import { Connection, Protocol, Record, Selector } from '../../shared/pb/types';
 import AdvancedConnectionSettings from '../components/AdvancedConnectionSettings';
 import AdvancedSettingsAccordion from '../components/AdvancedSettingsAccordion';
 import BeforeBackActionDialog from '../components/BeforeBackActionDialog';

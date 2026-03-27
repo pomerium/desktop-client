@@ -1,12 +1,4 @@
 /* eslint global-require: off, no-console: off */
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `npm run build` or `npm run build-main`, this file is compiled to
- * `./src/main.prod.js` using webpack. This gives us some performance wins.
- */
 import * as grpc from '@grpc/grpc-js';
 import * as Sentry from '@sentry/electron/main';
 import {
@@ -21,14 +13,10 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
 import { menubar } from 'menubar';
-import path from 'path';
-import * as url from 'url';
+import { join } from 'path';
 
-import { start } from './cli';
-import createWindow from './renderer/window';
 import {
   isDev,
-  isProd,
   prodDebug,
   ConnectionData,
   DELETE_ALL,
@@ -48,8 +36,8 @@ import {
   LISTENER_LOG,
   GET_ALL_RECORDS,
   FETCH_ROUTES,
-  GetRecordsResponseArgs,
-} from './shared/constants';
+} from '../shared/constants';
+import { GetRecordsResponseArgs } from '../shared/constants-main';
 import {
   ConnectionStatusUpdate,
   ExportRequest,
@@ -60,8 +48,10 @@ import {
   Selector,
   StatusUpdatesRequest,
   FetchRoutesRequest,
-} from './shared/pb/api';
-import Helper from './trayMenu/helper';
+} from '../shared/pb/api';
+import Helper from '../trayMenu/helper';
+import { start } from './cli';
+import createWindow from './window';
 
 const SentryDSN =
   'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413';
@@ -80,11 +70,6 @@ class AppUpdater {
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
-}
-
-if (isProd) {
-  const sourceMapSupport = require('source-map-support');
-  sourceMapSupport.install();
 }
 
 if (isDev || prodDebug) {
@@ -143,19 +128,19 @@ async function init(): Promise<void> {
   }
 
   mainWindow = createWindow();
-  mainWindow?.loadURL(
-    url.format({
-      pathname: path.join(__dirname, 'index.html'),
-      protocol: 'file:',
-      slashes: true,
-    }),
-  );
+  const rendererIndexPath = join(__dirname, '../renderer/index.html');
+  if (process.env.ELECTRON_RENDERER_URL) {
+    mainWindow?.loadURL(process.env.ELECTRON_RENDERER_URL);
+  } else {
+    mainWindow?.loadFile(rendererIndexPath);
+  }
 
   const trayMenuHelper = new Helper([], {}, [], mainWindow, null);
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
     preloadWindow: true,
     browserWindow: { width: 0, height: 0 },
+    index: process.env.ELECTRON_RENDERER_URL || `file://${rendererIndexPath}`,
     tray,
   });
   trayMenuHelper.setMenu(menu);

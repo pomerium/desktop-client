@@ -24,25 +24,20 @@ build/Release
 .eslintcache
 
 # Dependency directory
-# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 
 # OSX
 .DS_Store
 
-# App packaged
+# Build output
 release
-src/*.main.prod.js
-src/main.prod.js
-src/main.prod.js.map
-src/renderer.prod.js
-src/renderer.prod.js.map
-src/style.css
-src/style.css.map
-dist
-dll
-main.js
-main.js.map
+out
+
+# Config and scripts (not in tsconfig)
+electron.vite.config.ts
+vitest.config.ts
+scripts
+assets
 
 .idea
 npm-debug.log.*
