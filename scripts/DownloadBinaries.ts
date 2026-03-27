@@ -1,12 +1,12 @@
 import axios from 'axios';
-import path from 'path';
 import fs, { createWriteStream } from 'fs';
+import path from 'path';
 
 const { createGunzip } = require('gunzip-stream');
 const tar = require('tar-stream');
 const unzip = require('unzip-stream');
 
-const { pomeriumCli } = require('../../package.json');
+const { pomeriumCli } = require('../package.json');
 
 const pomeriumBuilds: { [char: string]: string[] } = {
   linux: ['amd64', 'arm64'],
@@ -56,7 +56,7 @@ const fetchURL = async (platform: string, arch: string) => {
     saveDetails.platform,
     saveDetails.arch,
     'bin',
-    saveDetails.binary
+    saveDetails.binary,
   );
   const url = `https://github.com/pomerium/cli/releases/download/${pomeriumCli.version}/pomerium-cli-${platform}-${arch}.${saveDetails.format}`;
 
@@ -87,7 +87,7 @@ const fetchURL = async (platform: string, arch: string) => {
             stream.pipe(writeStream);
           }
           stream.resume();
-        })
+        }),
     );
   } else if (saveDetails.format === 'zip') {
     resp.pipe(unzip.Parse()).on('entry', (entry: any) => {

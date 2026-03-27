@@ -1,34 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
-    "module": "CommonJS",
+    "target": "ES2022",
+    "module": "ESNext",
     "lib": ["dom", "esnext"],
     "declaration": true,
     "declarationMap": true,
     "noEmit": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "strict": true,
     "pretty": true,
     "sourceMap": true,
-    /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    /* Module Resolution Options */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "noImplicitAny": false,
+    "noImplicitAny": false
   },
-  "exclude": [
-    "test",
-    "release",
-    "src/main.prod.js",
-    "src/renderer.prod.js",
-    "src/dist",
-    ".erb/dll"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "out", "release"]
 }

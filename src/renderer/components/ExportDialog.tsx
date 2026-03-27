@@ -9,15 +9,12 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
-import { ipcRenderer, IpcRendererEvent } from 'electron';
 import React, { ReactElement, useState } from 'react';
 
 import { EXPORT, ExportFile } from '../../shared/constants';
+import { ipcRenderer } from '../../shared/electron';
 
-export type IpcRendererEventListener = (
-  event: IpcRendererEvent,
-  ...args: any[]
-) => void;
+export type IpcRendererEventListener = (event: any, ...args: any[]) => void;
 
 type ExportDialogProps = {
   onClose: () => void;
