@@ -2,8 +2,10 @@
 
 ## Get all the dependencies
 
+Requires npm 11.12.1 (`npm install -g npm@11.12.1`). npm 10 silently ignores the `min-release-age` package-age gate.
+
 ```bash
-npm install
+npm ci
 ```
 
 ## Development checkout of pomerium-cli
