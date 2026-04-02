@@ -12,6 +12,7 @@ jobs:
         uses: pozetroninc/github-action-get-latest-release@2a61c339ea7ef0a336d1daa35ef0cb1418e7676c
         with:
           repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           excludes: prerelease, draft
 
       - id: clean_versions
