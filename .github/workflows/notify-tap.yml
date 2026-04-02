@@ -1,25 +1,32 @@
 on:
   release:
+    types:
+      - published
 
 jobs:
   notify-tap:
     runs-on: ubuntu-latest
 
     steps:
-      - id: get_version
+      - id: get_latest
         uses: pozetroninc/github-action-get-latest-release@2a61c339ea7ef0a336d1daa35ef0cb1418e7676c
         with:
           repository: ${{ github.repository }}
+          excludes: prerelease, draft
 
-      - id: clean_version
+      - id: clean_versions
         run: |
           echo "release=${VERSION#v}" >> $GITHUB_OUTPUT
+          echo "latest_release=${LATEST_VERSION#v}" >> $GITHUB_OUTPUT
         env:
-          VERSION: '${{ steps.get_version.outputs.release }}'
+          VERSION: '${{ github.event.release.tag_name }}'
+          LATEST_VERSION: '${{ steps.get_latest.outputs.release }}'
 
-      - uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697
+      - name: Update homebrew tap
+        if: steps.clean_versions.outputs.release == steps.clean_versions.outputs.latest_release
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697
         with:
           repository: pomerium/homebrew-tap
           token: ${{ secrets.APPARITOR_GITHUB_TOKEN }}
           event-type: desktop-client-release
-          client-payload: '{ "version": "${{ steps.clean_version.outputs.release }}" }'
+          client-payload: '{ "version": "${{ steps.clean_versions.outputs.release }}" }'
