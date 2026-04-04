@@ -1,25 +1,26 @@
-name: Test
-
+name: NPM Audit Signatures
 on:
   push:
+    branches: [main]
+    paths:
+      - "**/package.json"
+      - "**/package-lock.json"
   pull_request:
+    paths:
+      - "**/package.json"
+      - "**/package-lock.json"
 
 permissions:
   contents: read
 
 jobs:
-  test:
-    name: Test
+  audit-signatures:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-
-      - name: Setup Node
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version-file: .tool-versions
-
       - name: Install npm 11.12.1 (npm 10 ignores min-release-age)
         run: |
           npm_dir="$(npm root -g)/npm"
@@ -28,15 +29,5 @@ jobs:
           curl -fsSL "https://registry.npmjs.org/npm/-/npm-11.12.1.tgz" | tar xz --strip-components=1 -C "$npm_dir"
       - name: Verify npm version
         run: npm --version
-
-      - name: npm ci
-        run: |
-          npm ci --network-timeout 300000
-
-      - name: npm run test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm run package
-          npm run lint
-          npm run test
+      - run: npm ci --ignore-scripts
+      - run: npm audit signatures --min-release-age=0

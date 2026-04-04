@@ -284,9 +284,10 @@
     "@tootallnate/once": ">=3.0.1",
     "diff": ">=5.2.2"
   },
+  "packageManager": "npm@11.12.1",
   "engines": {
     "node": ">=20",
-    "npm": ">=10",
+    "npm": ">=11 <12",
     "yarn": "YARN NO LONGER USED - use npm instead."
   },
   "browserslist": [],
