@@ -284,6 +284,7 @@
     "@tootallnate/once": ">=3.0.1",
     "diff": ">=5.2.2"
   },
+  "packageManager": "npm@10.9.4",
   "engines": {
     "node": ">=20",
     "npm": ">=10",
