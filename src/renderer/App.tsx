@@ -5,7 +5,6 @@ import {
 } from '@mui/material';
 import StylesProvider from '@mui/styles/StylesProvider';
 import jssPreset from '@mui/styles/jssPreset';
-import { ipcRenderer } from 'electron';
 import { create } from 'jss';
 import { SnackbarProvider } from 'notistack';
 import React, { FC, useEffect } from 'react';
@@ -18,20 +17,21 @@ import {
   Navigate,
 } from 'react-router-dom';
 
-import SnackbarCloseButton from './renderer/components/SnackbarCloseButton';
-import ConnectForm from './renderer/pages/ConnectForm';
-import ConnectionView from './renderer/pages/ConnectionView';
-import Layout from './renderer/pages/Layout';
-import LoadForm from './renderer/pages/LoadForm';
-import ManageConnections from './renderer/pages/ManageConnections';
-import { THEMES } from './shared/constants';
-import createCustomTheme, { ThemeConfig } from './shared/theme';
+import { THEMES } from '../shared/constants';
+import { ipcRenderer } from '../shared/electron';
+import createCustomTheme, { ThemeConfig } from '../shared/theme';
+import SnackbarCloseButton from './components/SnackbarCloseButton';
+import ConnectForm from './pages/ConnectForm';
+import ConnectionView from './pages/ConnectionView';
+import Layout from './pages/Layout';
+import LoadForm from './pages/LoadForm';
+import ManageConnections from './pages/ManageConnections';
 
 const RouteListener: FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    ipcRenderer?.on('redirectTo', (_, arg) => {
+    ipcRenderer.on('redirectTo', (_: any, arg: any) => {
       navigate(arg);
     });
     return function cleanup() {

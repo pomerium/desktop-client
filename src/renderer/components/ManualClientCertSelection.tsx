@@ -10,7 +10,7 @@ import { set } from 'lodash';
 import React, { FC, useEffect, useState } from 'react';
 import { Trash } from 'react-feather';
 
-import { Connection } from '../../shared/pb/api';
+import { Connection } from '../../shared/pb/types';
 import CertDetails from './CertDetails';
 import TextArea from './TextArea';
 

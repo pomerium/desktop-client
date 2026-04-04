@@ -6,7 +6,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Save, Upload } from 'react-feather';
@@ -23,11 +22,12 @@ import {
   TOAST_LENGTH,
   VIEW,
 } from '../../shared/constants';
+import { ipcRenderer } from '../../shared/electron';
 import {
   ListenerStatus,
   Record as ListenerRecord,
   Selector,
-} from '../../shared/pb/api';
+} from '../../shared/pb/types';
 import ConnectionRow from '../components/ConnectionRow';
 import ExportDialog, {
   IpcRendererEventListener,

@@ -16,7 +16,6 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { AlertTriangle, ChevronDown, Info } from 'react-feather';
@@ -34,13 +33,14 @@ import {
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
+import { ipcRenderer } from '../../shared/electron';
 import {
   Connection,
   ConnectionStatusUpdate,
   ListenerUpdateRequest,
   Record,
   Selector,
-} from '../../shared/pb/api';
+} from '../../shared/pb/types';
 import CertDetails from '../components/CertDetails';
 import { getClientCertFiltersSummary } from '../components/ClientCertSelection';
 import ExportDialog, {

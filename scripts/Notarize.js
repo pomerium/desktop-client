@@ -1,5 +1,5 @@
 const { notarize } = require('@electron/notarize');
-const { build } = require('../../package.json');
+const { build } = require('../package.json');
 
 exports.default = async function notarizeMacos(context) {
   const { electronPlatformName, appOutDir } = context;
@@ -17,7 +17,7 @@ exports.default = async function notarizeMacos(context) {
     !('APPLE_ID' in process.env && 'APPLE_ID_KEY_ISSUER' in process.env)
   ) {
     console.warn(
-      'Skipping notarizing step. APPLE_ID and APPLE_ID_PASS or APPLE_ID_KEY_ISSUER env variables must be set'
+      'Skipping notarizing step. APPLE_ID and APPLE_ID_PASS or APPLE_ID_KEY_ISSUER env variables must be set',
     );
     return;
   }

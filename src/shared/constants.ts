@@ -1,7 +1,3 @@
-import { ServiceError } from '@grpc/grpc-js';
-
-import { Records, Selector } from './pb/api';
-
 export const isProd = process.env.NODE_ENV === 'production';
 export const isDev = process.env.NODE_ENV === 'development';
 export const prodDebug = process.env.DEBUG_PROD === 'true';
@@ -52,8 +48,3 @@ export const THEMES = {
   LIGHT: 'LIGHT',
   DARK: 'DARK',
 };
-
-export interface GetRecordsResponseArgs {
-  err?: ServiceError | null;
-  res?: Records;
-}
