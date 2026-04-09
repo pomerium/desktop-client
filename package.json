@@ -1,6 +1,6 @@
 {
   "name": "pomerium-desktop",
-  "version": "0.32.1",
+  "version": "0.32.2",
   "productName": "PomeriumDesktop",
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
   "main": "out/main/index.js",
@@ -256,6 +256,6 @@
     }
   },
   "pomeriumCli": {
-    "version": "v0.32.0"
+    "version": "v0.32.2"
   }
 }
