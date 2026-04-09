@@ -8,7 +8,6 @@ import {
   Tooltip,
   Box,
 } from '@mui/material';
-import { clipboard, ipcRenderer } from 'electron';
 import { useSnackbar } from 'notistack';
 import React, { ReactElement } from 'react';
 import { Copy, MoreVertical } from 'react-feather';
@@ -27,11 +26,12 @@ import {
   UPDATE_LISTENERS,
   VIEW,
 } from '../../shared/constants';
+import { clipboard, ipcRenderer } from '../../shared/electron';
 import {
   ListenerUpdateRequest,
   Record as ListenerRecord,
   Connection,
-} from '../../shared/pb/api';
+} from '../../shared/pb/types';
 import Connected from '../icons/Connected';
 import Disconnected from '../icons/Disconnected';
 import ExportDialog from './ExportDialog';

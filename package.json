@@ -1,25 +1,23 @@
 {
   "name": "pomerium-desktop",
+  "version": "0.32.2",
   "productName": "PomeriumDesktop",
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
+  "main": "out/main/index.js",
   "scripts": {
-    "download": "npx tsx .erb/scripts/DownloadBinaries.ts",
+    "dev": "electron-vite dev",
+    "build": "concurrently \"npm run download\" \"npm run metadata\" && electron-vite build",
+    "preview": "electron-vite preview",
+    "download": "npx tsx scripts/DownloadBinaries.ts",
     "dev-setup": "git clone https://github.com/pomerium/cli && ln -s $(pwd)/cli/bin/pomerium-cli assets/bin/ && cd cli && make build && npm run metadata",
     "build-cli": "cd cli && git pull origin; make build",
-    "metadata": "npx tsx .erb/scripts/WriteMetadata.ts",
-    "build": "concurrently \"npm run download\" \"npm run metadata\"&& concurrently \"npm run build:main\" \"npm run build:renderer\"",
-    "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.mjs",
-    "build:renderer": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.renderer.prod.mjs",
-    "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
+    "metadata": "npx tsx scripts/WriteMetadata.ts",
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
     "package": "npm run build && electron-builder build --publish never",
     "release": "npm run build && electron-builder build --publish always",
-    "postinstall": "node .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.mjs",
-    "start": "node ./.erb/scripts/CheckPortInUse.js && cross-env npm run start:renderer",
-    "start:main": "cross-env NODE_ENV=development NODE_OPTIONS='--import tsx' electron ./src/main.dev.ts",
-    "start:renderer": "cross-env NODE_ENV=development webpack serve --config ./.erb/configs/webpack.config.renderer.dev.mjs",
-    "test": "jest --passWithNoTests ",
-    "protoc": ".erb/scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && prettier --write ./src/shared/pb"
+    "postinstall": "electron-builder install-app-deps",
+    "test": "vitest run --passWithNoTests",
+    "protoc": "scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && prettier --write ./src/shared/pb"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -39,24 +37,14 @@
     "productName": "Pomerium Desktop",
     "appId": "io.pomerium.PomeriumDesktop",
     "directories": {
-      "app": "src",
       "buildResources": "assets",
       "output": "release"
     },
     "files": [
-      "dist/",
-      "node_modules/",
-      "index.html",
-      "main.prod.js",
-      "main.prod.js.map",
-      "package.json",
-      "**/*",
-      "dist/**/*",
-      "!.github",
-      "!.vs",
-      "!node_modules/*"
+      "out/**/*",
+      "!out/**/*.map"
     ],
-    "afterSign": ".erb/scripts/Notarize.js",
+    "afterSign": "scripts/Notarize.js",
     "mac": {
       "target": [
         "dmg"
@@ -138,97 +126,47 @@
     "security"
   ],
   "homepage": "https://github.com/pomerium/desktop-client#readme",
-  "jest": {
-    "testURL": "http://localhost/",
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/.erb/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
-    },
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "ts",
-      "tsx",
-      "json"
-    ],
-    "moduleDirectories": [
-      "node_modules",
-      "src/node_modules"
-    ],
-    "setupFiles": [
-      "./.erb/scripts/CheckBuildsExist.js"
-    ]
-  },
   "devDependencies": {
     "@electron/notarize": "^2.5.0",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.1.2",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "@types/enzyme": "^3.10.18",
-    "@types/enzyme-adapter-react-16": "^1.0.9",
     "@types/history": "5.0.0",
-    "@types/jest": "^29.5.14",
     "@types/node": "20.11.5",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
     "@types/react-router": "5.1.20",
-    "@types/react-test-renderer": "^18.0.7",
-    "@types/webpack-env": "^1.18.8",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
+    "@vitejs/plugin-react": "^6.0.1",
     "axios": "^1.13.5",
-    "browserslist-config-erb": "^0.0.3",
-    "chalk": "^4.1.2",
     "concurrently": "^8.2.2",
-    "core-js": "^3.40.0",
     "cross-env": "^7.0.3",
-    "css-loader": "^6.9.0",
-    "detect-port": "^1.5.1",
     "electron": "35.7.5",
     "electron-builder": "^26.5.0",
-    "electron-rebuild": "^3.2.9",
-    "esbuild-loader": "^4.4.0",
+    "electron-vite": "^5.0.0",
     "eslint": "^8.56.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.1.0",
-    "eslint-config-erb": "^4.1.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-import-resolver-webpack": "^0.13.10",
     "eslint-plugin-compat": "^4.2.0",
     "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jest": "^27.6.3",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "file-loader": "^6.2.0",
     "gunzip-stream": "^1.0.1",
     "husky": "^7.0.1",
-    "identity-obj-proxy": "^3.0.0",
-    "jest": "^29.7.0",
+    "jsdom": "^29.0.1",
     "lint-staged": "^15.4.3",
-    "mini-css-extract-plugin": "^2.9.2",
-    "node-loader": "^2.1.0",
-    "optimize-css-assets-webpack-plugin": "^6.0.1",
     "prettier": "^3.5.0",
-    "react-refresh": "^0.14.0",
-    "react-test-renderer": "^18.2.0",
-    "rimraf": "^3.0.2",
-    "sass-loader": "^14.0.0",
-    "style-loader": "^3.3.4",
     "tar-stream": "^3.1.7",
-    "terser-webpack-plugin": "^5.3.11",
     "tsx": "^4.20.6",
     "typescript": "^5.3.3",
     "unzip-stream": "^0.3.2",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.104.1",
-    "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.2",
-    "webpack-merge": "^5.10.0"
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -257,8 +195,6 @@
     "react-feather": "^2.0.9",
     "react-router": "6.30.3",
     "react-router-dom": "6.30.3",
-    "regenerator-runtime": "^0.14.1",
-    "source-map-support": "^0.5.19",
     "ts-proto": "^1.166.2",
     "typescript-eslint": "^0.0.1-alpha.0",
     "usehooks-ts": "^3.1.1",
@@ -266,8 +202,6 @@
   },
   "overrides": {
     "tar": "^7.5.11",
-    "serialize-javascript": ">=7.0.3",
-    "svgo": ">=2.8.1",
     "flatted": ">=3.4.2",
     "picomatch": ">=2.3.2",
     "yaml": ">=2.8.3",
@@ -279,10 +213,7 @@
     },
     "@typescript-eslint/typescript-estree": {
       "minimatch": ">=9.0.7"
-    },
-    "qs": ">=6.14.2",
-    "@tootallnate/once": ">=3.0.1",
-    "diff": ">=5.2.2"
+    }
   },
   "engines": {
     "node": ">=20",

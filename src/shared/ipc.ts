@@ -1,16 +1,15 @@
-import { ipcRenderer } from 'electron';
-
 import { FETCH_ROUTES, GET_ALL_RECORDS, SAVE_RECORD } from './constants';
+import { ipcRenderer } from './electron';
 import {
   FetchRoutesRequest,
   FetchRoutesResponse,
   Record,
   Records,
-} from './pb/api';
+} from './pb/types';
 
 function invoke(name: string, ...args: any[]): Promise<any> {
   return new Promise((resolve, reject) => {
-    ipcRenderer.once(name, (_evt, result) => {
+    ipcRenderer.once(name, (_evt: any, result: any) => {
       const { res, err } = result;
       if (err) {
         reject(err);

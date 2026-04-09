@@ -1,12 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { AppBar, Autocomplete, Grid, TextField, Toolbar } from '@mui/material';
 import { createFilterOptions } from '@mui/material/useAutocomplete';
-import { ipcRenderer } from 'electron';
 import React, { FC, useEffect, useState } from 'react';
 import { Search } from 'react-feather';
 
 import { GET_ALL_RECORDS, VIEW } from '../../shared/constants';
-import { Record as ListenerRecord } from '../../shared/pb/api';
+import { ipcRenderer } from '../../shared/electron';
+import { Record as ListenerRecord } from '../../shared/pb/types';
 import Logo from '../icons/Logo';
 import TopTabs from './TopTabs';
 

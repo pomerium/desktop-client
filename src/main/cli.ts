@@ -3,8 +3,8 @@ import * as Sentry from '@sentry/electron/main';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { createServer } from 'net';
 
-import { pomeriumCli } from './main/binaries';
-import { ConfigClient, ListenerClient } from './shared/pb/api';
+import { ConfigClient, ListenerClient } from '../shared/pb/api';
+import { pomeriumCli } from './binaries';
 
 async function pickPort(): Promise<number> {
   const srv = createServer();

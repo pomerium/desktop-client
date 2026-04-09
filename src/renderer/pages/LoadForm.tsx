@@ -9,7 +9,6 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import { ipcRenderer } from 'electron';
 import { defaultsDeep, isEqual } from 'lodash';
 import { enqueueSnackbar } from 'notistack';
 import React, { FC, useState } from 'react';
@@ -20,8 +19,14 @@ import {
   TOAST_LENGTH,
   VIEW_CONNECTION_LIST,
 } from '../../shared/constants';
+import { ipcRenderer } from '../../shared/electron';
 import { fetchRoutes, getAllRecords, saveRecord } from '../../shared/ipc';
-import { Connection, PortalRoute, Protocol, Record } from '../../shared/pb/api';
+import {
+  Connection,
+  PortalRoute,
+  Protocol,
+  Record,
+} from '../../shared/pb/types';
 import AdvancedSettingsAccordion from '../components/AdvancedSettingsAccordion';
 import ClientCertSelection from '../components/ClientCertSelection';
 import StyledCard from '../components/StyledCard';

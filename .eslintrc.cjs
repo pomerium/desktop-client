@@ -1,5 +1,16 @@
 module.exports = {
-  extends: ['erb', 'plugin:@typescript-eslint/recommended'],
+  extends: [
+    'airbnb',
+    'airbnb/hooks',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:promise/recommended',
+    'plugin:compat/recommended',
+    'plugin:prettier/recommended',
+  ],
+  env: {
+    browser: true,
+    node: true,
+  },
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
@@ -27,6 +38,8 @@ module.exports = {
     'no-continue': 'off',
     // eslint doesn't seem to understand for ... of
     'no-restricted-syntax': 'off',
+    // allow property assignment on function parameters
+    'no-param-reassign': ['error', { props: false }],
   },
   parserOptions: {
     ecmaVersion: 2020,

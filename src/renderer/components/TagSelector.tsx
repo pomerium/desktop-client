@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { Autocomplete } from '@mui/material';
-import { ipcRenderer } from 'electron';
 import React, { FC, useEffect, useState } from 'react';
 
 import { GET_UNIQUE_TAGS } from '../../shared/constants';
+import { ipcRenderer } from '../../shared/electron';
 import { formatTag } from '../../shared/validators';
 import TextField from './TextField';
 

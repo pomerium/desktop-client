@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import moment from 'moment';
 import React, { ReactElement } from 'react';
 
-import { Certificate } from '../../shared/pb/api';
+import { Certificate } from '../../shared/pb/types';
 
 interface DetailViewDialogProps {
   open: boolean;
