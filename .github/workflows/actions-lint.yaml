@@ -3,7 +3,7 @@ name: lint workflows
 on:
   push:
     paths:
-      - '.github/workflows/'
+      - '.github/workflows/**'
   pull_request:
     branches:
       - 'main'
