@@ -215,6 +215,7 @@
       "minimatch": ">=9.0.7"
     }
   },
+  "packageManager": "npm@10.9.4",
   "engines": {
     "node": ">=20",
     "npm": ">=10",
