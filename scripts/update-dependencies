@@ -19,8 +19,8 @@ update-tools() {
 
 	asdf install action-validator latest
 	asdf set action-validator latest
-	asdf install nodejs latest:20
-	asdf set nodejs latest:20
+	asdf install nodejs latest:24
+	asdf set nodejs latest:24
 
 	popd
 }
