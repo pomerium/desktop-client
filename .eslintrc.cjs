@@ -32,6 +32,9 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-this-alias': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    // renamed from no-var-requires in @typescript-eslint v8; allows the
+    // conditional dev-only require('electron-debug') in main/index.ts
+    '@typescript-eslint/no-require-imports': 'off',
     // because of how we do ipc we need to save routes one at a time, awaiting in a loop makes sense
     'no-await-in-loop': 'off',
     // continue is fine
