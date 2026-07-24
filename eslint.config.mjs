@@ -1,6 +1,5 @@
 import eslintReact from '@eslint-react/eslint-plugin';
 import js from '@eslint/js';
-import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -30,8 +29,6 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   eslintReact.configs['recommended-typescript'],
   jsxA11y.flatConfigs.recommended,
-  // must come last: disables eslint rules that conflict with prettier
-  eslintConfigPrettier,
   {
     languageOptions: {
       ecmaVersion: 2020,

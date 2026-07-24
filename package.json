@@ -135,7 +135,6 @@
     "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
     "eslint": "^10.7.0",
-    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "globals": "^15.15.0",
     "gunzip-stream": "^1.0.1",
