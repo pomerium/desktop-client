@@ -21,21 +21,6 @@
     "test": "vitest run --passWithNoTests",
     "protoc": "scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && prettier --write ./src/shared/pb"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "cross-env NODE_ENV=development eslint --cache",
-      "prettier --ignore-path .prettierignore --single-quote --write"
-    ],
-    "{*.json,.prettierrc}": [
-      "prettier --ignore-path .prettierignore --parser json --write"
-    ],
-    "*.{css,scss}": [
-      "prettier --ignore-path .prettierignore --single-quote --write"
-    ],
-    "*.{html,md,yml}": [
-      "prettier --ignore-path .prettierignore --single-quote --write"
-    ]
-  },
   "build": {
     "productName": "Pomerium Desktop",
     "appId": "io.pomerium.PomeriumDesktop",
@@ -157,9 +142,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^15.15.0",
     "gunzip-stream": "^1.0.1",
-    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
-    "lint-staged": "^17.2.0",
     "prettier": "^3.9.6",
     "tar-stream": "^3.2.0",
     "tsx": "^4.23.1",
@@ -251,11 +234,6 @@
     "baseBranches": [
       "next"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "pomeriumCli": {
     "version": "v0.33.0"
