@@ -203,7 +203,6 @@
     "npm": ">=10",
     "yarn": "YARN NO LONGER USED - use npm instead."
   },
-  "browserslist": [],
   "prettier": {
     "overrides": [
       {
