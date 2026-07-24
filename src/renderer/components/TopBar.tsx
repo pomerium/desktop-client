@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { AppBar, Autocomplete, Grid, TextField, Toolbar } from '@mui/material';
 import { createFilterOptions } from '@mui/material/useAutocomplete';
 import React, { FC, useEffect, useState } from 'react';

@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import { TextField as MuiTextField, TextFieldProps } from '@mui/material';
 import React, { ReactElement } from 'react';
 

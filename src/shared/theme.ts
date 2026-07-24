@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import '@fontsource/dm-sans';
 import * as colors from '@mui/material/colors';
 import {
