@@ -1,0 +1,16 @@
+# See https://pre-commit.com for usage:
+#   pip install pre-commit   (or: brew install pre-commit)
+#   pre-commit install
+repos:
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: npx cross-env NODE_ENV=development eslint --cache
+        language: system
+        files: \.(js|jsx|ts|tsx)$
+      - id: prettier
+        name: prettier
+        entry: npx prettier --ignore-path .prettierignore --write
+        language: system
+        files: \.(js|jsx|ts|tsx|json|css|scss|html|md|ya?ml)$

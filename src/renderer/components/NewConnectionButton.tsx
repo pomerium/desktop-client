@@ -1,5 +1,4 @@
-/* eslint-disable react/jsx-props-no-spreading */
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
 import {
   Button,
   ClickAwayListener,

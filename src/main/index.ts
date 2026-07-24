@@ -99,7 +99,6 @@ const onUncaughtException = (() => {
       msg.title = 'Incorrect CLI supplied.';
       msg.message = 'Make sure the correct version for your OS is installed.';
     }
-    // eslint-disable-next-line promise/no-promise-in-callback
     await Promise.all([Sentry.close(2000), dialog.showMessageBox(msg)]);
 
     app.quit();
@@ -123,7 +122,6 @@ async function init(): Promise<void> {
   const { configClient, listenerClient } = cli;
 
   if (process.platform === 'win32') {
-    // eslint-disable-next-line
     new AppUpdater();
   }
 

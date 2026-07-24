@@ -35,7 +35,6 @@ jobs:
           git config --global --add safe.directory /__w/desktop-client/desktop-client
           # mac requires dmg-builder, which doesn't get installed for some reason
           #npm run package -m --arm64
-          #npm run package -m --x64
           npm run package -l --arm64
           npm run package -l --x64
           # windows complains about home directory permissions.
