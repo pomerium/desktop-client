@@ -138,7 +138,6 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-compat": "^7.0.2",
     "eslint-plugin-jsx-a11y": "6.10.2",
-    "eslint-plugin-promise": "^7.3.0",
     "globals": "^15.15.0",
     "gunzip-stream": "^1.0.1",
     "jsdom": "^29.1.1",
