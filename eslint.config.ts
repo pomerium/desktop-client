@@ -23,6 +23,7 @@ export default defineConfig([
     '**/*.css.d.ts',
     '**/*.sass.d.ts',
     '**/*.scss.d.ts',
+    'src/shared/pb/**',
   ]),
   js.configs.recommended,
   tseslint.configs.recommended,
@@ -62,14 +63,6 @@ export default defineConfig([
       'no-restricted-syntax': 'off',
       // allow property assignment on function parameters
       'no-param-reassign': ['error', { props: false }],
-    },
-  },
-  {
-    // generated protobuf code carries blanket eslint-disable headers; don't
-    // flag them as unused
-    files: ['src/shared/pb/**'],
-    linterOptions: {
-      reportUnusedDisableDirectives: 'off',
     },
   },
 ]);
