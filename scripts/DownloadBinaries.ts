@@ -11,7 +11,7 @@ const { pomeriumCli } = require('../package.json');
 const pomeriumBuilds: { [char: string]: string[] } = {
   linux: ['amd64', 'arm64'],
   windows: ['amd64'],
-  darwin: ['amd64', 'arm64'],
+  darwin: ['arm64'],
 };
 const baseSavePath = './system_files';
 
