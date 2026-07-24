@@ -1,7 +1,7 @@
 import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import compat from 'eslint-plugin-compat';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
-import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import promise from 'eslint-plugin-promise';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -35,7 +35,8 @@ export default tseslint.config(
   jsxA11y.flatConfigs.recommended,
   promise.configs['flat/recommended'],
   compat.configs['flat/recommended'],
-  prettierRecommended,
+  // must come last: disables eslint rules that conflict with prettier
+  eslintConfigPrettier,
   {
     languageOptions: {
       ecmaVersion: 2020,
