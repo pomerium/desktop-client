@@ -4,7 +4,6 @@ import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import compat from 'eslint-plugin-compat';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import promise from 'eslint-plugin-promise';
-import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -46,16 +45,10 @@ export default tseslint.config(
         ...globals.node,
       },
     },
-    plugins: {
-      'react-hooks': reactHooks,
-    },
     rules: {
-      // @eslint-react's recommended config does not cover rules-of-hooks, so
-      // keep enforcing it via eslint-plugin-react-hooks (exhaustive-deps off)
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'off',
-      // the project has never enforced exhaustive-deps; @eslint-react enables
-      // its own version in recommended, so turn it off to match
+      // rules-of-hooks is enforced by @eslint-react's recommended config.
+      // The project has never enforced exhaustive-deps, so turn off the
+      // version @eslint-react enables in recommended.
       '@eslint-react/exhaustive-deps': 'off',
       // console output is fine for a Node.js application
       'no-console': 'off',
