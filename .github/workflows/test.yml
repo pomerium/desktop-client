@@ -29,5 +29,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run package
+          npm run format:check
           npm run lint
           npm run test

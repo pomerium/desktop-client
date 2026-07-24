@@ -52,3 +52,6 @@ package.json
 
 # Generated protobuf code
 src/shared/pb
+
+# Generated at build time
+src/meta.json
