@@ -1,32 +1,31 @@
 import eslintReact from '@eslint-react/eslint-plugin';
 import js from '@eslint/js';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
-  {
-    // Migrated from the old .eslintignore. node_modules and .git are ignored
-    // by default in flat config.
-    ignores: [
-      'out/**',
-      'release/**',
-      'build/Release/**',
-      'coverage/**',
-      'lib-cov/**',
-      '.grunt/**',
-      '__snapshots__/**',
-      'assets/**',
-      'scripts/**',
-      'electron.vite.config.ts',
-      'vitest.config.ts',
-      '**/*.css.d.ts',
-      '**/*.sass.d.ts',
-      '**/*.scss.d.ts',
-    ],
-  },
+export default defineConfig([
+  // Migrated from the old .eslintignore. node_modules and .git are ignored
+  // by default in flat config.
+  globalIgnores([
+    'out/**',
+    'release/**',
+    'build/Release/**',
+    'coverage/**',
+    'lib-cov/**',
+    '.grunt/**',
+    '__snapshots__/**',
+    'assets/**',
+    'scripts/**',
+    'electron.vite.config.ts',
+    'vitest.config.ts',
+    '**/*.css.d.ts',
+    '**/*.sass.d.ts',
+    '**/*.scss.d.ts',
+  ]),
   js.configs.recommended,
-  ...tseslint.configs.recommended,
+  tseslint.configs.recommended,
   eslintReact.configs['recommended-typescript'],
   jsxA11y.flatConfigs.recommended,
   {
@@ -75,4 +74,4 @@ export default tseslint.config(
       reportUnusedDisableDirectives: 'off',
     },
   },
-);
+]);
