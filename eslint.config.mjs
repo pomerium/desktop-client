@@ -1,6 +1,5 @@
 import js from '@eslint/js';
 import compat from 'eslint-plugin-compat';
-import importPlugin from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import promise from 'eslint-plugin-promise';
@@ -34,7 +33,6 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   react.configs.flat.recommended,
   jsxA11y.flatConfigs.recommended,
-  importPlugin.flatConfigs.recommended,
   promise.configs['flat/recommended'],
   compat.configs['flat/recommended'],
   prettierRecommended,
@@ -61,17 +59,6 @@ export default tseslint.config(
       // match the old airbnb/hooks behavior: enforce rules-of-hooks, but leave
       // exhaustive-deps off (see override below)
       'react-hooks/rules-of-hooks': 'error',
-      // A temporary hack related to IDE not resolving correct package.json
-      'import/no-extraneous-dependencies': 'off',
-      // import resolution is handled by TypeScript/bundler, not eslint
-      'import/no-unresolved': 'off',
-      'import/extensions': 'off',
-      // TypeScript validates these; the import plugin can't see type-only
-      // exports and reports false positives (matches airbnb-typescript)
-      'import/named': 'off',
-      'import/namespace': 'off',
-      'import/default': 'off',
-      'import/no-named-as-default-member': 'off',
       // console output is fine for a Node.js application
       'no-console': 'off',
       // cause sometimes concat is more readable
