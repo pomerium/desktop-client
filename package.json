@@ -90,12 +90,10 @@
     "@vitejs/plugin-react": "^6.0.4",
     "axios": "^1.18.1",
     "concurrently": "^10.0.3",
-    "cross-env": "^10.1.0",
     "electron": "43.2.0",
     "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
     "gunzip-stream": "^1.0.1",
-    "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
     "oxfmt": "^0.60.0",
     "oxlint": "^1.75.0",
@@ -107,9 +105,6 @@
     "vitest": "^4.1.10"
   },
   "overrides": {
-    "@typescript-eslint/typescript-estree": {
-      "minimatch": ">=9.0.7"
-    },
     "ajv-formats": {
       "ajv": ">=8.18.0"
     },
