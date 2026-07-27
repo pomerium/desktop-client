@@ -1,3 +1,5 @@
+import path from "path";
+
 import {
   BrowserWindow,
   ipcMain,
@@ -6,13 +8,12 @@ import {
   MenuItemConstructorOptions,
   nativeImage,
   Tray,
-} from 'electron';
-import { Menubar } from 'menubar';
-import path from 'path';
+} from "electron";
+import { Menubar } from "menubar";
 
-import { getAssetPath, menuIconPath } from '../main/binaries';
-import { UPDATE_LISTENERS } from '../shared/constants';
-import { ListenerStatus, Record } from '../shared/pb/api';
+import { getAssetPath, menuIconPath } from "../main/binaries";
+import { UPDATE_LISTENERS } from "../shared/constants";
+import { ListenerStatus, Record } from "../shared/pb/api";
 
 export default class Helper {
   records: Record[];
@@ -75,7 +76,7 @@ export default class Helper {
     const connectionItems: MenuItemConstructorOptions[] = [];
 
     connectionItems.push({
-      label: 'Connect All',
+      label: "Connect All",
       click() {
         ipcMain.emit(
           UPDATE_LISTENERS,
@@ -89,7 +90,7 @@ export default class Helper {
     });
 
     connectionItems.push({
-      label: 'Disconnect All',
+      label: "Disconnect All",
       click() {
         ipcMain.emit(
           UPDATE_LISTENERS,
@@ -103,25 +104,24 @@ export default class Helper {
     });
 
     connectionItems.push({
-      type: 'separator',
+      type: "separator",
     });
 
     filtered.forEach((rec) => {
-      const that = this;
       const iconName = this.statuses[rec.id as string]?.listening
-        ? 'connected.png'
-        : 'disconnected.png';
+        ? "connected.png"
+        : "disconnected.png";
 
       connectionItems.push({
         label: rec?.conn?.name as string,
         icon: nativeImage.createFromPath(path.join(menuIconPath, iconName)),
-        click() {
+        click: () => {
           ipcMain.emit(
             UPDATE_LISTENERS,
             {},
             {
               connectionIds: [rec.id],
-              connected: !that.statuses[rec.id as string]?.listening,
+              connected: !this.statuses[rec.id as string]?.listening,
             },
           );
         },
@@ -134,52 +134,50 @@ export default class Helper {
     const { appWindow } = this;
     const template: (MenuItemConstructorOptions | MenuItem)[] = [];
     template.push({
-      label: 'Add Connection',
+      label: "Add Connection",
       click() {
-        appWindow?.webContents.send('redirectTo', '/connectForm');
+        appWindow?.webContents.send("redirectTo", "/connectForm");
         appWindow?.show();
       },
     });
 
     template.push({
-      label: 'Load Connections',
+      label: "Load Connections",
       click() {
-        appWindow?.webContents.send('redirectTo', '/loadForm');
+        appWindow?.webContents.send("redirectTo", "/loadForm");
         appWindow?.show();
       },
     });
 
     template.push({
-      label: 'Manage Connections',
+      label: "Manage Connections",
       click() {
-        appWindow?.webContents.send('redirectTo', '/manage');
+        appWindow?.webContents.send("redirectTo", "/manage");
         appWindow?.show();
       },
     });
 
     template.push({
-      type: 'separator',
+      type: "separator",
     });
 
     this.tags.forEach((tag) => {
-      const conns = this.buildFolderSubmenu(
-        this.records.filter((rec) => rec.tags.includes(tag)),
-      );
+      const conns = this.buildFolderSubmenu(this.records.filter((rec) => rec.tags.includes(tag)));
 
       template.push({
         label: tag,
-        icon: nativeImage.createFromPath(path.join(menuIconPath, 'folder.png')),
+        icon: nativeImage.createFromPath(path.join(menuIconPath, "folder.png")),
         submenu: conns,
       });
     });
 
     template.push({
-      type: 'separator',
+      type: "separator",
     });
 
     template.push({
-      label: 'Quit',
-      role: 'quit',
+      label: "Quit",
+      role: "quit",
     });
 
     return template;
@@ -191,17 +189,17 @@ export default class Helper {
 
   iconFile = (): string => {
     switch (process.platform) {
-      case 'darwin':
-        return 'trayTemplate.png';
-      case 'win32':
-        return 'tray.ico';
+      case "darwin":
+        return "trayTemplate.png";
+      case "win32":
+        return "tray.ico";
       default:
-        return '24x24.png';
+        return "24x24.png";
     }
   };
 
   createTray = (): Tray => {
-    const tray = new Tray(getAssetPath('icons', this.iconFile()));
+    const tray = new Tray(getAssetPath("icons", this.iconFile()));
     tray.setContextMenu(this.createContextMenu());
     return tray;
   };

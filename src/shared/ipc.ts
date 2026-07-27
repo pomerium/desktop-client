@@ -1,11 +1,6 @@
-import { FETCH_ROUTES, GET_ALL_RECORDS, SAVE_RECORD } from './constants';
-import { ipcRenderer } from './electron';
-import {
-  FetchRoutesRequest,
-  FetchRoutesResponse,
-  Record,
-  Records,
-} from './pb/types';
+import { FETCH_ROUTES, GET_ALL_RECORDS, SAVE_RECORD } from "./constants";
+import { ipcRenderer } from "./electron";
+import { FetchRoutesRequest, FetchRoutesResponse, Record, Records } from "./pb/types";
 
 function invoke(name: string, ...args: any[]): Promise<any> {
   return new Promise((resolve, reject) => {
@@ -21,9 +16,7 @@ function invoke(name: string, ...args: any[]): Promise<any> {
   });
 }
 
-export async function fetchRoutes(
-  request: FetchRoutesRequest,
-): Promise<FetchRoutesResponse> {
+export async function fetchRoutes(request: FetchRoutesRequest): Promise<FetchRoutesResponse> {
   return invoke(FETCH_ROUTES, request);
 }
 

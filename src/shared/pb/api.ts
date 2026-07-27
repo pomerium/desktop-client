@@ -6,7 +6,7 @@ import {
   handleServerStreamingCall,
   makeGenericClientConstructor,
   Metadata,
-} from '@grpc/grpc-js';
+} from "@grpc/grpc-js";
 import type {
   CallOptions,
   ClientOptions,
@@ -14,13 +14,13 @@ import type {
   handleUnaryCall,
   ServiceError,
   UntypedServiceImplementation,
-} from '@grpc/grpc-js';
-import Long from 'long';
-import _m0 from 'protobufjs/minimal';
+} from "@grpc/grpc-js";
+import Long from "long";
+import _m0 from "protobufjs/minimal";
 
-import { Timestamp } from './google/protobuf/timestamp';
+import { Timestamp } from "./google/protobuf/timestamp";
 
-export const protobufPackage = 'pomerium.cli';
+export const protobufPackage = "pomerium.cli";
 
 export enum Protocol {
   UNKNOWN = 0,
@@ -32,16 +32,16 @@ export enum Protocol {
 export function protocolFromJSON(object: any): Protocol {
   switch (object) {
     case 0:
-    case 'UNKNOWN':
+    case "UNKNOWN":
       return Protocol.UNKNOWN;
     case 1:
-    case 'TCP':
+    case "TCP":
       return Protocol.TCP;
     case 2:
-    case 'UDP':
+    case "UDP":
       return Protocol.UDP;
     case -1:
-    case 'UNRECOGNIZED':
+    case "UNRECOGNIZED":
     default:
       return Protocol.UNRECOGNIZED;
   }
@@ -50,14 +50,14 @@ export function protocolFromJSON(object: any): Protocol {
 export function protocolToJSON(object: Protocol): string {
   switch (object) {
     case Protocol.UNKNOWN:
-      return 'UNKNOWN';
+      return "UNKNOWN";
     case Protocol.TCP:
-      return 'TCP';
+      return "TCP";
     case Protocol.UDP:
-      return 'UDP';
+      return "UDP";
     case Protocol.UNRECOGNIZED:
     default:
-      return 'UNRECOGNIZED';
+      return "UNRECOGNIZED";
   }
 }
 
@@ -109,39 +109,35 @@ export enum ExportRequest_Format {
   UNRECOGNIZED = -1,
 }
 
-export function exportRequest_FormatFromJSON(
-  object: any,
-): ExportRequest_Format {
+export function exportRequest_FormatFromJSON(object: any): ExportRequest_Format {
   switch (object) {
     case 0:
-    case 'EXPORT_FORMAT_UNDEFINED':
+    case "EXPORT_FORMAT_UNDEFINED":
       return ExportRequest_Format.EXPORT_FORMAT_UNDEFINED;
     case 1:
-    case 'EXPORT_FORMAT_JSON_COMPACT':
+    case "EXPORT_FORMAT_JSON_COMPACT":
       return ExportRequest_Format.EXPORT_FORMAT_JSON_COMPACT;
     case 2:
-    case 'EXPORT_FORMAT_JSON_PRETTY':
+    case "EXPORT_FORMAT_JSON_PRETTY":
       return ExportRequest_Format.EXPORT_FORMAT_JSON_PRETTY;
     case -1:
-    case 'UNRECOGNIZED':
+    case "UNRECOGNIZED":
     default:
       return ExportRequest_Format.UNRECOGNIZED;
   }
 }
 
-export function exportRequest_FormatToJSON(
-  object: ExportRequest_Format,
-): string {
+export function exportRequest_FormatToJSON(object: ExportRequest_Format): string {
   switch (object) {
     case ExportRequest_Format.EXPORT_FORMAT_UNDEFINED:
-      return 'EXPORT_FORMAT_UNDEFINED';
+      return "EXPORT_FORMAT_UNDEFINED";
     case ExportRequest_Format.EXPORT_FORMAT_JSON_COMPACT:
-      return 'EXPORT_FORMAT_JSON_COMPACT';
+      return "EXPORT_FORMAT_JSON_COMPACT";
     case ExportRequest_Format.EXPORT_FORMAT_JSON_PRETTY:
-      return 'EXPORT_FORMAT_JSON_PRETTY';
+      return "EXPORT_FORMAT_JSON_PRETTY";
     case ExportRequest_Format.UNRECOGNIZED:
     default:
-      return 'UNRECOGNIZED';
+      return "UNRECOGNIZED";
   }
 }
 
@@ -252,28 +248,28 @@ export function connectionStatusUpdate_ConnectionStatusFromJSON(
 ): ConnectionStatusUpdate_ConnectionStatus {
   switch (object) {
     case 0:
-    case 'CONNECTION_STATUS_UNDEFINED':
+    case "CONNECTION_STATUS_UNDEFINED":
       return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_UNDEFINED;
     case 1:
-    case 'CONNECTION_STATUS_CONNECTING':
+    case "CONNECTION_STATUS_CONNECTING":
       return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTING;
     case 2:
-    case 'CONNECTION_STATUS_AUTH_REQUIRED':
+    case "CONNECTION_STATUS_AUTH_REQUIRED":
       return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_AUTH_REQUIRED;
     case 3:
-    case 'CONNECTION_STATUS_CONNECTED':
+    case "CONNECTION_STATUS_CONNECTED":
       return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTED;
     case 4:
-    case 'CONNECTION_STATUS_DISCONNECTED':
+    case "CONNECTION_STATUS_DISCONNECTED":
       return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED;
     case 5:
-    case 'CONNECTION_STATUS_LISTENING':
+    case "CONNECTION_STATUS_LISTENING":
       return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_LISTENING;
     case 6:
-    case 'CONNECTION_STATUS_CLOSED':
+    case "CONNECTION_STATUS_CLOSED":
       return ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CLOSED;
     case -1:
-    case 'UNRECOGNIZED':
+    case "UNRECOGNIZED":
     default:
       return ConnectionStatusUpdate_ConnectionStatus.UNRECOGNIZED;
   }
@@ -284,22 +280,22 @@ export function connectionStatusUpdate_ConnectionStatusToJSON(
 ): string {
   switch (object) {
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_UNDEFINED:
-      return 'CONNECTION_STATUS_UNDEFINED';
+      return "CONNECTION_STATUS_UNDEFINED";
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTING:
-      return 'CONNECTION_STATUS_CONNECTING';
+      return "CONNECTION_STATUS_CONNECTING";
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_AUTH_REQUIRED:
-      return 'CONNECTION_STATUS_AUTH_REQUIRED';
+      return "CONNECTION_STATUS_AUTH_REQUIRED";
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CONNECTED:
-      return 'CONNECTION_STATUS_CONNECTED';
+      return "CONNECTION_STATUS_CONNECTED";
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_DISCONNECTED:
-      return 'CONNECTION_STATUS_DISCONNECTED';
+      return "CONNECTION_STATUS_DISCONNECTED";
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_LISTENING:
-      return 'CONNECTION_STATUS_LISTENING';
+      return "CONNECTION_STATUS_LISTENING";
     case ConnectionStatusUpdate_ConnectionStatus.CONNECTION_STATUS_CLOSED:
-      return 'CONNECTION_STATUS_CLOSED';
+      return "CONNECTION_STATUS_CLOSED";
     case ConnectionStatusUpdate_ConnectionStatus.UNRECOGNIZED:
     default:
-      return 'UNRECOGNIZED';
+      return "UNRECOGNIZED";
   }
 }
 
@@ -408,10 +404,7 @@ function createBaseRecord(): Record {
 }
 
 export const Record = {
-  encode(
-    message: Record,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Record, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== undefined) {
       writer.uint32(10).string(message.id);
     }
@@ -428,8 +421,7 @@ export const Record = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Record {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRecord();
     while (reader.pos < end) {
@@ -479,9 +471,7 @@ export const Record = {
         ? object.tags.map((e: any) => globalThis.String(e))
         : [],
       conn: isSet(object.conn) ? Connection.fromJSON(object.conn) : undefined,
-      source: isSet(object.source)
-        ? globalThis.String(object.source)
-        : undefined,
+      source: isSet(object.source) ? globalThis.String(object.source) : undefined,
     };
   },
 
@@ -523,10 +513,7 @@ function createBaseRecords(): Records {
 }
 
 export const Records = {
-  encode(
-    message: Records,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Records, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.records) {
       Record.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -534,8 +521,7 @@ export const Records = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Records {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRecords();
     while (reader.pos < end) {
@@ -588,10 +574,7 @@ function createBaseSelector(): Selector {
 }
 
 export const Selector = {
-  encode(
-    message: Selector,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Selector, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.all === true) {
       writer.uint32(8).bool(message.all);
     }
@@ -605,8 +588,7 @@ export const Selector = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Selector {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSelector();
     while (reader.pos < end) {
@@ -685,19 +667,12 @@ function createBaseDeleteRecordsResponse(): DeleteRecordsResponse {
 }
 
 export const DeleteRecordsResponse = {
-  encode(
-    _: DeleteRecordsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: DeleteRecordsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): DeleteRecordsResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): DeleteRecordsResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDeleteRecordsResponse();
     while (reader.pos < end) {
@@ -721,14 +696,10 @@ export const DeleteRecordsResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<DeleteRecordsResponse>, I>>(
-    base?: I,
-  ): DeleteRecordsResponse {
+  create<I extends Exact<DeepPartial<DeleteRecordsResponse>, I>>(base?: I): DeleteRecordsResponse {
     return DeleteRecordsResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<DeleteRecordsResponse>, I>>(
-    _: I,
-  ): DeleteRecordsResponse {
+  fromPartial<I extends Exact<DeepPartial<DeleteRecordsResponse>, I>>(_: I): DeleteRecordsResponse {
     const message = createBaseDeleteRecordsResponse();
     return message;
   },
@@ -739,10 +710,7 @@ function createBaseExportRequest(): ExportRequest {
 }
 
 export const ExportRequest = {
-  encode(
-    message: ExportRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ExportRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.selector !== undefined) {
       Selector.encode(message.selector, writer.uint32(10).fork()).ldelim();
     }
@@ -756,8 +724,7 @@ export const ExportRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ExportRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseExportRequest();
     while (reader.pos < end) {
@@ -795,15 +762,9 @@ export const ExportRequest = {
 
   fromJSON(object: any): ExportRequest {
     return {
-      selector: isSet(object.selector)
-        ? Selector.fromJSON(object.selector)
-        : undefined,
-      removeTags: isSet(object.removeTags)
-        ? globalThis.Boolean(object.removeTags)
-        : false,
-      format: isSet(object.format)
-        ? exportRequest_FormatFromJSON(object.format)
-        : 0,
+      selector: isSet(object.selector) ? Selector.fromJSON(object.selector) : undefined,
+      removeTags: isSet(object.removeTags) ? globalThis.Boolean(object.removeTags) : false,
+      format: isSet(object.format) ? exportRequest_FormatFromJSON(object.format) : 0,
     };
   },
 
@@ -821,14 +782,10 @@ export const ExportRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ExportRequest>, I>>(
-    base?: I,
-  ): ExportRequest {
+  create<I extends Exact<DeepPartial<ExportRequest>, I>>(base?: I): ExportRequest {
     return ExportRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ExportRequest>, I>>(
-    object: I,
-  ): ExportRequest {
+  fromPartial<I extends Exact<DeepPartial<ExportRequest>, I>>(object: I): ExportRequest {
     const message = createBaseExportRequest();
     message.selector =
       object.selector !== undefined && object.selector !== null
@@ -845,16 +802,12 @@ function createBaseGetTagsRequest(): GetTagsRequest {
 }
 
 export const GetTagsRequest = {
-  encode(
-    _: GetTagsRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: GetTagsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetTagsRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetTagsRequest();
     while (reader.pos < end) {
@@ -878,14 +831,10 @@ export const GetTagsRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetTagsRequest>, I>>(
-    base?: I,
-  ): GetTagsRequest {
+  create<I extends Exact<DeepPartial<GetTagsRequest>, I>>(base?: I): GetTagsRequest {
     return GetTagsRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetTagsRequest>, I>>(
-    _: I,
-  ): GetTagsRequest {
+  fromPartial<I extends Exact<DeepPartial<GetTagsRequest>, I>>(_: I): GetTagsRequest {
     const message = createBaseGetTagsRequest();
     return message;
   },
@@ -896,10 +845,7 @@ function createBaseGetTagsResponse(): GetTagsResponse {
 }
 
 export const GetTagsResponse = {
-  encode(
-    message: GetTagsResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: GetTagsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.tags) {
       writer.uint32(10).string(v!);
     }
@@ -907,8 +853,7 @@ export const GetTagsResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): GetTagsResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGetTagsResponse();
     while (reader.pos < end) {
@@ -946,14 +891,10 @@ export const GetTagsResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetTagsResponse>, I>>(
-    base?: I,
-  ): GetTagsResponse {
+  create<I extends Exact<DeepPartial<GetTagsResponse>, I>>(base?: I): GetTagsResponse {
     return GetTagsResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetTagsResponse>, I>>(
-    object: I,
-  ): GetTagsResponse {
+  fromPartial<I extends Exact<DeepPartial<GetTagsResponse>, I>>(object: I): GetTagsResponse {
     const message = createBaseGetTagsResponse();
     message.tags = object.tags?.map((e) => e) || [];
     return message;
@@ -965,10 +906,7 @@ function createBaseConfigData(): ConfigData {
 }
 
 export const ConfigData = {
-  encode(
-    message: ConfigData,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ConfigData, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
     }
@@ -976,8 +914,7 @@ export const ConfigData = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ConfigData {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseConfigData();
     while (reader.pos < end) {
@@ -1001,9 +938,7 @@ export const ConfigData = {
 
   fromJSON(object: any): ConfigData {
     return {
-      data: isSet(object.data)
-        ? bytesFromBase64(object.data)
-        : new Uint8Array(0),
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(0),
     };
   },
 
@@ -1018,9 +953,7 @@ export const ConfigData = {
   create<I extends Exact<DeepPartial<ConfigData>, I>>(base?: I): ConfigData {
     return ConfigData.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ConfigData>, I>>(
-    object: I,
-  ): ConfigData {
+  fromPartial<I extends Exact<DeepPartial<ConfigData>, I>>(object: I): ConfigData {
     const message = createBaseConfigData();
     message.data = object.data ?? new Uint8Array(0);
     return message;
@@ -1032,10 +965,7 @@ function createBaseImportRequest(): ImportRequest {
 }
 
 export const ImportRequest = {
-  encode(
-    message: ImportRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ImportRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.overrideTag !== undefined) {
       writer.uint32(10).string(message.overrideTag);
     }
@@ -1046,8 +976,7 @@ export const ImportRequest = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ImportRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseImportRequest();
     while (reader.pos < end) {
@@ -1078,12 +1007,8 @@ export const ImportRequest = {
 
   fromJSON(object: any): ImportRequest {
     return {
-      overrideTag: isSet(object.overrideTag)
-        ? globalThis.String(object.overrideTag)
-        : undefined,
-      data: isSet(object.data)
-        ? bytesFromBase64(object.data)
-        : new Uint8Array(0),
+      overrideTag: isSet(object.overrideTag) ? globalThis.String(object.overrideTag) : undefined,
+      data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array(0),
     };
   },
 
@@ -1098,14 +1023,10 @@ export const ImportRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ImportRequest>, I>>(
-    base?: I,
-  ): ImportRequest {
+  create<I extends Exact<DeepPartial<ImportRequest>, I>>(base?: I): ImportRequest {
     return ImportRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ImportRequest>, I>>(
-    object: I,
-  ): ImportRequest {
+  fromPartial<I extends Exact<DeepPartial<ImportRequest>, I>>(object: I): ImportRequest {
     const message = createBaseImportRequest();
     message.overrideTag = object.overrideTag ?? undefined;
     message.data = object.data ?? new Uint8Array(0);
@@ -1118,16 +1039,12 @@ function createBaseImportResponse(): ImportResponse {
 }
 
 export const ImportResponse = {
-  encode(
-    _: ImportResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: ImportResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ImportResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseImportResponse();
     while (reader.pos < end) {
@@ -1151,14 +1068,10 @@ export const ImportResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ImportResponse>, I>>(
-    base?: I,
-  ): ImportResponse {
+  create<I extends Exact<DeepPartial<ImportResponse>, I>>(base?: I): ImportResponse {
     return ImportResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ImportResponse>, I>>(
-    _: I,
-  ): ImportResponse {
+  fromPartial<I extends Exact<DeepPartial<ImportResponse>, I>>(_: I): ImportResponse {
     const message = createBaseImportResponse();
     return message;
   },
@@ -1169,10 +1082,7 @@ function createBaseListenerUpdateRequest(): ListenerUpdateRequest {
 }
 
 export const ListenerUpdateRequest = {
-  encode(
-    message: ListenerUpdateRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ListenerUpdateRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.connectionIds) {
       writer.uint32(10).string(v!);
     }
@@ -1182,12 +1092,8 @@ export const ListenerUpdateRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ListenerUpdateRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListenerUpdateRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListenerUpdateRequest();
     while (reader.pos < end) {
@@ -1221,9 +1127,7 @@ export const ListenerUpdateRequest = {
       connectionIds: globalThis.Array.isArray(object?.connectionIds)
         ? object.connectionIds.map((e: any) => globalThis.String(e))
         : [],
-      connected: isSet(object.connected)
-        ? globalThis.Boolean(object.connected)
-        : false,
+      connected: isSet(object.connected) ? globalThis.Boolean(object.connected) : false,
     };
   },
 
@@ -1238,9 +1142,7 @@ export const ListenerUpdateRequest = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ListenerUpdateRequest>, I>>(
-    base?: I,
-  ): ListenerUpdateRequest {
+  create<I extends Exact<DeepPartial<ListenerUpdateRequest>, I>>(base?: I): ListenerUpdateRequest {
     return ListenerUpdateRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ListenerUpdateRequest>, I>>(
@@ -1258,10 +1160,7 @@ function createBaseListenerStatus(): ListenerStatus {
 }
 
 export const ListenerStatus = {
-  encode(
-    message: ListenerStatus,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ListenerStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.listening === true) {
       writer.uint32(8).bool(message.listening);
     }
@@ -1275,8 +1174,7 @@ export const ListenerStatus = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ListenerStatus {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListenerStatus();
     while (reader.pos < end) {
@@ -1314,15 +1212,9 @@ export const ListenerStatus = {
 
   fromJSON(object: any): ListenerStatus {
     return {
-      listening: isSet(object.listening)
-        ? globalThis.Boolean(object.listening)
-        : false,
-      listenAddr: isSet(object.listenAddr)
-        ? globalThis.String(object.listenAddr)
-        : undefined,
-      lastError: isSet(object.lastError)
-        ? globalThis.String(object.lastError)
-        : undefined,
+      listening: isSet(object.listening) ? globalThis.Boolean(object.listening) : false,
+      listenAddr: isSet(object.listenAddr) ? globalThis.String(object.listenAddr) : undefined,
+      lastError: isSet(object.lastError) ? globalThis.String(object.lastError) : undefined,
     };
   },
 
@@ -1340,14 +1232,10 @@ export const ListenerStatus = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ListenerStatus>, I>>(
-    base?: I,
-  ): ListenerStatus {
+  create<I extends Exact<DeepPartial<ListenerStatus>, I>>(base?: I): ListenerStatus {
     return ListenerStatus.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ListenerStatus>, I>>(
-    object: I,
-  ): ListenerStatus {
+  fromPartial<I extends Exact<DeepPartial<ListenerStatus>, I>>(object: I): ListenerStatus {
     const message = createBaseListenerStatus();
     message.listening = object.listening ?? false;
     message.listenAddr = object.listenAddr ?? undefined;
@@ -1361,10 +1249,7 @@ function createBaseListenerStatusResponse(): ListenerStatusResponse {
 }
 
 export const ListenerStatusResponse = {
-  encode(
-    message: ListenerStatusResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ListenerStatusResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     Object.entries(message.listeners).forEach(([key, value]) => {
       ListenerStatusResponse_ListenersEntry.encode(
         { key: key as any, value },
@@ -1374,12 +1259,8 @@ export const ListenerStatusResponse = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ListenerStatusResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListenerStatusResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListenerStatusResponse();
     while (reader.pos < end) {
@@ -1390,10 +1271,7 @@ export const ListenerStatusResponse = {
             break;
           }
 
-          const entry1 = ListenerStatusResponse_ListenersEntry.decode(
-            reader,
-            reader.uint32(),
-          );
+          const entry1 = ListenerStatusResponse_ListenersEntry.decode(reader, reader.uint32());
           if (entry1.value !== undefined) {
             message.listeners[entry1.key] = entry1.value;
           }
@@ -1456,7 +1334,7 @@ export const ListenerStatusResponse = {
 };
 
 function createBaseListenerStatusResponse_ListenersEntry(): ListenerStatusResponse_ListenersEntry {
-  return { key: '', value: undefined };
+  return { key: "", value: undefined };
 }
 
 export const ListenerStatusResponse_ListenersEntry = {
@@ -1464,7 +1342,7 @@ export const ListenerStatusResponse_ListenersEntry = {
     message: ListenerStatusResponse_ListenersEntry,
     writer: _m0.Writer = _m0.Writer.create(),
   ): _m0.Writer {
-    if (message.key !== '') {
+    if (message.key !== "") {
       writer.uint32(10).string(message.key);
     }
     if (message.value !== undefined) {
@@ -1473,12 +1351,8 @@ export const ListenerStatusResponse_ListenersEntry = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ListenerStatusResponse_ListenersEntry {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ListenerStatusResponse_ListenersEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseListenerStatusResponse_ListenersEntry();
     while (reader.pos < end) {
@@ -1509,16 +1383,14 @@ export const ListenerStatusResponse_ListenersEntry = {
 
   fromJSON(object: any): ListenerStatusResponse_ListenersEntry {
     return {
-      key: isSet(object.key) ? globalThis.String(object.key) : '',
-      value: isSet(object.value)
-        ? ListenerStatus.fromJSON(object.value)
-        : undefined,
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? ListenerStatus.fromJSON(object.value) : undefined,
     };
   },
 
   toJSON(message: ListenerStatusResponse_ListenersEntry): unknown {
     const obj: any = {};
-    if (message.key !== '') {
+    if (message.key !== "") {
       obj.key = message.key;
     }
     if (message.value !== undefined) {
@@ -1527,18 +1399,16 @@ export const ListenerStatusResponse_ListenersEntry = {
     return obj;
   },
 
-  create<
-    I extends Exact<DeepPartial<ListenerStatusResponse_ListenersEntry>, I>,
-  >(base?: I): ListenerStatusResponse_ListenersEntry {
-    return ListenerStatusResponse_ListenersEntry.fromPartial(
-      base ?? ({} as any),
-    );
+  create<I extends Exact<DeepPartial<ListenerStatusResponse_ListenersEntry>, I>>(
+    base?: I,
+  ): ListenerStatusResponse_ListenersEntry {
+    return ListenerStatusResponse_ListenersEntry.fromPartial(base ?? ({} as any));
   },
-  fromPartial<
-    I extends Exact<DeepPartial<ListenerStatusResponse_ListenersEntry>, I>,
-  >(object: I): ListenerStatusResponse_ListenersEntry {
+  fromPartial<I extends Exact<DeepPartial<ListenerStatusResponse_ListenersEntry>, I>>(
+    object: I,
+  ): ListenerStatusResponse_ListenersEntry {
     const message = createBaseListenerStatusResponse_ListenersEntry();
-    message.key = object.key ?? '';
+    message.key = object.key ?? "";
     message.value =
       object.value !== undefined && object.value !== null
         ? ListenerStatus.fromPartial(object.value)
@@ -1548,26 +1418,19 @@ export const ListenerStatusResponse_ListenersEntry = {
 };
 
 function createBaseStatusUpdatesRequest(): StatusUpdatesRequest {
-  return { connectionId: '' };
+  return { connectionId: "" };
 }
 
 export const StatusUpdatesRequest = {
-  encode(
-    message: StatusUpdatesRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
-    if (message.connectionId !== '') {
+  encode(message: StatusUpdatesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.connectionId !== "") {
       writer.uint32(10).string(message.connectionId);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): StatusUpdatesRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): StatusUpdatesRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStatusUpdatesRequest();
     while (reader.pos < end) {
@@ -1591,37 +1454,33 @@ export const StatusUpdatesRequest = {
 
   fromJSON(object: any): StatusUpdatesRequest {
     return {
-      connectionId: isSet(object.connectionId)
-        ? globalThis.String(object.connectionId)
-        : '',
+      connectionId: isSet(object.connectionId) ? globalThis.String(object.connectionId) : "",
     };
   },
 
   toJSON(message: StatusUpdatesRequest): unknown {
     const obj: any = {};
-    if (message.connectionId !== '') {
+    if (message.connectionId !== "") {
       obj.connectionId = message.connectionId;
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<StatusUpdatesRequest>, I>>(
-    base?: I,
-  ): StatusUpdatesRequest {
+  create<I extends Exact<DeepPartial<StatusUpdatesRequest>, I>>(base?: I): StatusUpdatesRequest {
     return StatusUpdatesRequest.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<StatusUpdatesRequest>, I>>(
     object: I,
   ): StatusUpdatesRequest {
     const message = createBaseStatusUpdatesRequest();
-    message.connectionId = object.connectionId ?? '';
+    message.connectionId = object.connectionId ?? "";
     return message;
   },
 };
 
 function createBaseFetchRoutesRequest(): FetchRoutesRequest {
   return {
-    serverUrl: '',
+    serverUrl: "",
     disableTlsVerification: undefined,
     caCert: undefined,
     clientCert: undefined,
@@ -1630,11 +1489,8 @@ function createBaseFetchRoutesRequest(): FetchRoutesRequest {
 }
 
 export const FetchRoutesRequest = {
-  encode(
-    message: FetchRoutesRequest,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
-    if (message.serverUrl !== '') {
+  encode(message: FetchRoutesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.serverUrl !== "") {
       writer.uint32(10).string(message.serverUrl);
     }
     if (message.disableTlsVerification !== undefined) {
@@ -1647,17 +1503,13 @@ export const FetchRoutesRequest = {
       Certificate.encode(message.clientCert, writer.uint32(34).fork()).ldelim();
     }
     if (message.clientCertFromStore !== undefined) {
-      ClientCertFromStore.encode(
-        message.clientCertFromStore,
-        writer.uint32(42).fork(),
-      ).ldelim();
+      ClientCertFromStore.encode(message.clientCertFromStore, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FetchRoutesRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFetchRoutesRequest();
     while (reader.pos < end) {
@@ -1696,10 +1548,7 @@ export const FetchRoutesRequest = {
             break;
           }
 
-          message.clientCertFromStore = ClientCertFromStore.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.clientCertFromStore = ClientCertFromStore.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1712,16 +1561,12 @@ export const FetchRoutesRequest = {
 
   fromJSON(object: any): FetchRoutesRequest {
     return {
-      serverUrl: isSet(object.serverUrl)
-        ? globalThis.String(object.serverUrl)
-        : '',
+      serverUrl: isSet(object.serverUrl) ? globalThis.String(object.serverUrl) : "",
       disableTlsVerification: isSet(object.disableTlsVerification)
         ? globalThis.Boolean(object.disableTlsVerification)
         : undefined,
       caCert: isSet(object.caCert) ? bytesFromBase64(object.caCert) : undefined,
-      clientCert: isSet(object.clientCert)
-        ? Certificate.fromJSON(object.clientCert)
-        : undefined,
+      clientCert: isSet(object.clientCert) ? Certificate.fromJSON(object.clientCert) : undefined,
       clientCertFromStore: isSet(object.clientCertFromStore)
         ? ClientCertFromStore.fromJSON(object.clientCertFromStore)
         : undefined,
@@ -1730,7 +1575,7 @@ export const FetchRoutesRequest = {
 
   toJSON(message: FetchRoutesRequest): unknown {
     const obj: any = {};
-    if (message.serverUrl !== '') {
+    if (message.serverUrl !== "") {
       obj.serverUrl = message.serverUrl;
     }
     if (message.disableTlsVerification !== undefined) {
@@ -1743,23 +1588,17 @@ export const FetchRoutesRequest = {
       obj.clientCert = Certificate.toJSON(message.clientCert);
     }
     if (message.clientCertFromStore !== undefined) {
-      obj.clientCertFromStore = ClientCertFromStore.toJSON(
-        message.clientCertFromStore,
-      );
+      obj.clientCertFromStore = ClientCertFromStore.toJSON(message.clientCertFromStore);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<FetchRoutesRequest>, I>>(
-    base?: I,
-  ): FetchRoutesRequest {
+  create<I extends Exact<DeepPartial<FetchRoutesRequest>, I>>(base?: I): FetchRoutesRequest {
     return FetchRoutesRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<FetchRoutesRequest>, I>>(
-    object: I,
-  ): FetchRoutesRequest {
+  fromPartial<I extends Exact<DeepPartial<FetchRoutesRequest>, I>>(object: I): FetchRoutesRequest {
     const message = createBaseFetchRoutesRequest();
-    message.serverUrl = object.serverUrl ?? '';
+    message.serverUrl = object.serverUrl ?? "";
     message.disableTlsVerification = object.disableTlsVerification ?? undefined;
     message.caCert = object.caCert ?? undefined;
     message.clientCert =
@@ -1767,8 +1606,7 @@ export const FetchRoutesRequest = {
         ? Certificate.fromPartial(object.clientCert)
         : undefined;
     message.clientCertFromStore =
-      object.clientCertFromStore !== undefined &&
-      object.clientCertFromStore !== null
+      object.clientCertFromStore !== undefined && object.clientCertFromStore !== null
         ? ClientCertFromStore.fromPartial(object.clientCertFromStore)
         : undefined;
     return message;
@@ -1780,10 +1618,7 @@ function createBaseFetchRoutesResponse(): FetchRoutesResponse {
 }
 
 export const FetchRoutesResponse = {
-  encode(
-    message: FetchRoutesResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: FetchRoutesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.routes) {
       PortalRoute.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -1791,8 +1626,7 @@ export const FetchRoutesResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): FetchRoutesResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseFetchRoutesResponse();
     while (reader.pos < end) {
@@ -1830,65 +1664,58 @@ export const FetchRoutesResponse = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<FetchRoutesResponse>, I>>(
-    base?: I,
-  ): FetchRoutesResponse {
+  create<I extends Exact<DeepPartial<FetchRoutesResponse>, I>>(base?: I): FetchRoutesResponse {
     return FetchRoutesResponse.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<FetchRoutesResponse>, I>>(
     object: I,
   ): FetchRoutesResponse {
     const message = createBaseFetchRoutesResponse();
-    message.routes =
-      object.routes?.map((e) => PortalRoute.fromPartial(e)) || [];
+    message.routes = object.routes?.map((e) => PortalRoute.fromPartial(e)) || [];
     return message;
   },
 };
 
 function createBasePortalRoute(): PortalRoute {
   return {
-    id: '',
-    name: '',
-    type: '',
-    from: '',
-    description: '',
+    id: "",
+    name: "",
+    type: "",
+    from: "",
+    description: "",
     connectCommand: undefined,
-    logoUrl: '',
+    logoUrl: "",
   };
 }
 
 export const PortalRoute = {
-  encode(
-    message: PortalRoute,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
-    if (message.id !== '') {
+  encode(message: PortalRoute, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
-    if (message.name !== '') {
+    if (message.name !== "") {
       writer.uint32(18).string(message.name);
     }
-    if (message.type !== '') {
+    if (message.type !== "") {
       writer.uint32(26).string(message.type);
     }
-    if (message.from !== '') {
+    if (message.from !== "") {
       writer.uint32(34).string(message.from);
     }
-    if (message.description !== '') {
+    if (message.description !== "") {
       writer.uint32(42).string(message.description);
     }
     if (message.connectCommand !== undefined) {
       writer.uint32(50).string(message.connectCommand);
     }
-    if (message.logoUrl !== '') {
+    if (message.logoUrl !== "") {
       writer.uint32(58).string(message.logoUrl);
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PortalRoute {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePortalRoute();
     while (reader.pos < end) {
@@ -1954,41 +1781,39 @@ export const PortalRoute = {
 
   fromJSON(object: any): PortalRoute {
     return {
-      id: isSet(object.id) ? globalThis.String(object.id) : '',
-      name: isSet(object.name) ? globalThis.String(object.name) : '',
-      type: isSet(object.type) ? globalThis.String(object.type) : '',
-      from: isSet(object.from) ? globalThis.String(object.from) : '',
-      description: isSet(object.description)
-        ? globalThis.String(object.description)
-        : '',
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      from: isSet(object.from) ? globalThis.String(object.from) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
       connectCommand: isSet(object.connectCommand)
         ? globalThis.String(object.connectCommand)
         : undefined,
-      logoUrl: isSet(object.logoUrl) ? globalThis.String(object.logoUrl) : '',
+      logoUrl: isSet(object.logoUrl) ? globalThis.String(object.logoUrl) : "",
     };
   },
 
   toJSON(message: PortalRoute): unknown {
     const obj: any = {};
-    if (message.id !== '') {
+    if (message.id !== "") {
       obj.id = message.id;
     }
-    if (message.name !== '') {
+    if (message.name !== "") {
       obj.name = message.name;
     }
-    if (message.type !== '') {
+    if (message.type !== "") {
       obj.type = message.type;
     }
-    if (message.from !== '') {
+    if (message.from !== "") {
       obj.from = message.from;
     }
-    if (message.description !== '') {
+    if (message.description !== "") {
       obj.description = message.description;
     }
     if (message.connectCommand !== undefined) {
       obj.connectCommand = message.connectCommand;
     }
-    if (message.logoUrl !== '') {
+    if (message.logoUrl !== "") {
       obj.logoUrl = message.logoUrl;
     }
     return obj;
@@ -1997,24 +1822,22 @@ export const PortalRoute = {
   create<I extends Exact<DeepPartial<PortalRoute>, I>>(base?: I): PortalRoute {
     return PortalRoute.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<PortalRoute>, I>>(
-    object: I,
-  ): PortalRoute {
+  fromPartial<I extends Exact<DeepPartial<PortalRoute>, I>>(object: I): PortalRoute {
     const message = createBasePortalRoute();
-    message.id = object.id ?? '';
-    message.name = object.name ?? '';
-    message.type = object.type ?? '';
-    message.from = object.from ?? '';
-    message.description = object.description ?? '';
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.type = object.type ?? "";
+    message.from = object.from ?? "";
+    message.description = object.description ?? "";
     message.connectCommand = object.connectCommand ?? undefined;
-    message.logoUrl = object.logoUrl ?? '';
+    message.logoUrl = object.logoUrl ?? "";
     return message;
   },
 };
 
 function createBaseConnectionStatusUpdate(): ConnectionStatusUpdate {
   return {
-    id: '',
+    id: "",
     peerAddr: undefined,
     status: 0,
     lastError: undefined,
@@ -2024,11 +1847,8 @@ function createBaseConnectionStatusUpdate(): ConnectionStatusUpdate {
 }
 
 export const ConnectionStatusUpdate = {
-  encode(
-    message: ConnectionStatusUpdate,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
-    if (message.id !== '') {
+  encode(message: ConnectionStatusUpdate, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
     if (message.peerAddr !== undefined) {
@@ -2044,20 +1864,13 @@ export const ConnectionStatusUpdate = {
       writer.uint32(42).string(message.authUrl);
     }
     if (message.ts !== undefined) {
-      Timestamp.encode(
-        toTimestamp(message.ts),
-        writer.uint32(50).fork(),
-      ).ldelim();
+      Timestamp.encode(toTimestamp(message.ts), writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ConnectionStatusUpdate {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ConnectionStatusUpdate {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseConnectionStatusUpdate();
     while (reader.pos < end) {
@@ -2116,35 +1929,27 @@ export const ConnectionStatusUpdate = {
 
   fromJSON(object: any): ConnectionStatusUpdate {
     return {
-      id: isSet(object.id) ? globalThis.String(object.id) : '',
-      peerAddr: isSet(object.peerAddr)
-        ? globalThis.String(object.peerAddr)
-        : undefined,
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      peerAddr: isSet(object.peerAddr) ? globalThis.String(object.peerAddr) : undefined,
       status: isSet(object.status)
         ? connectionStatusUpdate_ConnectionStatusFromJSON(object.status)
         : 0,
-      lastError: isSet(object.lastError)
-        ? globalThis.String(object.lastError)
-        : undefined,
-      authUrl: isSet(object.authUrl)
-        ? globalThis.String(object.authUrl)
-        : undefined,
+      lastError: isSet(object.lastError) ? globalThis.String(object.lastError) : undefined,
+      authUrl: isSet(object.authUrl) ? globalThis.String(object.authUrl) : undefined,
       ts: isSet(object.ts) ? fromJsonTimestamp(object.ts) : undefined,
     };
   },
 
   toJSON(message: ConnectionStatusUpdate): unknown {
     const obj: any = {};
-    if (message.id !== '') {
+    if (message.id !== "") {
       obj.id = message.id;
     }
     if (message.peerAddr !== undefined) {
       obj.peerAddr = message.peerAddr;
     }
     if (message.status !== 0) {
-      obj.status = connectionStatusUpdate_ConnectionStatusToJSON(
-        message.status,
-      );
+      obj.status = connectionStatusUpdate_ConnectionStatusToJSON(message.status);
     }
     if (message.lastError !== undefined) {
       obj.lastError = message.lastError;
@@ -2167,7 +1972,7 @@ export const ConnectionStatusUpdate = {
     object: I,
   ): ConnectionStatusUpdate {
     const message = createBaseConnectionStatusUpdate();
-    message.id = object.id ?? '';
+    message.id = object.id ?? "";
     message.peerAddr = object.peerAddr ?? undefined;
     message.status = object.status ?? 0;
     message.lastError = object.lastError ?? undefined;
@@ -2194,10 +1999,7 @@ function createBaseKeyUsage(): KeyUsage {
 }
 
 export const KeyUsage = {
-  encode(
-    message: KeyUsage,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: KeyUsage, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.digitalSignature === true) {
       writer.uint32(8).bool(message.digitalSignature);
     }
@@ -2235,8 +2037,7 @@ export const KeyUsage = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): KeyUsage {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseKeyUsage();
     while (reader.pos < end) {
@@ -2342,27 +2143,13 @@ export const KeyUsage = {
       dataEncipherment: isSet(object.dataEncipherment)
         ? globalThis.Boolean(object.dataEncipherment)
         : false,
-      keyAgreement: isSet(object.keyAgreement)
-        ? globalThis.Boolean(object.keyAgreement)
-        : false,
-      certSign: isSet(object.certSign)
-        ? globalThis.Boolean(object.certSign)
-        : false,
-      crlSign: isSet(object.crlSign)
-        ? globalThis.Boolean(object.crlSign)
-        : false,
-      encipherOnly: isSet(object.encipherOnly)
-        ? globalThis.Boolean(object.encipherOnly)
-        : false,
-      decipherOnly: isSet(object.decipherOnly)
-        ? globalThis.Boolean(object.decipherOnly)
-        : false,
-      serverAuth: isSet(object.serverAuth)
-        ? globalThis.Boolean(object.serverAuth)
-        : false,
-      clientAuth: isSet(object.clientAuth)
-        ? globalThis.Boolean(object.clientAuth)
-        : false,
+      keyAgreement: isSet(object.keyAgreement) ? globalThis.Boolean(object.keyAgreement) : false,
+      certSign: isSet(object.certSign) ? globalThis.Boolean(object.certSign) : false,
+      crlSign: isSet(object.crlSign) ? globalThis.Boolean(object.crlSign) : false,
+      encipherOnly: isSet(object.encipherOnly) ? globalThis.Boolean(object.encipherOnly) : false,
+      decipherOnly: isSet(object.decipherOnly) ? globalThis.Boolean(object.decipherOnly) : false,
+      serverAuth: isSet(object.serverAuth) ? globalThis.Boolean(object.serverAuth) : false,
+      clientAuth: isSet(object.clientAuth) ? globalThis.Boolean(object.clientAuth) : false,
     };
   },
 
@@ -2433,8 +2220,8 @@ function createBaseName(): Name {
     province: [],
     streetAddress: [],
     postalCode: [],
-    serialNumber: '',
-    commonName: '',
+    serialNumber: "",
+    commonName: "",
   };
 }
 
@@ -2461,18 +2248,17 @@ export const Name = {
     for (const v of message.postalCode) {
       writer.uint32(58).string(v!);
     }
-    if (message.serialNumber !== '') {
+    if (message.serialNumber !== "") {
       writer.uint32(66).string(message.serialNumber);
     }
-    if (message.commonName !== '') {
+    if (message.commonName !== "") {
       writer.uint32(74).string(message.commonName);
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Name {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseName();
     while (reader.pos < end) {
@@ -2573,12 +2359,8 @@ export const Name = {
       postalCode: globalThis.Array.isArray(object?.postalCode)
         ? object.postalCode.map((e: any) => globalThis.String(e))
         : [],
-      serialNumber: isSet(object.serialNumber)
-        ? globalThis.String(object.serialNumber)
-        : '',
-      commonName: isSet(object.commonName)
-        ? globalThis.String(object.commonName)
-        : '',
+      serialNumber: isSet(object.serialNumber) ? globalThis.String(object.serialNumber) : "",
+      commonName: isSet(object.commonName) ? globalThis.String(object.commonName) : "",
     };
   },
 
@@ -2605,10 +2387,10 @@ export const Name = {
     if (message.postalCode?.length) {
       obj.postalCode = message.postalCode;
     }
-    if (message.serialNumber !== '') {
+    if (message.serialNumber !== "") {
       obj.serialNumber = message.serialNumber;
     }
-    if (message.commonName !== '') {
+    if (message.commonName !== "") {
       obj.commonName = message.commonName;
     }
     return obj;
@@ -2626,8 +2408,8 @@ export const Name = {
     message.province = object.province?.map((e) => e) || [];
     message.streetAddress = object.streetAddress?.map((e) => e) || [];
     message.postalCode = object.postalCode?.map((e) => e) || [];
-    message.serialNumber = object.serialNumber ?? '';
-    message.commonName = object.commonName ?? '';
+    message.serialNumber = object.serialNumber ?? "";
+    message.commonName = object.commonName ?? "";
     return message;
   },
 };
@@ -2635,7 +2417,7 @@ export const Name = {
 function createBaseCertificateInfo(): CertificateInfo {
   return {
     version: 0,
-    serial: '',
+    serial: "",
     issuer: undefined,
     subject: undefined,
     notBefore: undefined,
@@ -2659,14 +2441,11 @@ function createBaseCertificateInfo(): CertificateInfo {
 }
 
 export const CertificateInfo = {
-  encode(
-    message: CertificateInfo,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: CertificateInfo, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.version !== 0) {
       writer.uint32(8).int64(message.version);
     }
-    if (message.serial !== '') {
+    if (message.serial !== "") {
       writer.uint32(18).string(message.serial);
     }
     if (message.issuer !== undefined) {
@@ -2676,16 +2455,10 @@ export const CertificateInfo = {
       Name.encode(message.subject, writer.uint32(34).fork()).ldelim();
     }
     if (message.notBefore !== undefined) {
-      Timestamp.encode(
-        toTimestamp(message.notBefore),
-        writer.uint32(42).fork(),
-      ).ldelim();
+      Timestamp.encode(toTimestamp(message.notBefore), writer.uint32(42).fork()).ldelim();
     }
     if (message.notAfter !== undefined) {
-      Timestamp.encode(
-        toTimestamp(message.notAfter),
-        writer.uint32(50).fork(),
-      ).ldelim();
+      Timestamp.encode(toTimestamp(message.notAfter), writer.uint32(50).fork()).ldelim();
     }
     if (message.keyUsage !== undefined) {
       KeyUsage.encode(message.keyUsage, writer.uint32(58).fork()).ldelim();
@@ -2736,8 +2509,7 @@ export const CertificateInfo = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): CertificateInfo {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCertificateInfo();
     while (reader.pos < end) {
@@ -2776,18 +2548,14 @@ export const CertificateInfo = {
             break;
           }
 
-          message.notBefore = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
-          );
+          message.notBefore = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         case 6:
           if (tag !== 50) {
             break;
           }
 
-          message.notAfter = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
-          );
+          message.notAfter = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         case 7:
           if (tag !== 58) {
@@ -2906,20 +2674,12 @@ export const CertificateInfo = {
   fromJSON(object: any): CertificateInfo {
     return {
       version: isSet(object.version) ? globalThis.Number(object.version) : 0,
-      serial: isSet(object.serial) ? globalThis.String(object.serial) : '',
+      serial: isSet(object.serial) ? globalThis.String(object.serial) : "",
       issuer: isSet(object.issuer) ? Name.fromJSON(object.issuer) : undefined,
-      subject: isSet(object.subject)
-        ? Name.fromJSON(object.subject)
-        : undefined,
-      notBefore: isSet(object.notBefore)
-        ? fromJsonTimestamp(object.notBefore)
-        : undefined,
-      notAfter: isSet(object.notAfter)
-        ? fromJsonTimestamp(object.notAfter)
-        : undefined,
-      keyUsage: isSet(object.keyUsage)
-        ? KeyUsage.fromJSON(object.keyUsage)
-        : undefined,
+      subject: isSet(object.subject) ? Name.fromJSON(object.subject) : undefined,
+      notBefore: isSet(object.notBefore) ? fromJsonTimestamp(object.notBefore) : undefined,
+      notAfter: isSet(object.notAfter) ? fromJsonTimestamp(object.notAfter) : undefined,
+      keyUsage: isSet(object.keyUsage) ? KeyUsage.fromJSON(object.keyUsage) : undefined,
       dnsNames: globalThis.Array.isArray(object?.dnsNames)
         ? object.dnsNames.map((e: any) => globalThis.String(e))
         : [],
@@ -2947,14 +2707,10 @@ export const CertificateInfo = {
       excludedIpRanges: globalThis.Array.isArray(object?.excludedIpRanges)
         ? object.excludedIpRanges.map((e: any) => globalThis.String(e))
         : [],
-      permittedEmailAddresses: globalThis.Array.isArray(
-        object?.permittedEmailAddresses,
-      )
+      permittedEmailAddresses: globalThis.Array.isArray(object?.permittedEmailAddresses)
         ? object.permittedEmailAddresses.map((e: any) => globalThis.String(e))
         : [],
-      excludedEmailAddresses: globalThis.Array.isArray(
-        object?.excludedEmailAddresses,
-      )
+      excludedEmailAddresses: globalThis.Array.isArray(object?.excludedEmailAddresses)
         ? object.excludedEmailAddresses.map((e: any) => globalThis.String(e))
         : [],
       permittedUriDomains: globalThis.Array.isArray(object?.permittedUriDomains)
@@ -2972,7 +2728,7 @@ export const CertificateInfo = {
     if (message.version !== 0) {
       obj.version = Math.round(message.version);
     }
-    if (message.serial !== '') {
+    if (message.serial !== "") {
       obj.serial = message.serial;
     }
     if (message.issuer !== undefined) {
@@ -3035,17 +2791,13 @@ export const CertificateInfo = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<CertificateInfo>, I>>(
-    base?: I,
-  ): CertificateInfo {
+  create<I extends Exact<DeepPartial<CertificateInfo>, I>>(base?: I): CertificateInfo {
     return CertificateInfo.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<CertificateInfo>, I>>(
-    object: I,
-  ): CertificateInfo {
+  fromPartial<I extends Exact<DeepPartial<CertificateInfo>, I>>(object: I): CertificateInfo {
     const message = createBaseCertificateInfo();
     message.version = object.version ?? 0;
-    message.serial = object.serial ?? '';
+    message.serial = object.serial ?? "";
     message.issuer =
       object.issuer !== undefined && object.issuer !== null
         ? Name.fromPartial(object.issuer)
@@ -3064,19 +2816,14 @@ export const CertificateInfo = {
     message.emailAddresses = object.emailAddresses?.map((e) => e) || [];
     message.ipAddresses = object.ipAddresses?.map((e) => e) || [];
     message.uris = object.uris?.map((e) => e) || [];
-    message.permittedDnsDomainsCritical =
-      object.permittedDnsDomainsCritical ?? false;
-    message.permittedDnsDomains =
-      object.permittedDnsDomains?.map((e) => e) || [];
+    message.permittedDnsDomainsCritical = object.permittedDnsDomainsCritical ?? false;
+    message.permittedDnsDomains = object.permittedDnsDomains?.map((e) => e) || [];
     message.excludedDnsDomains = object.excludedDnsDomains?.map((e) => e) || [];
     message.permittedIpRanges = object.permittedIpRanges?.map((e) => e) || [];
     message.excludedIpRanges = object.excludedIpRanges?.map((e) => e) || [];
-    message.permittedEmailAddresses =
-      object.permittedEmailAddresses?.map((e) => e) || [];
-    message.excludedEmailAddresses =
-      object.excludedEmailAddresses?.map((e) => e) || [];
-    message.permittedUriDomains =
-      object.permittedUriDomains?.map((e) => e) || [];
+    message.permittedEmailAddresses = object.permittedEmailAddresses?.map((e) => e) || [];
+    message.excludedEmailAddresses = object.excludedEmailAddresses?.map((e) => e) || [];
+    message.permittedUriDomains = object.permittedUriDomains?.map((e) => e) || [];
     message.excludedUriDomains = object.excludedUriDomains?.map((e) => e) || [];
     message.error = object.error ?? undefined;
     return message;
@@ -3088,10 +2835,7 @@ function createBaseCertificate(): Certificate {
 }
 
 export const Certificate = {
-  encode(
-    message: Certificate,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Certificate, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.cert.length !== 0) {
       writer.uint32(10).bytes(message.cert);
     }
@@ -3105,8 +2849,7 @@ export const Certificate = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Certificate {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseCertificate();
     while (reader.pos < end) {
@@ -3144,13 +2887,9 @@ export const Certificate = {
 
   fromJSON(object: any): Certificate {
     return {
-      cert: isSet(object.cert)
-        ? bytesFromBase64(object.cert)
-        : new Uint8Array(0),
+      cert: isSet(object.cert) ? bytesFromBase64(object.cert) : new Uint8Array(0),
       key: isSet(object.key) ? bytesFromBase64(object.key) : undefined,
-      info: isSet(object.info)
-        ? CertificateInfo.fromJSON(object.info)
-        : undefined,
+      info: isSet(object.info) ? CertificateInfo.fromJSON(object.info) : undefined,
     };
   },
 
@@ -3171,9 +2910,7 @@ export const Certificate = {
   create<I extends Exact<DeepPartial<Certificate>, I>>(base?: I): Certificate {
     return Certificate.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Certificate>, I>>(
-    object: I,
-  ): Certificate {
+  fromPartial<I extends Exact<DeepPartial<Certificate>, I>>(object: I): Certificate {
     const message = createBaseCertificate();
     message.cert = object.cert ?? new Uint8Array(0);
     message.key = object.key ?? undefined;
@@ -3190,10 +2927,7 @@ function createBaseClientCertFromStore(): ClientCertFromStore {
 }
 
 export const ClientCertFromStore = {
-  encode(
-    message: ClientCertFromStore,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ClientCertFromStore, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.issuerFilter !== undefined) {
       writer.uint32(10).string(message.issuerFilter);
     }
@@ -3204,8 +2938,7 @@ export const ClientCertFromStore = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ClientCertFromStore {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseClientCertFromStore();
     while (reader.pos < end) {
@@ -3236,9 +2969,7 @@ export const ClientCertFromStore = {
 
   fromJSON(object: any): ClientCertFromStore {
     return {
-      issuerFilter: isSet(object.issuerFilter)
-        ? globalThis.String(object.issuerFilter)
-        : undefined,
+      issuerFilter: isSet(object.issuerFilter) ? globalThis.String(object.issuerFilter) : undefined,
       subjectFilter: isSet(object.subjectFilter)
         ? globalThis.String(object.subjectFilter)
         : undefined,
@@ -3256,9 +2987,7 @@ export const ClientCertFromStore = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ClientCertFromStore>, I>>(
-    base?: I,
-  ): ClientCertFromStore {
+  create<I extends Exact<DeepPartial<ClientCertFromStore>, I>>(base?: I): ClientCertFromStore {
     return ClientCertFromStore.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ClientCertFromStore>, I>>(
@@ -3275,7 +3004,7 @@ function createBaseConnection(): Connection {
   return {
     name: undefined,
     protocol: undefined,
-    remoteAddr: '',
+    remoteAddr: "",
     listenAddr: undefined,
     pomeriumUrl: undefined,
     disableTlsVerification: undefined,
@@ -3287,17 +3016,14 @@ function createBaseConnection(): Connection {
 }
 
 export const Connection = {
-  encode(
-    message: Connection,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Connection, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== undefined) {
       writer.uint32(10).string(message.name);
     }
     if (message.protocol !== undefined) {
       writer.uint32(80).int32(message.protocol);
     }
-    if (message.remoteAddr !== '') {
+    if (message.remoteAddr !== "") {
       writer.uint32(18).string(message.remoteAddr);
     }
     if (message.listenAddr !== undefined) {
@@ -3316,10 +3042,7 @@ export const Connection = {
       Certificate.encode(message.clientCert, writer.uint32(58).fork()).ldelim();
     }
     if (message.clientCertFromStore !== undefined) {
-      ClientCertFromStore.encode(
-        message.clientCertFromStore,
-        writer.uint32(74).fork(),
-      ).ldelim();
+      ClientCertFromStore.encode(message.clientCertFromStore, writer.uint32(74).fork()).ldelim();
     }
     if (message.autostart !== undefined) {
       writer.uint32(88).bool(message.autostart);
@@ -3328,8 +3051,7 @@ export const Connection = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Connection {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseConnection();
     while (reader.pos < end) {
@@ -3396,10 +3118,7 @@ export const Connection = {
             break;
           }
 
-          message.clientCertFromStore = ClientCertFromStore.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.clientCertFromStore = ClientCertFromStore.decode(reader, reader.uint32());
           continue;
         case 11:
           if (tag !== 88) {
@@ -3420,31 +3139,19 @@ export const Connection = {
   fromJSON(object: any): Connection {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : undefined,
-      protocol: isSet(object.protocol)
-        ? protocolFromJSON(object.protocol)
-        : undefined,
-      remoteAddr: isSet(object.remoteAddr)
-        ? globalThis.String(object.remoteAddr)
-        : '',
-      listenAddr: isSet(object.listenAddr)
-        ? globalThis.String(object.listenAddr)
-        : undefined,
-      pomeriumUrl: isSet(object.pomeriumUrl)
-        ? globalThis.String(object.pomeriumUrl)
-        : undefined,
+      protocol: isSet(object.protocol) ? protocolFromJSON(object.protocol) : undefined,
+      remoteAddr: isSet(object.remoteAddr) ? globalThis.String(object.remoteAddr) : "",
+      listenAddr: isSet(object.listenAddr) ? globalThis.String(object.listenAddr) : undefined,
+      pomeriumUrl: isSet(object.pomeriumUrl) ? globalThis.String(object.pomeriumUrl) : undefined,
       disableTlsVerification: isSet(object.disableTlsVerification)
         ? globalThis.Boolean(object.disableTlsVerification)
         : undefined,
       caCert: isSet(object.caCert) ? bytesFromBase64(object.caCert) : undefined,
-      clientCert: isSet(object.clientCert)
-        ? Certificate.fromJSON(object.clientCert)
-        : undefined,
+      clientCert: isSet(object.clientCert) ? Certificate.fromJSON(object.clientCert) : undefined,
       clientCertFromStore: isSet(object.clientCertFromStore)
         ? ClientCertFromStore.fromJSON(object.clientCertFromStore)
         : undefined,
-      autostart: isSet(object.autostart)
-        ? globalThis.Boolean(object.autostart)
-        : undefined,
+      autostart: isSet(object.autostart) ? globalThis.Boolean(object.autostart) : undefined,
     };
   },
 
@@ -3456,7 +3163,7 @@ export const Connection = {
     if (message.protocol !== undefined) {
       obj.protocol = protocolToJSON(message.protocol);
     }
-    if (message.remoteAddr !== '') {
+    if (message.remoteAddr !== "") {
       obj.remoteAddr = message.remoteAddr;
     }
     if (message.listenAddr !== undefined) {
@@ -3475,9 +3182,7 @@ export const Connection = {
       obj.clientCert = Certificate.toJSON(message.clientCert);
     }
     if (message.clientCertFromStore !== undefined) {
-      obj.clientCertFromStore = ClientCertFromStore.toJSON(
-        message.clientCertFromStore,
-      );
+      obj.clientCertFromStore = ClientCertFromStore.toJSON(message.clientCertFromStore);
     }
     if (message.autostart !== undefined) {
       obj.autostart = message.autostart;
@@ -3488,13 +3193,11 @@ export const Connection = {
   create<I extends Exact<DeepPartial<Connection>, I>>(base?: I): Connection {
     return Connection.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Connection>, I>>(
-    object: I,
-  ): Connection {
+  fromPartial<I extends Exact<DeepPartial<Connection>, I>>(object: I): Connection {
     const message = createBaseConnection();
     message.name = object.name ?? undefined;
     message.protocol = object.protocol ?? undefined;
-    message.remoteAddr = object.remoteAddr ?? '';
+    message.remoteAddr = object.remoteAddr ?? "";
     message.listenAddr = object.listenAddr ?? undefined;
     message.pomeriumUrl = object.pomeriumUrl ?? undefined;
     message.disableTlsVerification = object.disableTlsVerification ?? undefined;
@@ -3504,8 +3207,7 @@ export const Connection = {
         ? Certificate.fromPartial(object.clientCert)
         : undefined;
     message.clientCertFromStore =
-      object.clientCertFromStore !== undefined &&
-      object.clientCertFromStore !== null
+      object.clientCertFromStore !== undefined && object.clientCertFromStore !== null
         ? ClientCertFromStore.fromPartial(object.clientCertFromStore)
         : undefined;
     message.autostart = object.autostart ?? undefined;
@@ -3518,23 +3220,20 @@ export type ConfigService = typeof ConfigService;
 export const ConfigService = {
   /** List returns records that match Selector */
   list: {
-    path: '/pomerium.cli.Config/List',
+    path: "/pomerium.cli.Config/List",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: Selector) =>
-      Buffer.from(Selector.encode(value).finish()),
+    requestSerialize: (value: Selector) => Buffer.from(Selector.encode(value).finish()),
     requestDeserialize: (value: Buffer) => Selector.decode(value),
-    responseSerialize: (value: Records) =>
-      Buffer.from(Records.encode(value).finish()),
+    responseSerialize: (value: Records) => Buffer.from(Records.encode(value).finish()),
     responseDeserialize: (value: Buffer) => Records.decode(value),
   },
   /** Delete deletes records that match Selector */
   delete: {
-    path: '/pomerium.cli.Config/Delete',
+    path: "/pomerium.cli.Config/Delete",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: Selector) =>
-      Buffer.from(Selector.encode(value).finish()),
+    requestSerialize: (value: Selector) => Buffer.from(Selector.encode(value).finish()),
     requestDeserialize: (value: Buffer) => Selector.decode(value),
     responseSerialize: (value: DeleteRecordsResponse) =>
       Buffer.from(DeleteRecordsResponse.encode(value).finish()),
@@ -3545,23 +3244,20 @@ export const ConfigService = {
    * you may omit the Connection data to just manipulate tags
    */
   upsert: {
-    path: '/pomerium.cli.Config/Upsert',
+    path: "/pomerium.cli.Config/Upsert",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: Record) =>
-      Buffer.from(Record.encode(value).finish()),
+    requestSerialize: (value: Record) => Buffer.from(Record.encode(value).finish()),
     requestDeserialize: (value: Buffer) => Record.decode(value),
-    responseSerialize: (value: Record) =>
-      Buffer.from(Record.encode(value).finish()),
+    responseSerialize: (value: Record) => Buffer.from(Record.encode(value).finish()),
     responseDeserialize: (value: Buffer) => Record.decode(value),
   },
   /** GetTags returns all tags. Note that tags are case sensitive */
   getTags: {
-    path: '/pomerium.cli.Config/GetTags',
+    path: "/pomerium.cli.Config/GetTags",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: GetTagsRequest) =>
-      Buffer.from(GetTagsRequest.encode(value).finish()),
+    requestSerialize: (value: GetTagsRequest) => Buffer.from(GetTagsRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => GetTagsRequest.decode(value),
     responseSerialize: (value: GetTagsResponse) =>
       Buffer.from(GetTagsResponse.encode(value).finish()),
@@ -3569,23 +3265,20 @@ export const ConfigService = {
   },
   /** Export dumps config into serialized format */
   export: {
-    path: '/pomerium.cli.Config/Export',
+    path: "/pomerium.cli.Config/Export",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: ExportRequest) =>
-      Buffer.from(ExportRequest.encode(value).finish()),
+    requestSerialize: (value: ExportRequest) => Buffer.from(ExportRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => ExportRequest.decode(value),
-    responseSerialize: (value: ConfigData) =>
-      Buffer.from(ConfigData.encode(value).finish()),
+    responseSerialize: (value: ConfigData) => Buffer.from(ConfigData.encode(value).finish()),
     responseDeserialize: (value: Buffer) => ConfigData.decode(value),
   },
   /** Import imports previously serialized records */
   import: {
-    path: '/pomerium.cli.Config/Import',
+    path: "/pomerium.cli.Config/Import",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: ImportRequest) =>
-      Buffer.from(ImportRequest.encode(value).finish()),
+    requestSerialize: (value: ImportRequest) => Buffer.from(ImportRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => ImportRequest.decode(value),
     responseSerialize: (value: ImportResponse) =>
       Buffer.from(ImportResponse.encode(value).finish()),
@@ -3593,7 +3286,7 @@ export const ConfigService = {
   },
   /** FetchRoutes fetches all the routes from the routes portal. */
   fetchRoutes: {
-    path: '/pomerium.cli.Config/FetchRoutes',
+    path: "/pomerium.cli.Config/FetchRoutes",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: FetchRoutesRequest) =>
@@ -3645,27 +3338,18 @@ export interface ConfigClient extends Client {
   /** Delete deletes records that match Selector */
   delete(
     request: Selector,
-    callback: (
-      error: ServiceError | null,
-      response: DeleteRecordsResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: DeleteRecordsResponse) => void,
   ): ClientUnaryCall;
   delete(
     request: Selector,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: DeleteRecordsResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: DeleteRecordsResponse) => void,
   ): ClientUnaryCall;
   delete(
     request: Selector,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: DeleteRecordsResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: DeleteRecordsResponse) => void,
   ): ClientUnaryCall;
   /**
    * Upsert inserts (if no ID is provided) or updates records
@@ -3737,33 +3421,24 @@ export interface ConfigClient extends Client {
   /** FetchRoutes fetches all the routes from the routes portal. */
   fetchRoutes(
     request: FetchRoutesRequest,
-    callback: (
-      error: ServiceError | null,
-      response: FetchRoutesResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: FetchRoutesResponse) => void,
   ): ClientUnaryCall;
   fetchRoutes(
     request: FetchRoutesRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: FetchRoutesResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: FetchRoutesResponse) => void,
   ): ClientUnaryCall;
   fetchRoutes(
     request: FetchRoutesRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: FetchRoutesResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: FetchRoutesResponse) => void,
   ): ClientUnaryCall;
 }
 
 export const ConfigClient = makeGenericClientConstructor(
   ConfigService,
-  'pomerium.cli.Config',
+  "pomerium.cli.Config",
 ) as unknown as {
   new (
     address: string,
@@ -3779,7 +3454,7 @@ export type ListenerService = typeof ListenerService;
 export const ListenerService = {
   /** Update alters connection status. */
   update: {
-    path: '/pomerium.cli.Listener/Update',
+    path: "/pomerium.cli.Listener/Update",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListenerUpdateRequest) =>
@@ -3787,21 +3462,18 @@ export const ListenerService = {
     requestDeserialize: (value: Buffer) => ListenerUpdateRequest.decode(value),
     responseSerialize: (value: ListenerStatusResponse) =>
       Buffer.from(ListenerStatusResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      ListenerStatusResponse.decode(value),
+    responseDeserialize: (value: Buffer) => ListenerStatusResponse.decode(value),
   },
   /** GetStatus returns current listener status for active tunnels */
   getStatus: {
-    path: '/pomerium.cli.Listener/GetStatus',
+    path: "/pomerium.cli.Listener/GetStatus",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: Selector) =>
-      Buffer.from(Selector.encode(value).finish()),
+    requestSerialize: (value: Selector) => Buffer.from(Selector.encode(value).finish()),
     requestDeserialize: (value: Buffer) => Selector.decode(value),
     responseSerialize: (value: ListenerStatusResponse) =>
       Buffer.from(ListenerStatusResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      ListenerStatusResponse.decode(value),
+    responseDeserialize: (value: Buffer) => ListenerStatusResponse.decode(value),
   },
   /**
    * StatusUpdates opens a stream to listen to connection status updates
@@ -3809,7 +3481,7 @@ export const ListenerService = {
    * listen to the broadcasted updates
    */
   statusUpdates: {
-    path: '/pomerium.cli.Listener/StatusUpdates',
+    path: "/pomerium.cli.Listener/StatusUpdates",
     requestStream: false,
     responseStream: true,
     requestSerialize: (value: StatusUpdatesRequest) =>
@@ -3817,8 +3489,7 @@ export const ListenerService = {
     requestDeserialize: (value: Buffer) => StatusUpdatesRequest.decode(value),
     responseSerialize: (value: ConnectionStatusUpdate) =>
       Buffer.from(ConnectionStatusUpdate.encode(value).finish()),
-    responseDeserialize: (value: Buffer) =>
-      ConnectionStatusUpdate.decode(value),
+    responseDeserialize: (value: Buffer) => ConnectionStatusUpdate.decode(value),
   },
 } as const;
 
@@ -3832,62 +3503,41 @@ export interface ListenerServer extends UntypedServiceImplementation {
    * a client has to subscribe and continuously
    * listen to the broadcasted updates
    */
-  statusUpdates: handleServerStreamingCall<
-    StatusUpdatesRequest,
-    ConnectionStatusUpdate
-  >;
+  statusUpdates: handleServerStreamingCall<StatusUpdatesRequest, ConnectionStatusUpdate>;
 }
 
 export interface ListenerClient extends Client {
   /** Update alters connection status. */
   update(
     request: ListenerUpdateRequest,
-    callback: (
-      error: ServiceError | null,
-      response: ListenerStatusResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: ListenerStatusResponse) => void,
   ): ClientUnaryCall;
   update(
     request: ListenerUpdateRequest,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: ListenerStatusResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: ListenerStatusResponse) => void,
   ): ClientUnaryCall;
   update(
     request: ListenerUpdateRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: ListenerStatusResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: ListenerStatusResponse) => void,
   ): ClientUnaryCall;
   /** GetStatus returns current listener status for active tunnels */
   getStatus(
     request: Selector,
-    callback: (
-      error: ServiceError | null,
-      response: ListenerStatusResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: ListenerStatusResponse) => void,
   ): ClientUnaryCall;
   getStatus(
     request: Selector,
     metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: ListenerStatusResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: ListenerStatusResponse) => void,
   ): ClientUnaryCall;
   getStatus(
     request: Selector,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: ListenerStatusResponse,
-    ) => void,
+    callback: (error: ServiceError | null, response: ListenerStatusResponse) => void,
   ): ClientUnaryCall;
   /**
    * StatusUpdates opens a stream to listen to connection status updates
@@ -3907,7 +3557,7 @@ export interface ListenerClient extends Client {
 
 export const ListenerClient = makeGenericClientConstructor(
   ListenerService,
-  'pomerium.cli.Listener',
+  "pomerium.cli.Listener",
 ) as unknown as {
   new (
     address: string,
@@ -3920,7 +3570,7 @@ export const ListenerClient = makeGenericClientConstructor(
 
 function bytesFromBase64(b64: string): Uint8Array {
   if (globalThis.Buffer) {
-    return Uint8Array.from(globalThis.Buffer.from(b64, 'base64'));
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
   } else {
     const bin = globalThis.atob(b64);
     const arr = new Uint8Array(bin.length);
@@ -3933,24 +3583,17 @@ function bytesFromBase64(b64: string): Uint8Array {
 
 function base64FromBytes(arr: Uint8Array): string {
   if (globalThis.Buffer) {
-    return globalThis.Buffer.from(arr).toString('base64');
+    return globalThis.Buffer.from(arr).toString("base64");
   } else {
     const bin: string[] = [];
     arr.forEach((byte) => {
       bin.push(globalThis.String.fromCharCode(byte));
     });
-    return globalThis.btoa(bin.join(''));
+    return globalThis.btoa(bin.join(""));
   }
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin
   ? T
@@ -3984,7 +3627,7 @@ function fromTimestamp(t: Timestamp): Date {
 function fromJsonTimestamp(o: any): Date {
   if (o instanceof globalThis.Date) {
     return o;
-  } else if (typeof o === 'string') {
+  } else if (typeof o === "string") {
     return new globalThis.Date(o);
   } else {
     return fromTimestamp(Timestamp.fromJSON(o));
@@ -3993,7 +3636,7 @@ function fromJsonTimestamp(o: any): Date {
 
 function longToNumber(long: Long): number {
   if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
   }
   return long.toNumber();
 }
@@ -4004,7 +3647,7 @@ if (_m0.util.Long !== Long) {
 }
 
 function isObject(value: any): boolean {
-  return typeof value === 'object' && value !== null;
+  return typeof value === "object" && value !== null;
 }
 
 function isSet(value: any): boolean {

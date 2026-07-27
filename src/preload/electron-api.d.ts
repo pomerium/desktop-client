@@ -4,10 +4,7 @@ interface ElectronAPI {
     on: (channel: string, callback: (...args: any[]) => void) => void;
     once: (channel: string, callback: (...args: any[]) => void) => void;
     removeAllListeners: (channel: string) => void;
-    removeListener: (
-      channel: string,
-      callback: (...args: any[]) => void,
-    ) => void;
+    removeListener: (channel: string, callback: (...args: any[]) => void) => void;
   };
   clipboard: {
     writeText: (text: string) => void;

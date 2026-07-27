@@ -1,13 +1,13 @@
-import { execSync } from 'child_process';
-import { writeFileSync } from 'fs';
+import { execSync } from "child_process";
+import { writeFileSync } from "fs";
 
-const { pomeriumCli, version } = require('../package.json');
+const { pomeriumCli, version } = require("../package.json");
 
-const gitHash = execSync('git rev-parse --short HEAD');
+const gitHash = execSync("git rev-parse --short HEAD");
 const cliVersion = pomeriumCli.version;
 
 writeFileSync(
-  './src/meta.json',
+  "./src/meta.json",
   JSON.stringify({
     gitHash: gitHash.toString().trimRight(),
     cliVersion,

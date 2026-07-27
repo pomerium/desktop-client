@@ -5,8 +5,8 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-} from '@mui/material';
-import React, { FC, ReactElement } from 'react';
+} from "@mui/material";
+import React, { FC, ReactElement } from "react";
 
 export interface ConfirmationDialogProps {
   title: string;
@@ -24,9 +24,7 @@ const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
   <Dialog open onClose={onClose}>
     <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
     <DialogContent>
-      <DialogContentText id="alert-dialog-description">
-        {text}
-      </DialogContentText>
+      <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
     </DialogContent>
     <DialogActions>
       <Button onClick={onClose}>Cancel</Button>

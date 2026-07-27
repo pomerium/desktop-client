@@ -2,8 +2,8 @@ name: Dependency Review
 on:
   pull_request:
     paths:
-      - '**/package.json'
-      - '**/package-lock.json'
+      - "**/package.json"
+      - "**/package-lock.json"
 
 permissions:
   contents: read

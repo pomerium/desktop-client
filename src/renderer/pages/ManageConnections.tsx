@@ -1,14 +1,7 @@
-import {
-  Button,
-  CardContent,
-  Container,
-  Grid,
-  Stack,
-  Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
-import React, { ReactElement, useEffect, useState } from 'react';
-import { Save, Upload } from 'react-feather';
+import { Button, CardContent, Container, Grid, Stack, Typography } from "@mui/material";
+import { useSnackbar } from "notistack";
+import React, { ReactElement, useEffect, useState } from "react";
+import { Save, Upload } from "react-feather";
 
 import {
   DELETE,
@@ -21,21 +14,15 @@ import {
   SAVE_RECORD,
   TOAST_LENGTH,
   VIEW,
-} from '../../shared/constants';
-import { ipcRenderer } from '../../shared/electron';
-import {
-  ListenerStatus,
-  Record as ListenerRecord,
-  Selector,
-} from '../../shared/pb/types';
-import ConnectionRow from '../components/ConnectionRow';
-import ExportDialog, {
-  IpcRendererEventListener,
-} from '../components/ExportDialog';
-import NewConnectionButton from '../components/NewConnectionButton';
-import StyledCard from '../components/StyledCard';
-import TagFolderRow from '../components/TagFolderRow';
-import VirtualFolderRow from '../components/VirtualFolderRow';
+} from "../../shared/constants";
+import { ipcRenderer } from "../../shared/electron";
+import { ListenerStatus, Record as ListenerRecord, Selector } from "../../shared/pb/types";
+import ConnectionRow from "../components/ConnectionRow";
+import ExportDialog, { IpcRendererEventListener } from "../components/ExportDialog";
+import NewConnectionButton from "../components/NewConnectionButton";
+import StyledCard from "../components/StyledCard";
+import TagFolderRow from "../components/TagFolderRow";
+import VirtualFolderRow from "../components/VirtualFolderRow";
 
 function ManageConnections(): ReactElement {
   const [folderNames, setFolderNames] = useState([] as string[]);
@@ -45,25 +32,21 @@ function ManageConnections(): ReactElement {
   const { enqueueSnackbar } = useSnackbar();
 
   const getConnectedCount = (conns: ListenerRecord[]) => {
-    return (
-      conns
-        .map((rec) => rec.id as string)
-        .filter((id) => statuses[id]?.listening).length || 0
-    );
+    return conns.map((rec) => rec.id as string).filter((id) => statuses[id]?.listening).length || 0;
   };
 
   useEffect(() => {
     const listener: IpcRendererEventListener = (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else {
-        const blob = new Blob([args.data], { type: 'application/json' });
-        const link = document.createElement('a');
+        const blob = new Blob([args.data], { type: "application/json" });
+        const link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
-        link.download = args.filename.replace(/\s+/g, '_') + '.json';
+        link.download = args.filename.replace(/\s+/g, "_") + ".json";
         link.click();
       }
     };
@@ -82,7 +65,7 @@ function ManageConnections(): ReactElement {
     ipcRenderer.on(GET_ALL_RECORDS, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else {
@@ -92,20 +75,18 @@ function ManageConnections(): ReactElement {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else {
-        Object.values(args.res.listeners as ListenerStatus[]).forEach(
-          ({ lastError }) => {
-            if (lastError) {
-              enqueueSnackbar(lastError, {
-                variant: 'error',
-                autoHideDuration: TOAST_LENGTH,
-              });
-            }
-          },
-        );
+        Object.values(args.res.listeners as ListenerStatus[]).forEach(({ lastError }) => {
+          if (lastError) {
+            enqueueSnackbar(lastError, {
+              variant: "error",
+              autoHideDuration: TOAST_LENGTH,
+            });
+          }
+        });
         setStatuses((prevState) => {
           return {
             ...prevState,
@@ -117,7 +98,7 @@ function ManageConnections(): ReactElement {
     ipcRenderer.on(DELETE, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       }
@@ -125,12 +106,12 @@ function ManageConnections(): ReactElement {
     ipcRenderer.on(IMPORT, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else {
-        enqueueSnackbar('Uploaded Successfully', {
-          variant: 'success',
+        enqueueSnackbar("Uploaded Successfully", {
+          variant: "success",
           autoHideDuration: TOAST_LENGTH,
         });
         ipcRenderer.send(GET_ALL_RECORDS);
@@ -140,7 +121,7 @@ function ManageConnections(): ReactElement {
     ipcRenderer.on(SAVE_RECORD, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else {
@@ -165,16 +146,11 @@ function ManageConnections(): ReactElement {
     };
   }, []);
 
-  const untagged = connections?.filter(
-    (connection) => !connection?.tags?.length,
-  );
+  const untagged = connections?.filter((connection) => !connection?.tags?.length);
 
   return (
     <>
-      <ExportDialog
-        exportFile={exportFile}
-        onClose={() => setExportFile(null)}
-      />
+      <ExportDialog exportFile={exportFile} onClose={() => setExportFile(null)} />
       <Container maxWidth={false} sx={{ pt: 4 }}>
         <Stack spacing={2}>
           <Grid>
@@ -203,7 +179,7 @@ function ManageConnections(): ReactElement {
                       color="primary"
                       onClick={() =>
                         setExportFile({
-                          filename: 'connections',
+                          filename: "connections",
                           selector: {
                             all: true,
                             ids: [],
@@ -232,7 +208,7 @@ function ManageConnections(): ReactElement {
                 );
                 return (
                   <TagFolderRow
-                    key={'folderRow' + folderName}
+                    key={"folderRow" + folderName}
                     folderName={folderName}
                     connectedListeners={getConnectedCount(folderConns)}
                     totalListeners={folderConns.length}
@@ -241,14 +217,11 @@ function ManageConnections(): ReactElement {
                     {folderConns.map((record) => {
                       return (
                         <ConnectionRow
-                          key={'connectionRow' + folderName + record.id}
+                          key={"connectionRow" + folderName + record.id}
                           folderName={folderName}
                           connection={record}
-                          connected={
-                            !!record?.id &&
-                            statuses[record.id as string]?.listening
-                          }
-                          port={statuses[record.id as string]?.listenAddr || ''}
+                          connected={!!record?.id && statuses[record.id as string]?.listening}
+                          port={statuses[record.id as string]?.listenAddr || ""}
                         />
                       );
                     })}
@@ -263,13 +236,11 @@ function ManageConnections(): ReactElement {
                 {connections.map((record) => {
                   return (
                     <ConnectionRow
-                      key={'connectionRowAllConnections' + record.id}
+                      key={"connectionRowAllConnections" + record.id}
                       folderName="All Connections"
                       connection={record}
-                      connected={
-                        !!record?.id && statuses[record.id as string]?.listening
-                      }
-                      port={statuses[record.id as string]?.listenAddr || ''}
+                      connected={!!record?.id && statuses[record.id as string]?.listening}
+                      port={statuses[record.id as string]?.listenAddr || ""}
                     />
                   );
                 })}
@@ -282,13 +253,11 @@ function ManageConnections(): ReactElement {
                 {untagged.map((record) => {
                   return (
                     <ConnectionRow
-                      key={'connectionRowUntagged' + record.id}
+                      key={"connectionRowUntagged" + record.id}
                       folderName="Untagged"
                       connection={record}
-                      connected={
-                        !!record?.id && statuses[record.id as string]?.listening
-                      }
-                      port={statuses[record.id as string]?.listenAddr || ''}
+                      connected={!!record?.id && statuses[record.id as string]?.listening}
+                      port={statuses[record.id as string]?.listenAddr || ""}
                     />
                   );
                 })}

@@ -1,26 +1,19 @@
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Typography,
-} from '@mui/material';
-import React, { FC } from 'react';
-import { ChevronDown } from 'react-feather';
+import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
+import React, { FC } from "react";
+import { ChevronDown } from "react-feather";
 
 export type AdvancedSettingsAccordionProps = React.PropsWithChildren;
-const AdvancedSettingsAccordion: FC<AdvancedSettingsAccordionProps> = ({
-  children,
-}) => {
+const AdvancedSettingsAccordion: FC<AdvancedSettingsAccordionProps> = ({ children }) => {
   return (
     <Accordion
       sx={{
-        backgroundColor: 'background.paper',
+        backgroundColor: "background.paper",
         marginTop: 2,
         paddingLeft: 2,
         paddingRight: 2,
         borderRadius: 4,
-        '&:before': {
-          display: 'none',
+        "&:before": {
+          display: "none",
         },
       }}
       square={false}

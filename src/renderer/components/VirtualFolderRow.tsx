@@ -1,9 +1,9 @@
-import { Typography, Grid, IconButton, Divider } from '@mui/material';
-import * as React from 'react';
-import { PropsWithChildren, ReactElement } from 'react';
+import { Typography, Grid, IconButton, Divider } from "@mui/material";
+import * as React from "react";
+import { PropsWithChildren, ReactElement } from "react";
 
-import VirtualClosedFolder from '../icons/VirtualClosedFolder';
-import VirtualOpenFolder from '../icons/VirtualOpenFolder';
+import VirtualClosedFolder from "../icons/VirtualClosedFolder";
+import VirtualOpenFolder from "../icons/VirtualOpenFolder";
 
 type VirtualFolderProps = {
   folderName: string;
@@ -29,8 +29,8 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
       <Grid container item xs={12} alignItems="center">
         <Grid item xs={1}>
           <IconButton
-            key={'menuButton' + folderName}
-            aria-label={'toggle listeners for ' + folderName}
+            key={"menuButton" + folderName}
+            aria-label={"toggle listeners for " + folderName}
             component="span"
             onClick={toggleOpen}
             size="large"
@@ -44,13 +44,7 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
         <Grid container item xs={5} onClick={toggleOpen}>
           &nbsp;
         </Grid>
-        <Grid
-          container
-          item
-          xs={2}
-          justifyContent="flex-end"
-          onClick={toggleOpen}
-        >
+        <Grid container item xs={2} justifyContent="flex-end" onClick={toggleOpen}>
           <Typography variant="subtitle2">
             {connectedListeners} of {totalListeners} listening
           </Typography>

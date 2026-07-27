@@ -1,9 +1,9 @@
-import { SvgIcon } from '@mui/material';
-import React, { ReactElement } from 'react';
+import { SvgIcon } from "@mui/material";
+import React, { ReactElement } from "react";
 
 function OpenFolder(): ReactElement {
   return (
-    <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
+    <SvgIcon viewBox="0 0 20 20" sx={{ width: "20px", height: "20px" }}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"

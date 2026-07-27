@@ -1,6 +1,6 @@
-import { ServiceError } from '@grpc/grpc-js';
+import { ServiceError } from "@grpc/grpc-js";
 
-import { Records } from './pb/api';
+import { Records } from "./pb/api";
 
 export interface GetRecordsResponseArgs {
   err?: ServiceError | null;

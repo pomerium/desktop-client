@@ -1,14 +1,14 @@
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import React, { ReactElement } from 'react';
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import React, { ReactElement } from "react";
 
-import { VIEW_CONNECTION_LIST } from '../../shared/constants';
-import { ipcRenderer } from '../../shared/electron';
+import { VIEW_CONNECTION_LIST } from "../../shared/constants";
+import { ipcRenderer } from "../../shared/electron";
 
 interface Props {
   open: boolean;
@@ -27,13 +27,7 @@ function BeforeBackActionDialog({ open, onClose }: Props): ReactElement {
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      scroll="paper"
-      maxWidth="xs"
-      fullWidth
-    >
+    <Dialog open={open} onClose={onClose} scroll="paper" maxWidth="xs" fullWidth>
       <DialogTitle>
         <Typography variant="h4">Go Back?</Typography>
       </DialogTitle>

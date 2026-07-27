@@ -1,13 +1,8 @@
-import {
-  clipboard,
-  contextBridge,
-  ipcRenderer,
-  IpcRendererEvent,
-} from 'electron';
+import { clipboard, contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 
 type IpcCallback = (event: IpcRendererEvent, ...args: any[]) => void;
 
-contextBridge.exposeInMainWorld('electronAPI', {
+contextBridge.exposeInMainWorld("electronAPI", {
   ipcRenderer: {
     send: (channel: string, ...args: any[]) => {
       ipcRenderer.send(channel, ...args);

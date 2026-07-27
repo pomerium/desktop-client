@@ -1,8 +1,34 @@
 {
   "name": "pomerium-desktop",
   "version": "0.33.0",
-  "productName": "PomeriumDesktop",
   "description": "Cross Platform Desktop Application for establishing TCP connections through Pomerium",
+  "keywords": [
+    "internal",
+    "network",
+    "security",
+    "zero trust"
+  ],
+  "homepage": "https://github.com/pomerium/desktop-client#readme",
+  "bugs": {
+    "url": "https://github.com/pomerium/desktop-client/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Pomerium Inc",
+    "email": "info@pomerium.com",
+    "url": "https://pomerium.io/"
+  },
+  "contributors": [
+    {
+      "name": "Nathan Hayfield",
+      "email": "nhayfield@pomerium.com",
+      "url": "https://github.com/nhayfield"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pomerium/desktop-client.git"
+  },
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -12,15 +38,96 @@
     "dev-setup": "git clone https://github.com/pomerium/cli && ln -s $(pwd)/cli/bin/pomerium-cli assets/bin/ && cd cli && make build && npm run metadata",
     "build-cli": "cd cli && git pull origin; make build",
     "metadata": "npx tsx scripts/WriteMetadata.ts",
-    "lint": "cross-env NODE_ENV=development eslint . --cache",
-    "format": "prettier --ignore-path .prettierignore --write .",
-    "format:check": "prettier --ignore-path .prettierignore --check .",
+    "lint": "oxlint .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
     "package": "npm run build && electron-builder build --publish never",
     "release": "npm run build && electron-builder build --publish always",
     "postinstall": "electron-builder install-app-deps",
     "test": "vitest run --passWithNoTests",
-    "protoc": "scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && prettier --write ./src/shared/pb"
+    "protoc": "scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && oxfmt --write ./src/shared/pb"
   },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/dm-sans": "^5.3.0",
+    "@grpc/grpc-js": "^1.14.4",
+    "@mui/icons-material": "^9.2.0",
+    "@mui/lab": "^7.0.0-beta.17",
+    "@mui/material": "^9.2.0",
+    "@mui/styles": "^6.4.8",
+    "@sentry/electron": "^7.16.0",
+    "electron-context-menu": "^4.1.2",
+    "electron-debug": "^4.1.0",
+    "electron-is-packaged": "^1.0.2",
+    "electron-log": "^5.4.4",
+    "electron-store": "^11.0.2",
+    "electron-updater": "^6.8.9",
+    "history": "^5.0.0",
+    "json-schema": "^0.4.0",
+    "menubar": "^9.4.0",
+    "moment": "^2.30.1",
+    "notistack": "^3.0.2",
+    "nth-check": "3.0.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-feather": "^2.0.9",
+    "react-router": "8.3.0",
+    "react-router-dom": "7.18.1",
+    "ts-proto": "^2.12.0",
+    "usehooks-ts": "^3.1.1",
+    "validator": "^13.15.35"
+  },
+  "devDependencies": {
+    "@electron/notarize": "^3.1.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/history": "5.0.0",
+    "@types/node": "26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-router": "5.1.20",
+    "@vitejs/plugin-react": "^6.0.4",
+    "axios": "^1.18.1",
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "electron": "43.2.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "gunzip-stream": "^1.0.1",
+    "jiti": "^2.7.0",
+    "jsdom": "^29.1.1",
+    "oxfmt": "^0.60.0",
+    "oxlint": "^1.75.0",
+    "tar-stream": "^3.2.0",
+    "tsx": "^4.23.1",
+    "typescript": "^6.0.3",
+    "unzip-stream": "^0.3.2",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": ">=9.0.7"
+    },
+    "ajv-formats": {
+      "ajv": ">=8.18.0"
+    },
+    "brace-expansion@^5.0.0": "^5.0.6",
+    "conf": {
+      "ajv": ">=8.18.0"
+    },
+    "flatted": ">=3.4.2",
+    "picomatch": ">=2.3.2",
+    "tar": "^7.5.11",
+    "yaml": ">=2.8.3"
+  },
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10",
+    "yarn": "YARN NO LONGER USED - use npm instead."
+  },
+  "packageManager": "npm@11.11.0",
   "build": {
     "productName": "Pomerium Desktop",
     "appId": "io.pomerium.PomeriumDesktop",
@@ -87,142 +194,10 @@
       "repo": "desktop-client"
     }
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pomerium/desktop-client.git"
+  "pomeriumCli": {
+    "version": "v0.33.0"
   },
-  "author": {
-    "name": "Pomerium Inc",
-    "email": "info@pomerium.com",
-    "url": "https://pomerium.io/"
-  },
-  "contributors": [
-    {
-      "name": "Nathan Hayfield",
-      "email": "nhayfield@pomerium.com",
-      "url": "https://github.com/nhayfield"
-    }
-  ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/pomerium/desktop-client/issues"
-  },
-  "keywords": [
-    "zero trust",
-    "network",
-    "internal",
-    "security"
-  ],
-  "homepage": "https://github.com/pomerium/desktop-client#readme",
-  "devDependencies": {
-    "@electron/notarize": "^3.1.1",
-    "@eslint-react/eslint-plugin": "^5.18.0",
-    "@eslint/js": "^10.0.1",
-    "@testing-library/jest-dom": "^7.0.0",
-    "@testing-library/react": "^16.3.2",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
-    "@types/history": "5.0.0",
-    "@types/node": "26.1.1",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@types/react-router": "5.1.20",
-    "@typescript-eslint/parser": "^8.65.0",
-    "@vitejs/plugin-react": "^6.0.4",
-    "axios": "^1.18.1",
-    "concurrently": "^10.0.3",
-    "cross-env": "^10.1.0",
-    "electron": "43.2.0",
-    "electron-builder": "^26.15.3",
-    "electron-vite": "^5.0.0",
-    "eslint": "^10.7.0",
-    "eslint-plugin-jsx-a11y": "6.10.2",
-    "globals": "^15.15.0",
-    "gunzip-stream": "^1.0.1",
-    "jiti": "^2.7.0",
-    "jsdom": "^29.1.1",
-    "prettier": "^3.9.6",
-    "tar-stream": "^3.2.0",
-    "tsx": "^4.23.1",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.65.0",
-    "unzip-stream": "^0.3.2",
-    "vite": "^8.1.5",
-    "vitest": "^4.1.10"
-  },
-  "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@fontsource/dm-sans": "^5.3.0",
-    "@grpc/grpc-js": "^1.14.4",
-    "@mui/icons-material": "^9.2.0",
-    "@mui/lab": "^7.0.0-beta.17",
-    "@mui/material": "^9.2.0",
-    "@mui/styles": "^6.4.8",
-    "@sentry/electron": "^7.16.0",
-    "electron-context-menu": "^4.1.2",
-    "electron-debug": "^4.1.0",
-    "electron-is-packaged": "^1.0.2",
-    "electron-log": "^5.4.4",
-    "electron-store": "^11.0.2",
-    "electron-updater": "^6.8.9",
-    "history": "^5.0.0",
-    "json-schema": "^0.4.0",
-    "menubar": "^9.4.0",
-    "moment": "^2.30.1",
-    "notistack": "^3.0.2",
-    "nth-check": "3.0.1",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "react-feather": "^2.0.9",
-    "react-router": "8.3.0",
-    "react-router-dom": "7.18.1",
-    "ts-proto": "^2.12.0",
-    "typescript-eslint": "^8.65.0",
-    "usehooks-ts": "^3.1.1",
-    "validator": "^13.15.35"
-  },
-  "overrides": {
-    "brace-expansion@^5.0.0": "^5.0.6",
-    "tar": "^7.5.11",
-    "flatted": ">=3.4.2",
-    "picomatch": ">=2.3.2",
-    "yaml": ">=2.8.3",
-    "ajv-formats": {
-      "ajv": ">=8.18.0"
-    },
-    "conf": {
-      "ajv": ">=8.18.0"
-    },
-    "@typescript-eslint/typescript-estree": {
-      "minimatch": ">=9.0.7"
-    }
-  },
-  "packageManager": "npm@11.11.0",
-  "engines": {
-    "node": ">=20",
-    "npm": ">=10",
-    "yarn": "YARN NO LONGER USED - use npm instead."
-  },
-  "prettier": {
-    "overrides": [
-      {
-        "files": [
-          ".prettierrc"
-        ],
-        "options": {
-          "parser": "json"
-        }
-      }
-    ],
-    "singleQuote": true,
-    "plugins": [
-      "@trivago/prettier-plugin-sort-imports"
-    ],
-    "importOrder": [
-      "^[./]"
-    ],
-    "importOrderSeparation": true
-  },
+  "productName": "PomeriumDesktop",
   "renovate": {
     "extends": [
       "bliss"
@@ -230,8 +205,5 @@
     "baseBranches": [
       "next"
     ]
-  },
-  "pomeriumCli": {
-    "version": "v0.33.0"
   }
 }

@@ -1,15 +1,9 @@
-import {
-  FormControlLabel,
-  FormHelperText,
-  Grid,
-  Switch,
-  Typography,
-} from '@mui/material';
-import React, { FC } from 'react';
+import { FormControlLabel, FormHelperText, Grid, Switch, Typography } from "@mui/material";
+import React, { FC } from "react";
 
-import { Connection } from '../../shared/pb/types';
-import ClientCertSelection from './ClientCertSelection';
-import TextField from './TextField';
+import { Connection } from "../../shared/pb/types";
+import ClientCertSelection from "./ClientCertSelection";
+import TextField from "./TextField";
 
 export type AdvancedConnectionSettingsProps = {
   connection: Connection;
@@ -39,7 +33,7 @@ const AdvancedConnectionSettings: FC<AdvancedConnectionSettingsProps> = ({
           fullWidth
           required
           label="Pomerium URL"
-          value={connection?.pomeriumUrl || ''}
+          value={connection?.pomeriumUrl || ""}
           onChange={onChangeUrl}
           variant="outlined"
           autoFocus
@@ -63,14 +57,9 @@ const AdvancedConnectionSettings: FC<AdvancedConnectionSettingsProps> = ({
         </FormHelperText>
       </Grid>
       <Grid item xs={12}>
-        <Typography sx={{ fontWeight: 500, pt: 1 }}>
-          Client certificates
-        </Typography>
+        <Typography sx={{ fontWeight: 500, pt: 1 }}>Client certificates</Typography>
       </Grid>
-      <ClientCertSelection
-        connection={connection}
-        onChangeConnection={onChangeConnection}
-      />
+      <ClientCertSelection connection={connection} onChangeConnection={onChangeConnection} />
     </Grid>
   );
 };

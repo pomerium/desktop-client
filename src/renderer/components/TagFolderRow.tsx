@@ -1,14 +1,7 @@
-import {
-  Divider,
-  Grid,
-  IconButton,
-  Menu,
-  MenuItem,
-  Typography,
-} from '@mui/material';
-import * as React from 'react';
-import { PropsWithChildren, ReactElement } from 'react';
-import { MoreVertical } from 'react-feather';
+import { Divider, Grid, IconButton, Menu, MenuItem, Typography } from "@mui/material";
+import * as React from "react";
+import { PropsWithChildren, ReactElement } from "react";
+import { MoreVertical } from "react-feather";
 
 import {
   CONNECT_ALL,
@@ -17,15 +10,13 @@ import {
   EXPORT,
   ExportFile,
   UPDATE_LISTENERS,
-} from '../../shared/constants';
-import { ipcRenderer } from '../../shared/electron';
-import { ListenerUpdateRequest, Selector } from '../../shared/pb/types';
-import ClosedFolder from '../icons/ClosedFolder';
-import OpenFolder from '../icons/OpenFolder';
-import ConfirmationDialog, {
-  ConfirmationDialogProps,
-} from './ConfirmationDialog';
-import ExportDialog from './ExportDialog';
+} from "../../shared/constants";
+import { ipcRenderer } from "../../shared/electron";
+import { ListenerUpdateRequest, Selector } from "../../shared/pb/types";
+import ClosedFolder from "../icons/ClosedFolder";
+import OpenFolder from "../icons/OpenFolder";
+import ConfirmationDialog, { ConfirmationDialogProps } from "./ConfirmationDialog";
+import ExportDialog from "./ExportDialog";
 
 type FolderProps = {
   folderName: string;
@@ -43,8 +34,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
   children,
 }: PropsWithChildren<FolderProps>): ReactElement => {
   const [open, setOpen] = React.useState<boolean>(false);
-  const [confirmation, setConfirmation] =
-    React.useState<ConfirmationDialogProps | null>(null);
+  const [confirmation, setConfirmation] = React.useState<ConfirmationDialogProps | null>(null);
   const [exportFile, setExportFile] = React.useState<ExportFile | null>(null);
 
   const toggleOpen = () => {
@@ -94,16 +84,13 @@ const TagFolderRow: React.FC<FolderProps> = ({
           onClose={confirmation.onClose}
         />
       )}
-      <ExportDialog
-        exportFile={exportFile}
-        onClose={() => setExportFile(null)}
-      />
+      <ExportDialog exportFile={exportFile} onClose={() => setExportFile(null)} />
       <Grid container>
         <Grid container item xs={12} alignItems="center">
           <Grid item xs={1}>
             <IconButton
-              key={'menuButton' + folderName}
-              aria-label={'toggle listeners for ' + folderName}
+              key={"menuButton" + folderName}
+              aria-label={"toggle listeners for " + folderName}
               component="span"
               onClick={toggleOpen}
               size="large"
@@ -117,13 +104,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
           <Grid container item xs={5} onClick={toggleOpen}>
             &nbsp;
           </Grid>
-          <Grid
-            container
-            item
-            xs={2}
-            justifyContent="flex-end"
-            onClick={toggleOpen}
-          >
+          <Grid container item xs={2} justifyContent="flex-end" onClick={toggleOpen}>
             <Typography variant="subtitle2">
               {connectedListeners} of {totalListeners} listening
             </Typography>
@@ -133,28 +114,22 @@ const TagFolderRow: React.FC<FolderProps> = ({
               aria-controls="folder-menu"
               aria-haspopup="true"
               onClick={toggleMenu}
-              aria-label={'Menu for folder: ' + folderName}
+              aria-label={"Menu for folder: " + folderName}
               size="large"
             >
               <MoreVertical />
             </IconButton>
             <Menu
-              id={'folder-menu' + folderName}
+              id={"folder-menu" + folderName}
               anchorEl={menuAnchor}
               keepMounted
               open={Boolean(menuAnchor)}
               onClose={handleMenuClose}
             >
-              <MenuItem
-                key={CONNECT_ALL}
-                onClick={() => handleMenuClick(CONNECT_ALL)}
-              >
+              <MenuItem key={CONNECT_ALL} onClick={() => handleMenuClick(CONNECT_ALL)}>
                 Connect All
               </MenuItem>
-              <MenuItem
-                key={DISCONNECT_ALL}
-                onClick={() => handleMenuClick(DISCONNECT_ALL)}
-              >
+              <MenuItem key={DISCONNECT_ALL} onClick={() => handleMenuClick(DISCONNECT_ALL)}>
                 Disconnect All
               </MenuItem>
               <MenuItem key={EXPORT} onClick={() => handleMenuClick(EXPORT)}>
@@ -164,7 +139,7 @@ const TagFolderRow: React.FC<FolderProps> = ({
                 key={DELETE_ALL}
                 onClick={() => {
                   setConfirmation({
-                    title: 'Delete connections?',
+                    title: "Delete connections?",
                     text: `All connections with tag ${folderName} will be deleted.`,
                     onClose: () => setConfirmation(null),
                     onConfirm: () => {

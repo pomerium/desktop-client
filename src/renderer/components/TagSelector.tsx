@@ -1,10 +1,10 @@
-import { Autocomplete } from '@mui/material';
-import React, { FC, useEffect, useState } from 'react';
+import { Autocomplete } from "@mui/material";
+import React, { FC, useEffect, useState } from "react";
 
-import { GET_UNIQUE_TAGS } from '../../shared/constants';
-import { ipcRenderer } from '../../shared/electron';
-import { formatTag } from '../../shared/validators';
-import TextField from './TextField';
+import { GET_UNIQUE_TAGS } from "../../shared/constants";
+import { ipcRenderer } from "../../shared/electron";
+import { formatTag } from "../../shared/validators";
+import TextField from "./TextField";
 
 export type TagSelectorProps = {
   tags: string[];
@@ -43,7 +43,7 @@ const TagSelector: FC<TagSelectorProps> = ({ tags, onChangeTags }) => {
             onKeyDown={(e) => {
               const element = e.target as HTMLInputElement;
               const { value } = element;
-              if (e.key === 'Enter' && value.trim()) {
+              if (e.key === "Enter" && value.trim()) {
                 saveTags(tags.concat(value));
               }
             }}

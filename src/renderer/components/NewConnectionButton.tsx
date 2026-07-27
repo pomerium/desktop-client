@@ -1,4 +1,4 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlined';
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutlined";
 import {
   Button,
   ClickAwayListener,
@@ -9,11 +9,11 @@ import {
   Popper,
   Stack,
   Typography,
-} from '@mui/material';
-import React, { FC, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+} from "@mui/material";
+import React, { FC, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
-import usePopover from '../hooks/use-popover';
+import usePopover from "../hooks/use-popover";
 
 const NewConnectionButton: FC = () => {
   const popover = usePopover<HTMLButtonElement>();
@@ -21,10 +21,7 @@ const NewConnectionButton: FC = () => {
   const anchorRef = useRef<HTMLDivElement>(null);
 
   const handleClose = (event: Event) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
       return;
     }
     popover.handleClose();
@@ -33,12 +30,12 @@ const NewConnectionButton: FC = () => {
   const handleMenuItemClick = (key: string) => {
     popover.handleClose();
     switch (key) {
-      case 'load':
+      case "load":
         navigate(`/loadForm`, {
           replace: true,
         });
         break;
-      case 'add':
+      case "add":
         navigate(`/connectForm`, {
           replace: true,
         });
@@ -50,12 +47,12 @@ const NewConnectionButton: FC = () => {
 
   const options = [
     {
-      key: 'load',
-      title: 'Load Connections',
+      key: "load",
+      title: "Load Connections",
     },
     {
-      key: 'add',
-      title: 'Add Connecton',
+      key: "add",
+      title: "Add Connecton",
     },
   ];
 
@@ -83,8 +80,7 @@ const NewConnectionButton: FC = () => {
           <Grow
             {...TransitionProps}
             style={{
-              transformOrigin:
-                placement === 'bottom' ? 'center top' : 'center bottom',
+              transformOrigin: placement === "bottom" ? "center top" : "center bottom",
             }}
           >
             <Paper>
@@ -97,11 +93,7 @@ const NewConnectionButton: FC = () => {
                       sx={{ borderRadius: 1 }}
                       divider
                     >
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        justifyContent="center"
-                      >
+                      <Stack direction="row" spacing={1} justifyContent="center">
                         <Typography variant="button">{option.title}</Typography>
                       </Stack>
                     </MenuItem>

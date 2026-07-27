@@ -2,7 +2,7 @@ name: Update Dependencies
 
 on:
   schedule:
-    - cron: '40 1 * * *'
+    - cron: "40 1 * * *"
   workflow_dispatch:
 
 jobs:
@@ -31,10 +31,10 @@ jobs:
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
         with:
           author: GitHub Actions <apparitor@users.noreply.github.com>
-          body: 'This PR updates dependencies not managed by dependabot.'
+          body: "This PR updates dependencies not managed by dependabot."
           branch: ci/update-core
-          commit-message: 'ci: update dependencies'
+          commit-message: "ci: update dependencies"
           delete-branch: true
           labels: ci
-          title: 'ci: update dependencies'
+          title: "ci: update dependencies"
           token: ${{ secrets.APPARITOR_GITHUB_TOKEN }}

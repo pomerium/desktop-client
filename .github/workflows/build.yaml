@@ -14,8 +14,8 @@ jobs:
     container:
       image: electronuserland/builder:wine
       env:
-        ELECTRON_CACHE: '/root/.cache/electron'
-        ELECTRON_BUILDER_CACHE: '/root/.cache/electron-builder'
+        ELECTRON_CACHE: "/root/.cache/electron"
+        ELECTRON_BUILDER_CACHE: "/root/.cache/electron-builder"
 
     steps:
       - name: Checkout
