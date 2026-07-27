@@ -9,11 +9,10 @@ jobs:
 
     steps:
       - id: get_latest
-        uses: pozetroninc/github-action-get-latest-release@2a61c339ea7ef0a336d1daa35ef0cb1418e7676c
+        uses: rez0n/actions-github-release@05fabbd6b2b3ce3383299555ea518faea69b736d
         with:
           repository: ${{ github.repository }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          excludes: prerelease, draft
+          type: 'stable'
 
       - id: clean_versions
         run: |
