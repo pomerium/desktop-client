@@ -1,8 +1,8 @@
 /* eslint-disable */
-import Long from 'long';
-import _m0 from 'protobufjs/minimal';
+import Long from "long";
+import _m0 from "protobufjs/minimal";
 
-export const protobufPackage = 'google.protobuf';
+export const protobufPackage = "google.protobuf";
 
 /**
  * A Timestamp represents a point in time independent of any time zone or local
@@ -116,10 +116,7 @@ function createBaseTimestamp(): Timestamp {
 }
 
 export const Timestamp = {
-  encode(
-    message: Timestamp,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Timestamp, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.seconds !== 0) {
       writer.uint32(8).int64(message.seconds);
     }
@@ -130,8 +127,7 @@ export const Timestamp = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Timestamp {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseTimestamp();
     while (reader.pos < end) {
@@ -181,9 +177,7 @@ export const Timestamp = {
   create<I extends Exact<DeepPartial<Timestamp>, I>>(base?: I): Timestamp {
     return Timestamp.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Timestamp>, I>>(
-    object: I,
-  ): Timestamp {
+  fromPartial<I extends Exact<DeepPartial<Timestamp>, I>>(object: I): Timestamp {
     const message = createBaseTimestamp();
     message.seconds = object.seconds ?? 0;
     message.nanos = object.nanos ?? 0;
@@ -191,14 +185,7 @@ export const Timestamp = {
   },
 };
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin
   ? T
@@ -219,7 +206,7 @@ export type Exact<P, I extends P> = P extends Builtin
 
 function longToNumber(long: Long): number {
   if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
   }
   return long.toNumber();
 }

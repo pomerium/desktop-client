@@ -12,15 +12,15 @@ jobs:
         uses: rez0n/actions-github-release@05fabbd6b2b3ce3383299555ea518faea69b736d
         with:
           repository: ${{ github.repository }}
-          type: 'stable'
+          type: "stable"
 
       - id: clean_versions
         run: |
           echo "release=${VERSION#v}" >> $GITHUB_OUTPUT
           echo "latest_release=${LATEST_VERSION#v}" >> $GITHUB_OUTPUT
         env:
-          VERSION: '${{ github.event.release.tag_name }}'
-          LATEST_VERSION: '${{ steps.get_latest.outputs.release }}'
+          VERSION: "${{ github.event.release.tag_name }}"
+          LATEST_VERSION: "${{ steps.get_latest.outputs.release }}"
 
       - name: Update homebrew tap
         if: steps.clean_versions.outputs.release == steps.clean_versions.outputs.latest_release

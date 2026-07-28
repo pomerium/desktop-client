@@ -1,14 +1,15 @@
-import { app } from 'electron';
-import path from 'path';
+import path from "path";
+
+import { app } from "electron";
 
 export const RESOURCES_PATH = app.isPackaged
-  ? path.join(process.resourcesPath, 'assets')
-  : path.join(__dirname, '../../assets');
+  ? path.join(process.resourcesPath, "assets")
+  : path.join(__dirname, "../../assets");
 
 export const getAssetPath = (...paths: string[]): string => {
   return path.join(RESOURCES_PATH, ...paths);
 };
 
-export const menuIconPath: string = getAssetPath('icons');
+export const menuIconPath: string = getAssetPath("icons");
 
-export const pomeriumCli: string = getAssetPath('bin', 'pomerium-cli');
+export const pomeriumCli: string = getAssetPath("bin", "pomerium-cli");

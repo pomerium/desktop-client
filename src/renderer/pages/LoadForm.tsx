@@ -8,48 +8,33 @@ import {
   Stack,
   Switch,
   Typography,
-} from '@mui/material';
-import { defaultsDeep, isEqual } from 'lodash';
-import { enqueueSnackbar } from 'notistack';
-import React, { FC, useState } from 'react';
-import { useLocalStorage } from 'usehooks-ts';
+} from "@mui/material";
+import { defaultsDeep, isEqual } from "lodash";
+import { enqueueSnackbar } from "notistack";
+import React, { FC, useState } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
-import {
-  DELETE,
-  TOAST_LENGTH,
-  VIEW_CONNECTION_LIST,
-} from '../../shared/constants';
-import { ipcRenderer } from '../../shared/electron';
-import { fetchRoutes, getAllRecords, saveRecord } from '../../shared/ipc';
-import {
-  Connection,
-  PortalRoute,
-  Protocol,
-  Record,
-} from '../../shared/pb/types';
-import AdvancedSettingsAccordion from '../components/AdvancedSettingsAccordion';
-import ClientCertSelection from '../components/ClientCertSelection';
-import StyledCard from '../components/StyledCard';
-import TagSelector from '../components/TagSelector';
-import TextField from '../components/TextField';
+import { DELETE, TOAST_LENGTH, VIEW_CONNECTION_LIST } from "../../shared/constants";
+import { ipcRenderer } from "../../shared/electron";
+import { fetchRoutes, getAllRecords, saveRecord } from "../../shared/ipc";
+import { Connection, PortalRoute, Protocol, Record } from "../../shared/pb/types";
+import AdvancedSettingsAccordion from "../components/AdvancedSettingsAccordion";
+import ClientCertSelection from "../components/ClientCertSelection";
+import StyledCard from "../components/StyledCard";
+import TagSelector from "../components/TagSelector";
+import TextField from "../components/TextField";
 
-function portalRouteToRecord(
-  baseRecord: Record,
-  portalRoute: PortalRoute,
-): Record {
-  const from = new URL(
-    portalRoute.from.replace(/^(udp[+])|(tcp[+])(.*?)$/, '$3'),
-  );
-  const remoteAddr =
-    from.pathname === '/' ? from.host : from.pathname.substring(1);
-  const pomeriumUrl = from.pathname === '/' ? undefined : from.toString();
+function portalRouteToRecord(baseRecord: Record, portalRoute: PortalRoute): Record {
+  const from = new URL(portalRoute.from.replace(/^(udp[+])|(tcp[+])(.*?)$/, "$3"));
+  const remoteAddr = from.pathname === "/" ? from.host : from.pathname.substring(1);
+  const pomeriumUrl = from.pathname === "/" ? undefined : from.toString();
 
   return defaultsDeep(
     {
       source: `portal-route-${portalRoute.id}`,
       conn: {
         name: portalRoute.name,
-        protocol: portalRoute.type === 'tcp' ? Protocol.TCP : Protocol.UDP,
+        protocol: portalRoute.type === "tcp" ? Protocol.TCP : Protocol.UDP,
         remoteAddr,
         pomeriumUrl,
       },
@@ -58,22 +43,19 @@ function portalRouteToRecord(
   );
 }
 
-async function reconcileConnections(
-  baseRecord: Record,
-  portalRoutes: PortalRoute[],
-) {
+async function reconcileConnections(baseRecord: Record, portalRoutes: PortalRoute[]) {
   const res = await getAllRecords();
 
   const currentRecords = new Map<string, Record>(
     res?.records
-      ?.filter((r) => r.source?.startsWith('portal-route-'))
-      ?.map((r) => [r.source || '', r]) || [],
+      ?.filter((r) => r.source?.startsWith("portal-route-"))
+      ?.map((r) => [r.source || "", r]) || [],
   );
   const newRecords = new Map<string, Record>(
     portalRoutes
-      ?.filter((pr) => pr.type === 'tcp' || pr.type === 'udp')
+      ?.filter((pr) => pr.type === "tcp" || pr.type === "udp")
       ?.map((pr) => portalRouteToRecord(baseRecord, pr))
-      ?.map((r) => [r.source || '', r]) || [],
+      ?.map((r) => [r.source || "", r]) || [],
   );
 
   // remove current records which have been deleted
@@ -102,16 +84,13 @@ async function reconcileConnections(
 }
 
 const LoadForm: FC = () => {
-  const [serverUrl, setServerUrl] = useLocalStorage('LoadForm/serverUrl', '');
-  const [connection, setConnection] = useLocalStorage(
-    'LoadForm/connection',
-    (): Connection => {
-      return {
-        remoteAddr: '',
-      };
-    },
-  );
-  const [tags, setTags] = useLocalStorage('LoadForm/tags', (): string[] => []);
+  const [serverUrl, setServerUrl] = useLocalStorage("LoadForm/serverUrl", "");
+  const [connection, setConnection] = useLocalStorage("LoadForm/connection", (): Connection => {
+    return {
+      remoteAddr: "",
+    };
+  });
+  const [tags, setTags] = useLocalStorage("LoadForm/tags", (): string[] => []);
   const [loading, setLoading] = useState(false);
 
   const onChangeUrl = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,7 +124,7 @@ const LoadForm: FC = () => {
         }
       } catch (e) {
         enqueueSnackbar(`${(e as any)?.message || e}`, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } finally {
@@ -159,9 +138,7 @@ const LoadForm: FC = () => {
   const onToggleDisableTlsVerification = () => {
     setConnection({
       ...connection,
-      disableTlsVerification: connection?.disableTlsVerification
-        ? undefined
-        : true,
+      disableTlsVerification: connection?.disableTlsVerification ? undefined : true,
     });
   };
 
@@ -209,23 +186,13 @@ const LoadForm: FC = () => {
                   </FormHelperText>
                 </FormControl>
                 <FormControl>
-                  <Typography sx={{ fontWeight: 500, pt: 1 }}>
-                    Client certificates
-                  </Typography>
-                  <ClientCertSelection
-                    connection={connection}
-                    onChangeConnection={setConnection}
-                  />
+                  <Typography sx={{ fontWeight: 500, pt: 1 }}>Client certificates</Typography>
+                  <ClientCertSelection connection={connection} onChangeConnection={setConnection} />
                 </FormControl>
               </Stack>
             </AdvancedSettingsAccordion>
             <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                type="button"
-                variant="contained"
-                color="secondary"
-                onClick={onClickBack}
-              >
+              <Button type="button" variant="contained" color="secondary" onClick={onClickBack}>
                 Back
               </Button>
               <Button

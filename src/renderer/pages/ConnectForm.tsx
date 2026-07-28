@@ -11,11 +11,11 @@ import {
   Stack,
   Switch,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
-import React, { FC, useEffect, useState } from 'react';
-import { CheckCircle } from 'react-feather';
-import { useParams } from 'react-router-dom';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import React, { FC, useEffect, useState } from "react";
+import { CheckCircle } from "react-feather";
+import { useParams } from "react-router-dom";
 
 import {
   GET_RECORDS,
@@ -24,15 +24,15 @@ import {
   TOAST_LENGTH,
   VIEW,
   VIEW_CONNECTION_LIST,
-} from '../../shared/constants';
-import { ipcRenderer } from '../../shared/electron';
-import { Connection, Protocol, Record, Selector } from '../../shared/pb/types';
-import AdvancedConnectionSettings from '../components/AdvancedConnectionSettings';
-import AdvancedSettingsAccordion from '../components/AdvancedSettingsAccordion';
-import BeforeBackActionDialog from '../components/BeforeBackActionDialog';
-import StyledCard from '../components/StyledCard';
-import TagSelector from '../components/TagSelector';
-import TextField from '../components/TextField';
+} from "../../shared/constants";
+import { ipcRenderer } from "../../shared/electron";
+import { Connection, Protocol, Record, Selector } from "../../shared/pb/types";
+import AdvancedConnectionSettings from "../components/AdvancedConnectionSettings";
+import AdvancedSettingsAccordion from "../components/AdvancedSettingsAccordion";
+import BeforeBackActionDialog from "../components/BeforeBackActionDialog";
+import StyledCard from "../components/StyledCard";
+import TagSelector from "../components/TagSelector";
+import TextField from "../components/TextField";
 
 interface Props {
   onComplete?: () => void;
@@ -41,7 +41,7 @@ interface Props {
 const initialConnData: Connection = {
   name: undefined,
   protocol: Protocol.TCP,
-  remoteAddr: '',
+  remoteAddr: "",
   listenAddr: undefined,
   pomeriumUrl: undefined,
   disableTlsVerification: false,
@@ -54,7 +54,7 @@ const initialConnData: Connection = {
 const ConnectForm: FC<Props> = () => {
   const [showBackWarning, setShowBackWarning] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
-  const [source, setSource] = useState<string>('');
+  const [source, setSource] = useState<string>("");
   const [connection, setConnection] = useState(initialConnData);
   const [originalConnection, setOriginalConnection] = useState(initialConnData);
   const handleSubmit = (evt: React.FormEvent): void => {
@@ -67,7 +67,7 @@ const ConnectForm: FC<Props> = () => {
     ipcRenderer.on(GET_RECORDS, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else if (args.res.records.length === 1) {
@@ -95,21 +95,21 @@ const ConnectForm: FC<Props> = () => {
   const saveName = (value: string): void => {
     setConnection({
       ...connection,
-      ...{ name: value || undefined },
+      name: value || undefined,
     });
   };
 
   const saveDestination = (value: string): void => {
     setConnection({
       ...connection,
-      ...{ remoteAddr: value.trim() },
+      remoteAddr: value.trim(),
     });
   };
 
   const saveLocal = (value: string): void => {
     setConnection({
       ...connection,
-      ...{ listenAddr: value.trim() || undefined },
+      listenAddr: value.trim() || undefined,
     });
   };
 
@@ -123,8 +123,7 @@ const ConnectForm: FC<Props> = () => {
 
   const handleChangeProtocol = (evt: SelectChangeEvent) => {
     setConnection((oldConnection) => {
-      oldConnection.protocol =
-        evt.target.value === 'UDP' ? Protocol.UDP : Protocol.TCP;
+      oldConnection.protocol = evt.target.value === "UDP" ? Protocol.UDP : Protocol.TCP;
       return oldConnection;
     });
   };
@@ -142,7 +141,7 @@ const ConnectForm: FC<Props> = () => {
     ipcRenderer.once(SAVE_RECORD, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else if (args.res) {
@@ -164,17 +163,14 @@ const ConnectForm: FC<Props> = () => {
 
   return (
     <Container maxWidth={false} sx={{ pt: 4 }}>
-      <BeforeBackActionDialog
-        open={showBackWarning}
-        onClose={() => setShowBackWarning(false)}
-      />
+      <BeforeBackActionDialog open={showBackWarning} onClose={() => setShowBackWarning(false)} />
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
           <Grid>
             <Grid container alignItems="flex-start">
               <Grid item xs={12}>
                 <Typography variant="h3" color="textPrimary">
-                  {connectionID ? 'Edit' : 'Add'} Connection
+                  {connectionID ? "Edit" : "Add"} Connection
                 </Typography>
               </Grid>
             </Grid>
@@ -187,22 +183,20 @@ const ConnectForm: FC<Props> = () => {
                     fullWidth
                     required
                     label="Name"
-                    value={connection?.name || ''}
+                    value={connection?.name || ""}
                     onChange={(evt): void => saveName(evt.target.value)}
                     variant="outlined"
                     autoFocus
                     helperText="Name of the route."
                   />
-                </Grid>{' '}
+                </Grid>{" "}
                 <Grid item xs={12}>
                   <FormControl fullWidth>
                     <InputLabel id="protocol-label">Protocol</InputLabel>
                     <Select
                       labelId="protocol-label"
                       id="demo-simple-select"
-                      value={
-                        connection?.protocol === Protocol.UDP ? 'UDP' : 'TCP'
-                      }
+                      value={connection?.protocol === Protocol.UDP ? "UDP" : "TCP"}
                       label="Age"
                       onChange={handleChangeProtocol}
                     >
@@ -226,7 +220,7 @@ const ConnectForm: FC<Props> = () => {
                   <TextField
                     fullWidth
                     label="Local Address"
-                    value={connection?.listenAddr || ''}
+                    value={connection?.listenAddr || ""}
                     onChange={(evt): void => saveLocal(evt.target.value)}
                     variant="outlined"
                     helperText="The port or local address you want to connect to. Ex. :8888 or 127.0.0.1:8888"
@@ -264,12 +258,7 @@ const ConnectForm: FC<Props> = () => {
           </AdvancedSettingsAccordion>
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button
-              type="button"
-              variant="contained"
-              color="secondary"
-              onClick={handleClickBack}
-            >
+            <Button type="button" variant="contained" color="secondary" onClick={handleClickBack}>
               Back
             </Button>
             <Button

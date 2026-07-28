@@ -15,11 +15,11 @@ import {
   MenuItem,
   Stack,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
-import React, { ReactElement, useEffect, useState } from 'react';
-import { AlertTriangle, ChevronDown, Info } from 'react-feather';
-import { useParams } from 'react-router-dom';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import React, { ReactElement, useEffect, useState } from "react";
+import { AlertTriangle, ChevronDown, Info } from "react-feather";
+import { useParams } from "react-router-dom";
 
 import {
   DELETE,
@@ -32,41 +32,39 @@ import {
   TOAST_LENGTH,
   UPDATE_LISTENERS,
   VIEW_CONNECTION_LIST,
-} from '../../shared/constants';
-import { ipcRenderer } from '../../shared/electron';
+} from "../../shared/constants";
+import { ipcRenderer } from "../../shared/electron";
 import {
   Connection,
   ConnectionStatusUpdate,
   ListenerUpdateRequest,
   Record,
   Selector,
-} from '../../shared/pb/types';
-import CertDetails from '../components/CertDetails';
-import { getClientCertFiltersSummary } from '../components/ClientCertSelection';
-import ExportDialog, {
-  IpcRendererEventListener,
-} from '../components/ExportDialog';
-import StyledCard from '../components/StyledCard';
-import Connected from '../icons/Connected';
-import Delete from '../icons/Delete';
-import Disconnected from '../icons/Disconnected';
-import Edit from '../icons/Edit';
-import Export from '../icons/Export';
-import ExportJSON from '../icons/ExportJSON';
+} from "../../shared/pb/types";
+import CertDetails from "../components/CertDetails";
+import { getClientCertFiltersSummary } from "../components/ClientCertSelection";
+import ExportDialog, { IpcRendererEventListener } from "../components/ExportDialog";
+import StyledCard from "../components/StyledCard";
+import Connected from "../icons/Connected";
+import Delete from "../icons/Delete";
+import Disconnected from "../icons/Disconnected";
+import Edit from "../icons/Edit";
+import Export from "../icons/Export";
+import ExportJSON from "../icons/ExportJSON";
 
 type SimplifiedLog = {
-  status: 'info' | 'error';
+  status: "info" | "error";
   message: string;
   date: string;
 };
 
 function ConnectionView(): ReactElement {
-  const [tags, setTags] = useState([] as Record['tags']);
+  const [tags, setTags] = useState([] as Record["tags"]);
   const [connection, setConnection] = useState({} as Connection);
   const [connected, setConnected] = useState(false);
   const [errorFilter, setErrorFilter] = useState(false);
   const [infoFilter, setInfoFilter] = useState(false);
-  const [connectionPort, setConnectionPort] = useState('');
+  const [connectionPort, setConnectionPort] = useState("");
   const [filteredLogs, setFilteredLogs] = useState([] as SimplifiedLog[]);
   const [logs, setLogs] = useState([] as SimplifiedLog[]);
   const [menuAnchor, setMenuAnchor] = React.useState(null);
@@ -96,44 +94,44 @@ function ConnectionView(): ReactElement {
 
   const exportLogs = () => {
     const blob = new Blob([JSON.stringify(filteredLogs)], {
-      type: 'application/json',
+      type: "application/json",
     });
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
-    link.download = 'logs.json';
+    link.download = "logs.json";
     link.click();
   };
 
   const formatLog = (msg: ConnectionStatusUpdate): SimplifiedLog => {
-    const date = msg.ts?.toLocaleTimeString() || '';
-    const status = msg.lastError ? 'error' : 'info';
-    let message = '';
+    const date = msg.ts?.toLocaleTimeString() || "";
+    const status = msg.lastError ? "error" : "info";
+    let message = "";
 
     switch (msg.status) {
       case 1:
-        message = 'Connecting to Pomerium...';
+        message = "Connecting to Pomerium...";
         break;
       case 2:
         message = `Authentication required, web browser was open`;
         break;
       case 3:
-        message = 'Connected to Pomerium';
+        message = "Connected to Pomerium";
         break;
       case 4:
-        message = 'Disconnected from Pomerium';
+        message = "Disconnected from Pomerium";
         break;
       case 5:
-        message = 'Listening for new connections';
+        message = "Listening for new connections";
         break;
       case 6:
-        message = 'Stop listening for new connections';
+        message = "Stop listening for new connections";
         break;
       default:
         break;
     }
 
     if (msg.lastError) {
-      message += ': ' + msg.lastError;
+      message += ": " + msg.lastError;
     }
 
     return { message, status, date };
@@ -143,14 +141,14 @@ function ConnectionView(): ReactElement {
     const listener: IpcRendererEventListener = (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else {
-        const blob = new Blob([args.data], { type: 'application/json' });
-        const link = document.createElement('a');
+        const blob = new Blob([args.data], { type: "application/json" });
+        const link = document.createElement("a");
         link.href = window.URL.createObjectURL(blob);
-        link.download = args.filename.replace(/\s+/g, '_') + '.json';
+        link.download = args.filename.replace(/\s+/g, "_") + ".json";
         link.click();
       }
     };
@@ -164,22 +162,18 @@ function ConnectionView(): ReactElement {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
       if (args.err) {
         enqueueSnackbar(args.err.message, {
-          variant: 'error',
+          variant: "error",
           autoHideDuration: TOAST_LENGTH,
         });
       } else {
         setConnected(!!args?.res?.listeners[connectionID as string]?.listening);
-        const listenAddr =
-          args?.res?.listeners[connectionID as string]?.listenAddr;
-        setConnectionPort(listenAddr || '');
+        const listenAddr = args?.res?.listeners[connectionID as string]?.listenAddr;
+        setConnectionPort(listenAddr || "");
         if (args?.res?.listeners[connectionID as string]?.lastError) {
-          enqueueSnackbar(
-            args?.res?.listeners[connectionID as string]?.lastError,
-            {
-              variant: 'error',
-              autoHideDuration: TOAST_LENGTH,
-            },
-          );
+          enqueueSnackbar(args?.res?.listeners[connectionID as string]?.lastError, {
+            variant: "error",
+            autoHideDuration: TOAST_LENGTH,
+          });
         }
       }
     });
@@ -219,23 +213,18 @@ function ConnectionView(): ReactElement {
     if ((errorFilter && infoFilter) || (!errorFilter && !infoFilter)) {
       setFilteredLogs(logs);
     } else if (errorFilter) {
-      setFilteredLogs(logs.filter((log) => log.status === 'error'));
+      setFilteredLogs(logs.filter((log) => log.status === "error"));
     } else {
-      setFilteredLogs(logs.filter((log) => log.status === 'info'));
+      setFilteredLogs(logs.filter((log) => log.status === "info"));
     }
   }, [logs, errorFilter, infoFilter]);
 
-  const clientCertFiltersSummary = getClientCertFiltersSummary(
-    connection?.clientCertFromStore,
-  );
+  const clientCertFiltersSummary = getClientCertFiltersSummary(connection?.clientCertFromStore);
 
   if (Object.keys(connection).length) {
     return (
       <>
-        <ExportDialog
-          exportFile={exportFile}
-          onClose={() => setExportFile(null)}
-        />
+        <ExportDialog exportFile={exportFile} onClose={() => setExportFile(null)} />
         <Container maxWidth={false} sx={{ pt: 4 }}>
           <Stack spacing={2}>
             <Grid>
@@ -264,7 +253,7 @@ function ConnectionView(): ReactElement {
                       color="primary"
                       onClick={() =>
                         setExportFile({
-                          filename: connection?.name || 'download',
+                          filename: connection?.name || "download",
                           selector: {
                             all: false,
                             ids: [connectionID as string],
@@ -324,9 +313,7 @@ function ConnectionView(): ReactElement {
                       <Typography variant="h6">Destination URL</Typography>
                     </Grid>
                     <Grid item xs={8}>
-                      <Typography variant="subtitle2">
-                        {connection.remoteAddr}
-                      </Typography>
+                      <Typography variant="subtitle2">{connection.remoteAddr}</Typography>
                     </Grid>
                   </Grid>
                   <Grid item xs={12}>
@@ -350,9 +337,7 @@ function ConnectionView(): ReactElement {
                       <Typography variant="h6">Tags</Typography>
                     </Grid>
                     <Grid item xs={8}>
-                      <Typography variant="subtitle2">
-                        {tags?.join(', ')}
-                      </Typography>
+                      <Typography variant="subtitle2">{tags?.join(", ")}</Typography>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -361,13 +346,13 @@ function ConnectionView(): ReactElement {
 
             <Accordion
               sx={{
-                backgroundColor: 'background.paper',
+                backgroundColor: "background.paper",
                 marginTop: 2,
                 paddingLeft: 2,
                 paddingRight: 2,
                 borderRadius: 4,
-                '&:before': {
-                  display: 'none',
+                "&:before": {
+                  display: "none",
                 },
               }}
               square={false}
@@ -383,13 +368,11 @@ function ConnectionView(): ReactElement {
                 <Grid container spacing={2}>
                   <Grid container item xs={12} alignItems="center">
                     <Grid item xs={4}>
-                      <Typography variant="h6">
-                        Disable TLS Verification
-                      </Typography>
+                      <Typography variant="h6">Disable TLS Verification</Typography>
                     </Grid>
                     <Grid item xs={8}>
                       <Typography variant="subtitle2">
-                        {connection.disableTlsVerification ? 'Yes' : 'No'}
+                        {connection.disableTlsVerification ? "Yes" : "No"}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -401,9 +384,7 @@ function ConnectionView(): ReactElement {
                       <Typography variant="h6">Pomerium URL</Typography>
                     </Grid>
                     <Grid item xs={8}>
-                      <Typography variant="subtitle2">
-                        {connection.pomeriumUrl}
-                      </Typography>
+                      <Typography variant="subtitle2">{connection.pomeriumUrl}</Typography>
                     </Grid>
                   </Grid>
                   <Grid item xs={12}>
@@ -426,11 +407,7 @@ function ConnectionView(): ReactElement {
                           </Typography>
                         )}
                         {connection?.clientCert?.info && (
-                          <Stack
-                            direction="row"
-                            alignItems="baseline"
-                            spacing={1}
-                          >
+                          <Stack direction="row" alignItems="baseline" spacing={1}>
                             <CertDetails
                               open={showDetail}
                               onClose={() => setShowDetail(false)}
@@ -452,13 +429,13 @@ function ConnectionView(): ReactElement {
             </Accordion>
             <Accordion
               sx={{
-                backgroundColor: 'background.paper',
+                backgroundColor: "background.paper",
                 marginTop: 2,
                 paddingLeft: 2,
                 paddingRight: 2,
                 borderRadius: 4,
-                '&:before': {
-                  display: 'none',
+                "&:before": {
+                  display: "none",
                 },
               }}
               square={false}
@@ -570,24 +547,18 @@ function ConnectionView(): ReactElement {
                       alignItems="center"
                       key={Math.random()}
                       sx={{
-                        borderTop: '1px solid #E3E3E3',
+                        borderTop: "1px solid #E3E3E3",
                       }}
                     >
                       <Grid item xs={2}>
-                        {log.status === 'info' && (
-                          <Info style={{ color: 'blue' }} />
-                        )}
-                        {log.status === 'error' && (
-                          <AlertTriangle style={{ color: 'orange' }} />
-                        )}
+                        {log.status === "info" && <Info style={{ color: "blue" }} />}
+                        {log.status === "error" && <AlertTriangle style={{ color: "orange" }} />}
                       </Grid>
                       <Grid item xs={4}>
                         <Typography>{log.date}</Typography>
                       </Grid>
                       <Grid item xs={6}>
-                        <Typography style={{ wordWrap: 'break-word' }}>
-                          {log.message}
-                        </Typography>
+                        <Typography style={{ wordWrap: "break-word" }}>{log.message}</Typography>
                       </Grid>
                     </Grid>
                   ))}

@@ -1,17 +1,8 @@
-import {
-  Typography,
-  Grid,
-  IconButton,
-  Divider,
-  MenuItem,
-  Menu,
-  Tooltip,
-  Box,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
-import React, { ReactElement } from 'react';
-import { Copy, MoreVertical } from 'react-feather';
-import { Link } from 'react-router-dom';
+import { Typography, Grid, IconButton, Divider, MenuItem, Menu, Tooltip, Box } from "@mui/material";
+import { useSnackbar } from "notistack";
+import React, { ReactElement } from "react";
+import { Copy, MoreVertical } from "react-feather";
+import { Link } from "react-router-dom";
 
 import {
   CONNECT,
@@ -25,16 +16,12 @@ import {
   TOAST_LENGTH,
   UPDATE_LISTENERS,
   VIEW,
-} from '../../shared/constants';
-import { clipboard, ipcRenderer } from '../../shared/electron';
-import {
-  ListenerUpdateRequest,
-  Record as ListenerRecord,
-  Connection,
-} from '../../shared/pb/types';
-import Connected from '../icons/Connected';
-import Disconnected from '../icons/Disconnected';
-import ExportDialog from './ExportDialog';
+} from "../../shared/constants";
+import { clipboard, ipcRenderer } from "../../shared/electron";
+import { ListenerUpdateRequest, Record as ListenerRecord, Connection } from "../../shared/pb/types";
+import Connected from "../icons/Connected";
+import Disconnected from "../icons/Disconnected";
+import ExportDialog from "./ExportDialog";
 
 type ConnectionRowProps = {
   folderName: string;
@@ -65,10 +52,10 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
     switch (action) {
       case EXPORT:
         setExportFile({
-          filename: connection?.conn?.name || '',
+          filename: connection?.conn?.name || "",
           selector: {
             all: false,
-            ids: [connection?.id || ''],
+            ids: [connection?.id || ""],
             tags: [],
           },
         });
@@ -83,25 +70,25 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
         delete dupe.id;
         ipcRenderer.send(SAVE_RECORD, dupe);
         break;
-      case 'copy_port':
+      case "copy_port":
         // eslint-disable-next-line no-case-declarations
         const parsed = port?.match(/\d+(?![^:]*:)/g);
-        clipboard.writeText(parsed?.length ? parsed[0] : '');
-        enqueueSnackbar('Port Copied', {
-          variant: 'success',
+        clipboard.writeText(parsed?.length ? parsed[0] : "");
+        enqueueSnackbar("Port Copied", {
+          variant: "success",
           autoHideDuration: TOAST_LENGTH,
         });
         break;
       default:
-        ipcRenderer.send(action, connection?.id || '');
+        ipcRenderer.send(action, connection?.id || "");
     }
   };
 
   const copyAddress = () => {
     setMenuAnchor(null);
     clipboard.writeText(port);
-    enqueueSnackbar('Address Copied', {
-      variant: 'success',
+    enqueueSnackbar("Address Copied", {
+      variant: "success",
       autoHideDuration: TOAST_LENGTH,
     });
   };
@@ -109,26 +96,20 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   const toggleConnected = () => {
     setMenuAnchor(null);
     ipcRenderer.send(UPDATE_LISTENERS, {
-      connectionIds: [connection?.id || ''],
+      connectionIds: [connection?.id || ""],
       connected: !connected,
     } as ListenerUpdateRequest);
   };
 
   return (
     <>
-      <ExportDialog
-        exportFile={exportFile}
-        onClose={() => setExportFile(null)}
-      />
+      <ExportDialog exportFile={exportFile} onClose={() => setExportFile(null)} />
       <Grid container>
         <Grid container item xs={12} alignItems="center">
           <Grid container item xs={1} justifyContent="flex-end">
             <IconButton
-              key={'menuButton' + folderName}
-              aria-label={
-                'toggle listeners for ' + folderName + ' ' + connection?.id ||
-                ''
-              }
+              key={"menuButton" + folderName}
+              aria-label={"toggle listeners for " + folderName + " " + connection?.id || ""}
               component="span"
               onClick={toggleConnected}
               size="large"
@@ -137,18 +118,12 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             </IconButton>
           </Grid>
           <Grid item xs={3}>
-            <Typography variant="h6">{connection?.conn?.name || ''}</Typography>
+            <Typography variant="h6">{connection?.conn?.name || ""}</Typography>
           </Grid>
           <Grid item xs={4}>
-            <Link to={'/view_connection/' + connection?.id || ''} />
+            <Link to={"/view_connection/" + connection?.id || ""} />
           </Grid>
-          <Grid
-            container
-            item
-            xs={3}
-            justifyContent="flex-end"
-            alignItems="center"
-          >
+          <Grid container item xs={3} justifyContent="flex-end" alignItems="center">
             {connected && (
               <>
                 <Tooltip title="Copy to Clipboard">
@@ -156,13 +131,13 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
                     variant="subtitle2"
                     onClick={copyAddress}
                     sx={{
-                      cursor: 'pointer',
-                      '&:hover': {
-                        color: '#6E43E8',
+                      cursor: "pointer",
+                      "&:hover": {
+                        color: "#6E43E8",
                       },
                     }}
                   >
-                    {'Listening on ' + port}
+                    {"Listening on " + port}
                   </Typography>
                 </Tooltip>
                 <Tooltip title="Copy to Clipboard">
@@ -170,10 +145,10 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
                     sx={{
                       padding: 0,
                       margin: 0,
-                      marginLeft: '5px',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        color: '#6E43E8',
+                      marginLeft: "5px",
+                      cursor: "pointer",
+                      "&:hover": {
+                        color: "#6E43E8",
                       },
                     }}
                   >
@@ -182,27 +157,20 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
                 </Tooltip>
               </>
             )}
-            {!connected && (
-              <Typography variant="subtitle2">Inactive</Typography>
-            )}
+            {!connected && <Typography variant="subtitle2">Inactive</Typography>}
           </Grid>
           <Grid container item xs={1} justifyContent="center">
             <IconButton
               aria-controls="connection-menu"
               aria-haspopup="true"
               onClick={toggleMenu}
-              aria-label={
-                'Menu for listener: ' +
-                  folderName +
-                  '-' +
-                  connection?.conn?.name || ''
-              }
+              aria-label={"Menu for listener: " + folderName + "-" + connection?.conn?.name || ""}
               size="large"
             >
               <MoreVertical />
             </IconButton>
             <Menu
-              id={'connection-menu' + folderName + connection?.id || ''}
+              id={"connection-menu" + folderName + connection?.id || ""}
               anchorEl={menuAnchor}
               keepMounted
               open={Boolean(menuAnchor)}
@@ -224,17 +192,11 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
               <MenuItem key="view" onClick={() => handleMenuClick(VIEW)}>
                 View
               </MenuItem>
-              <MenuItem
-                key={DUPLICATE}
-                onClick={() => handleMenuClick(DUPLICATE)}
-              >
+              <MenuItem key={DUPLICATE} onClick={() => handleMenuClick(DUPLICATE)}>
                 Duplicate
               </MenuItem>
               {connected && (
-                <MenuItem
-                  key="copy_port"
-                  onClick={() => handleMenuClick('copy_port')}
-                >
+                <MenuItem key="copy_port" onClick={() => handleMenuClick("copy_port")}>
                   Copy Port
                 </MenuItem>
               )}

@@ -1,37 +1,34 @@
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Typography from '@mui/material/Typography';
-import moment from 'moment';
-import React, { ReactElement } from 'react';
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Typography from "@mui/material/Typography";
+import moment from "moment";
+import React, { ReactElement } from "react";
 
-import { Certificate } from '../../shared/pb/types';
+import { Certificate } from "../../shared/pb/types";
 
 interface DetailViewDialogProps {
   open: boolean;
   onClose: () => void;
-  certInfo: Certificate['info'];
+  certInfo: Certificate["info"];
 }
 
 interface DataPointProps {
   title;
 }
 
-function DataPoint({
-  children,
-  title,
-}: React.PropsWithChildren<DataPointProps>) {
+function DataPoint({ children, title }: React.PropsWithChildren<DataPointProps>) {
   return (
     <Grid container alignItems="stretch" spacing={1}>
       <Grid item xs={4}>
-        <Typography sx={{ fontWeight: 'bold' }} variant="h6">
+        <Typography sx={{ fontWeight: "bold" }} variant="h6">
           {title}
         </Typography>
       </Grid>
@@ -42,19 +39,9 @@ function DataPoint({
   );
 }
 
-function DetailViewDialog({
-  open,
-  onClose,
-  certInfo,
-}: DetailViewDialogProps): ReactElement {
+function DetailViewDialog({ open, onClose, certInfo }: DetailViewDialogProps): ReactElement {
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      scroll="paper"
-      maxWidth="sm"
-      fullWidth
-    >
+    <Dialog open={open} onClose={onClose} scroll="paper" maxWidth="sm" fullWidth>
       <DialogTitle>
         <Typography variant="h4">Cert Details</Typography>
       </DialogTitle>
@@ -92,7 +79,7 @@ function DetailViewDialog({
             </List>
           </DataPoint>
           <DataPoint title="Expires">
-            <Typography>{moment(certInfo?.notAfter).format('LLLL')}</Typography>
+            <Typography>{moment(certInfo?.notAfter).format("LLLL")}</Typography>
           </DataPoint>
         </Container>
       </DialogContent>

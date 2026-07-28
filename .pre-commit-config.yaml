@@ -4,13 +4,13 @@
 repos:
   - repo: local
     hooks:
-      - id: eslint
-        name: eslint
-        entry: npx cross-env NODE_ENV=development eslint --cache
+      - id: ui-lint
+        name: ui-lint
+        entry: npm run lint
         language: system
         files: \.(js|jsx|ts|tsx)$
-      - id: prettier
-        name: prettier
-        entry: npx prettier --ignore-path .prettierignore --write
+      - id: ui-format
+        name: ui-format
+        entry: npm run format
         language: system
         files: \.(js|jsx|ts|tsx|json|css|scss|html|md|ya?ml)$

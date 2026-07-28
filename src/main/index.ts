@@ -1,19 +1,14 @@
+import fs from "fs";
+import { join } from "path";
+
 /* eslint global-require: off, no-console: off */
-import * as grpc from '@grpc/grpc-js';
-import * as Sentry from '@sentry/electron/main';
-import {
-  app,
-  BrowserWindow,
-  dialog,
-  ipcMain,
-  MessageBoxOptions,
-} from 'electron';
-import contextMenu from 'electron-context-menu';
-import log from 'electron-log';
-import { autoUpdater } from 'electron-updater';
-import fs from 'fs';
-import { menubar } from 'menubar';
-import { join } from 'path';
+import * as grpc from "@grpc/grpc-js";
+import * as Sentry from "@sentry/electron/main";
+import { app, BrowserWindow, dialog, ipcMain, MessageBoxOptions } from "electron";
+import contextMenu from "electron-context-menu";
+import log from "electron-log";
+import { autoUpdater } from "electron-updater";
+import { menubar } from "menubar";
 
 import {
   isDev,
@@ -36,8 +31,8 @@ import {
   LISTENER_LOG,
   GET_ALL_RECORDS,
   FETCH_ROUTES,
-} from '../shared/constants';
-import { GetRecordsResponseArgs } from '../shared/constants-main';
+} from "../shared/constants";
+import { GetRecordsResponseArgs } from "../shared/constants-main";
 import {
   ConnectionStatusUpdate,
   ExportRequest,
@@ -48,16 +43,15 @@ import {
   Selector,
   StatusUpdatesRequest,
   FetchRoutesRequest,
-} from '../shared/pb/api';
-import Helper from '../trayMenu/helper';
-import { start } from './cli';
-import createWindow from './window';
+} from "../shared/pb/api";
+import Helper from "../trayMenu/helper";
+import { start } from "./cli";
+import createWindow from "./window";
 
-const SentryDSN =
-  'https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413';
+const SentryDSN = "https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413";
 Sentry.init({
   dsn: SentryDSN,
-  debug: process.env.NODE_ENV !== 'production',
+  debug: process.env.NODE_ENV !== "production",
 });
 
 let mainWindow: BrowserWindow | null;
@@ -66,14 +60,14 @@ let updateStream: grpc.ClientReadableStream<ConnectionStatusUpdate> | undefined;
 
 class AppUpdater {
   constructor() {
-    log.transports.file.level = 'info';
+    log.transports.file.level = "info";
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
 if (isDev || prodDebug) {
-  require('electron-debug')();
+  require("electron-debug")();
 }
 
 const onUncaughtException = (() => {
@@ -88,16 +82,16 @@ const onUncaughtException = (() => {
     const sentryId = Sentry.captureException(err);
 
     const msg = {
-      type: 'error',
-      title: 'Error in Main process',
+      type: "error",
+      title: "Error in Main process",
       message:
-        'If you would like to file a bug report please include the following Sentry Id: ' +
+        "If you would like to file a bug report please include the following Sentry Id: " +
         sentryId,
     } as MessageBoxOptions;
 
-    if ('spawnargs' in err) {
-      msg.title = 'Incorrect CLI supplied.';
-      msg.message = 'Make sure the correct version for your OS is installed.';
+    if ("spawnargs" in err) {
+      msg.title = "Incorrect CLI supplied.";
+      msg.message = "Make sure the correct version for your OS is installed.";
     }
     await Promise.all([Sentry.close(2000), dialog.showMessageBox(msg)]);
 
@@ -105,9 +99,9 @@ const onUncaughtException = (() => {
   };
 })();
 
-process.on('uncaughtException', onUncaughtException);
+process.on("uncaughtException", onUncaughtException);
 
-app.on('activate', async () => {
+app.on("activate", async () => {
   // On macOS, it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) mainWindow = createWindow();
@@ -116,17 +110,17 @@ app.on('activate', async () => {
 async function init(): Promise<void> {
   const [cli] = await Promise.all([
     start(SentryDSN),
-    new Promise((resolve) => app.on('ready', resolve)),
+    new Promise((resolve) => app.on("ready", resolve)),
   ]);
   const cliProcess = cli.process;
   const { configClient, listenerClient } = cli;
 
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     new AppUpdater();
   }
 
   mainWindow = createWindow();
-  const rendererIndexPath = join(__dirname, '../renderer/index.html');
+  const rendererIndexPath = join(__dirname, "../renderer/index.html");
   if (process.env.ELECTRON_RENDERER_URL) {
     mainWindow?.loadURL(process.env.ELECTRON_RENDERER_URL);
   } else {
@@ -142,8 +136,8 @@ async function init(): Promise<void> {
     tray,
   });
   trayMenuHelper.setMenu(menu);
-  menu.on('ready', async () => {
-    menu.tray.on('click', () => {
+  menu.on("ready", async () => {
+    menu.tray.on("click", () => {
       menu.tray.popUpContextMenu(trayMenuHelper.createContextMenu());
     });
     ipcMain.on(SAVE_RECORD, (evt, args: ListenerRecord) => {
@@ -229,13 +223,13 @@ async function init(): Promise<void> {
       });
     });
     ipcMain.on(EDIT, (_evt, id: string) => {
-      mainWindow?.webContents.send('redirectTo', `/edit_connect/${id}`);
+      mainWindow?.webContents.send("redirectTo", `/edit_connect/${id}`);
     });
     ipcMain.on(VIEW, (_evt, id: string) => {
-      mainWindow?.webContents.send('redirectTo', `/view_connection/${id}`);
+      mainWindow?.webContents.send("redirectTo", `/view_connection/${id}`);
     });
     ipcMain.on(VIEW_CONNECTION_LIST, () => {
-      mainWindow?.webContents.send('redirectTo', `/manage`);
+      mainWindow?.webContents.send("redirectTo", `/manage`);
     });
     ipcMain.on(EXPORT, (evt, args: ExportFile) => {
       configClient.export(
@@ -255,7 +249,7 @@ async function init(): Promise<void> {
     });
     ipcMain.on(IMPORT, (evt) => {
       dialog
-        .showOpenDialog({ properties: ['openFile'] })
+        .showOpenDialog({ properties: ["openFile"] })
         .then((response) => {
           if (!response.canceled) {
             const bytes = fs.readFileSync(response.filePaths[0], null);
@@ -276,7 +270,7 @@ async function init(): Promise<void> {
         });
     });
     ipcMain.on(DUPLICATE, (_evt, args: ConnectionData) => {
-      console.log(DUPLICATE + ' ' + args.connectionID + ' action was called.');
+      console.log(DUPLICATE + " " + args.connectionID + " action was called.");
     });
     ipcMain.on(UPDATE_LISTENERS, (evt, args: ListenerUpdateRequest) => {
       const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
@@ -310,14 +304,14 @@ async function init(): Promise<void> {
       updateStream = listenerClient.statusUpdates({
         connectionId: args.id as string,
       } as StatusUpdatesRequest);
-      updateStream.on('data', (response) => {
+      updateStream.on("data", (response) => {
         sendTo?.send(LISTENER_LOG, {
           msg: response as ConnectionStatusUpdate,
           remoteAddr: args.remoteAddr,
         });
       });
       // empty function otherwise causes fatal error on cancel !!!
-      updateStream.on('error', () => {});
+      updateStream.on("error", () => {});
     });
     ipcMain.on(FETCH_ROUTES, (evt, args) => {
       const sendTo = evt?.sender ? evt.sender : mainWindow?.webContents;
@@ -325,22 +319,20 @@ async function init(): Promise<void> {
         sendTo?.send(FETCH_ROUTES, { err, res });
       });
     });
-    menu.app.on('web-contents-created', () => {
+    menu.app.on("web-contents-created", () => {
       contextMenu();
     });
-    app.on('before-quit', () => {
-      mainWindow?.removeAllListeners('close');
+    app.on("before-quit", () => {
+      mainWindow?.removeAllListeners("close");
       updateStream?.cancel();
-      cliProcess.kill('SIGINT');
+      cliProcess.kill("SIGINT");
       mainWindow?.close();
     });
 
     // Auto-start connections marked with autostart flag
     configClient.list({ all: true, ids: [], tags: [] }, (err, res) => {
       if (!err && res) {
-        const autoStartIds = res.records
-          .filter((r) => r.conn && r.conn.autostart)
-          .map((r) => r.id);
+        const autoStartIds = res.records.filter((r) => r.conn && r.conn.autostart).map((r) => r.id);
         if (autoStartIds.length > 0) {
           listenerClient.update(
             { connectionIds: autoStartIds, connected: true },
@@ -348,7 +340,7 @@ async function init(): Promise<void> {
               if (!updateErr && updateRes) {
                 trayMenuHelper.setStatuses(updateRes.listeners);
                 menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
-                console.log('Auto-started connections:', autoStartIds);
+                console.log("Auto-started connections:", autoStartIds);
               }
             },
           );
@@ -361,7 +353,7 @@ async function init(): Promise<void> {
 if (!singleInstanceLock) {
   app.quit();
 } else {
-  app.on('second-instance', () => {
+  app.on("second-instance", () => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();

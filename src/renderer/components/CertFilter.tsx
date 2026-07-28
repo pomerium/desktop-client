@@ -1,13 +1,13 @@
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import Typography from '@mui/material/Typography';
-import React, { useEffect, useId, useRef } from 'react';
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Typography from "@mui/material/Typography";
+import React, { useEffect, useId, useRef } from "react";
 
-import TextField from './TextField';
+import TextField from "./TextField";
 
 interface Props {
   label: string;
@@ -17,18 +17,18 @@ interface Props {
 }
 
 const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
-  const [dataAttribute, dataValue] = (data || '').split('=', 2);
-  const attribute = dataAttribute || '';
-  const value = dataValue || '';
+  const [dataAttribute, dataValue] = (data || "").split("=", 2);
+  const attribute = dataAttribute || "";
+  const value = dataValue || "";
 
   const selectLabelId = useId();
   const selectId = useId();
 
   const setAttribute = (newAttribute: string) => {
-    onChange(newAttribute ? newAttribute + '=' + value : undefined);
+    onChange(newAttribute ? newAttribute + "=" + value : undefined);
   };
   const setValue = (newValue: string) => {
-    onChange(attribute + '=' + newValue);
+    onChange(attribute + "=" + newValue);
   };
 
   const valueInputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +53,7 @@ const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
             value={attribute}
             notched
             displayEmpty
-            renderValue={(selected) => selected || 'No filter'}
+            renderValue={(selected) => selected || "No filter"}
             onChange={(evt) => setAttribute(evt.target.value)}
             MenuProps={{ disablePortal: true }}
           >
@@ -82,8 +82,8 @@ const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
       </Grid>
       <Grid item xs={12}>
         <FormHelperText>
-          Further limits the search to certificates where the {label} has a
-          particular attribute value (exact match).
+          Further limits the search to certificates where the {label} has a particular attribute
+          value (exact match).
         </FormHelperText>
       </Grid>
     </Grid>

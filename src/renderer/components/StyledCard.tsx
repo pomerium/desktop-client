@@ -1,5 +1,5 @@
-import { Card } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Card } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -7,7 +7,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   marginTop: 2,
   marginBottom: 2,
   borderRadius: 16,
-  offset: '0px, 1px',
+  offset: "0px, 1px",
 }));
 
 export default StyledCard;

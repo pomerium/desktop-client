@@ -1,17 +1,17 @@
-import { AppBar, Autocomplete, Grid, TextField, Toolbar } from '@mui/material';
-import { createFilterOptions } from '@mui/material/useAutocomplete';
-import React, { FC, useEffect, useState } from 'react';
-import { Search } from 'react-feather';
+import { AppBar, Autocomplete, Grid, TextField, Toolbar } from "@mui/material";
+import { createFilterOptions } from "@mui/material/useAutocomplete";
+import React, { FC, useEffect, useState } from "react";
+import { Search } from "react-feather";
 
-import { GET_ALL_RECORDS, VIEW } from '../../shared/constants';
-import { ipcRenderer } from '../../shared/electron';
-import { Record as ListenerRecord } from '../../shared/pb/types';
-import Logo from '../icons/Logo';
-import TopTabs from './TopTabs';
+import { GET_ALL_RECORDS, VIEW } from "../../shared/constants";
+import { ipcRenderer } from "../../shared/electron";
+import { Record as ListenerRecord } from "../../shared/pb/types";
+import Logo from "../icons/Logo";
+import TopTabs from "./TopTabs";
 
 const TopBar: FC = () => {
   const [connections, setConnections] = useState([] as ListenerRecord[]);
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState("");
 
   const handleChange = (_e, conn) => {
     if (conn?.id) {
@@ -30,9 +30,7 @@ const TopBar: FC = () => {
 
   const filterOptions = createFilterOptions({
     stringify: (option: ListenerRecord) =>
-      option.tags.join(' ') +
-      (option?.conn?.name || '') +
-      (option?.conn?.remoteAddr || ''),
+      option.tags.join(" ") + (option?.conn?.name || "") + (option?.conn?.remoteAddr || ""),
   });
 
   useEffect(() => {
@@ -50,27 +48,22 @@ const TopBar: FC = () => {
             <Autocomplete
               id="search"
               sx={{
-                '& .MuiAutocomplete-popupIndicatorOpen': {
-                  transform: 'none',
+                "& .MuiAutocomplete-popupIndicatorOpen": {
+                  transform: "none",
                 },
               }}
               options={connections}
               filterOptions={filterOptions}
-              getOptionLabel={(option: ListenerRecord) =>
-                option?.conn?.name || ''
-              }
-              isOptionEqualToValue={(
-                option: ListenerRecord,
-                value: ListenerRecord,
-              ) => {
+              getOptionLabel={(option: ListenerRecord) => option?.conn?.name || ""}
+              isOptionEqualToValue={(option: ListenerRecord, value: ListenerRecord) => {
                 return option.id === value.id;
               }}
               inputValue={filter}
               clearOnBlur
               onOpen={fetch}
               onInputChange={(_e, newInputValue, reason) => {
-                if (reason === 'reset') {
-                  setFilter('');
+                if (reason === "reset") {
+                  setFilter("");
                 } else {
                   setFilter(newInputValue);
                 }

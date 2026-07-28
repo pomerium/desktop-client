@@ -1,14 +1,6 @@
-import {
-  Grid,
-  Typography,
-  SvgIcon,
-  Divider,
-  Container,
-  Tooltip,
-  Box,
-} from '@mui/material';
-import React, { FC, ReactElement, ReactFragment, ReactNode } from 'react';
-import { HelpCircle } from 'react-feather';
+import { Grid, Typography, SvgIcon, Divider, Container, Tooltip, Box } from "@mui/material";
+import React, { FC, ReactElement, ReactFragment, ReactNode } from "react";
+import { HelpCircle } from "react-feather";
 
 type FieldWrapperProps = {
   label: string;
@@ -27,7 +19,7 @@ const FieldWrapper: FC<FieldWrapperProps> = ({
         <Grid
           item
           sx={{
-            width: '260px',
+            width: "260px",
             paddingRight: 2,
             display: `flex`,
             flexFlow: `row wrap`,

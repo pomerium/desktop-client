@@ -1,18 +1,11 @@
-import {
-  Button,
-  Chip,
-  FormHelperText,
-  Grid,
-  IconButton,
-  Typography,
-} from '@mui/material';
-import { set } from 'lodash';
-import React, { FC, useEffect, useState } from 'react';
-import { Trash } from 'react-feather';
+import { Button, Chip, FormHelperText, Grid, IconButton, Typography } from "@mui/material";
+import { set } from "lodash";
+import React, { FC, useEffect, useState } from "react";
+import { Trash } from "react-feather";
 
-import { Connection } from '../../shared/pb/types';
-import CertDetails from './CertDetails';
-import TextArea from './TextArea';
+import { Connection } from "../../shared/pb/types";
+import CertDetails from "./CertDetails";
+import TextArea from "./TextArea";
 
 export type ManualClientCertSelectionProps = {
   connection: Connection;
@@ -26,10 +19,10 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
   const [showDetail, setShowDetail] = useState(false);
   const certText = connection?.clientCert?.cert
     ? new TextDecoder().decode(connection.clientCert.cert)
-    : '';
+    : "";
   const keyText = connection?.clientCert?.key
     ? new TextDecoder().decode(connection.clientCert.key)
-    : '';
+    : "";
 
   useEffect(() => {
     if (connection?.clientCert?.info) {
@@ -41,12 +34,12 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
 
   const saveCertText = (value: string): void => {
     const c = { ...connection };
-    set(c, 'clientCert.cert', new TextEncoder().encode(value));
+    set(c, "clientCert.cert", new TextEncoder().encode(value));
     onChangeConnection(c);
   };
   const saveKeyText = (value: string): void => {
     const c = { ...connection };
-    set(c, 'clientCert.key', new TextEncoder().encode(value));
+    set(c, "clientCert.key", new TextEncoder().encode(value));
     onChangeConnection(c);
   };
 
@@ -89,7 +82,7 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
         <Grid item xs={12}>
           <label htmlFor="cert-file">
             <input
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               id="cert-file"
               type="file"
               onChange={onChangeCertFile}
@@ -115,8 +108,8 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
             spellCheck={false}
           />
           <FormHelperText sx={{ pl: 2 }}>
-            Add a Client Certificate with the File Selector or Copy/Paste to the
-            Text Area. Key is required if the Certificate is present.
+            Add a Client Certificate with the File Selector or Copy/Paste to the Text Area. Key is
+            required if the Certificate is present.
           </FormHelperText>
         </Grid>
       )}
@@ -124,7 +117,7 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
         <Grid item xs={12}>
           <label htmlFor="key-file">
             <input
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               id="key-file"
               type="file"
               onChange={onChangeKeyFile}
@@ -149,8 +142,8 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
             onChange={onChangeKeyText}
           />
           <FormHelperText sx={{ pl: 2 }}>
-            Add a Client Certificate Key with the File Selector or Copy/Paste to
-            the Text Area. Certificate is required if the Key is present.
+            Add a Client Certificate Key with the File Selector or Copy/Paste to the Text Area.
+            Certificate is required if the Key is present.
           </FormHelperText>
         </Grid>
       )}
@@ -163,17 +156,8 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
             certInfo={connection?.clientCert?.info}
           />
           <Typography variant="body2">Client Certificate</Typography>
-          <Chip
-            label="Details"
-            color="primary"
-            onClick={() => setShowDetail(true)}
-          />
-          <IconButton
-            aria-label="delete"
-            onClick={onDeleteCert}
-            color="primary"
-            size="large"
-          >
+          <Chip label="Details" color="primary" onClick={() => setShowDetail(true)} />
+          <IconButton aria-label="delete" onClick={onDeleteCert} color="primary" size="large">
             <Trash />
           </IconButton>
         </Grid>

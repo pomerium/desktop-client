@@ -1,8 +1,8 @@
-import { AppBar, Grid, Tab, Tabs, Toolbar, Typography } from '@mui/material';
-import React, { ReactElement } from 'react';
-import { Link } from 'react-router-dom';
+import { AppBar, Grid, Tab, Tabs, Toolbar, Typography } from "@mui/material";
+import React, { ReactElement } from "react";
+import { Link } from "react-router-dom";
 
-import metadata from '../../meta.json';
+import metadata from "../../meta.json";
 
 function TopTabs(): ReactElement {
   return (
@@ -10,7 +10,7 @@ function TopTabs(): ReactElement {
       position="sticky"
       color="secondary"
       sx={{
-        '& .MuiToolbar-regular': {
+        "& .MuiToolbar-regular": {
           minHeight: 0,
         },
       }}
@@ -19,12 +19,7 @@ function TopTabs(): ReactElement {
         <Grid container alignItems="center">
           <Grid item xs={8}>
             <Tabs value="/manage" indicatorColor="primary" textColor="primary">
-              <Tab
-                label="MANAGE CONNECTIONS"
-                to="/manage"
-                value="/manage"
-                component={Link}
-              />
+              <Tab label="MANAGE CONNECTIONS" to="/manage" value="/manage" component={Link} />
             </Tabs>
           </Grid>
           <Grid item xs={4}>

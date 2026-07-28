@@ -1,16 +1,11 @@
-import '@fontsource/dm-sans';
-import * as colors from '@mui/material/colors';
-import {
-  createTheme,
-  responsiveFontSizes,
-  ThemeOptions,
-  Theme,
-} from '@mui/material/styles';
-import _ from 'lodash';
+import "@fontsource/dm-sans";
+import * as colors from "@mui/material/colors";
+import { createTheme, responsiveFontSizes, ThemeOptions, Theme } from "@mui/material/styles";
+import _ from "lodash";
 
-import { THEMES } from './constants';
-import { softShadows, strongShadows } from './shadows';
-import typography from './typography';
+import { THEMES } from "./constants";
+import { softShadows, strongShadows } from "./shadows";
+import typography from "./typography";
 
 export interface ThemeConfig {
   responsiveFontSizes?: boolean;
@@ -25,26 +20,26 @@ const baseOptions: ThemeOptions = {
   components: {
     MuiCssBaseline: {
       styleOverrides: {
-        '@global': {
-          '@fontFace': ['DM Sans'],
-          '*': {
-            boxSizing: 'border-box',
+        "@global": {
+          "@fontFace": ["DM Sans"],
+          "*": {
+            boxSizing: "border-box",
             margin: 0,
             padding: 0,
           },
           html: {
-            WebkitFontSmoothing: 'antialiased',
-            MozOsxFontSmoothing: 'grayscale',
-            height: '100%',
-            width: '100%',
+            WebkitFontSmoothing: "antialiased",
+            MozOsxFontSmoothing: "grayscale",
+            height: "100%",
+            width: "100%",
           },
           body: {
-            height: '100%',
-            width: '100%',
+            height: "100%",
+            width: "100%",
           },
-          '#root': {
-            height: '100%',
-            width: '100%',
+          "#root": {
+            height: "100%",
+            width: "100%",
           },
         },
       },
@@ -53,7 +48,7 @@ const baseOptions: ThemeOptions = {
       styleOverrides: {
         root: {
           borderRadius: 3,
-          overflow: 'hidden',
+          overflow: "hidden",
         },
       },
     },
@@ -67,7 +62,7 @@ const baseOptions: ThemeOptions = {
     MuiBackdrop: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgba(68, 56, 102, 0.8)',
+          backgroundColor: "rgba(68, 56, 102, 0.8)",
         },
       },
     },
@@ -81,7 +76,7 @@ const baseOptions: ThemeOptions = {
     MuiBreadcrumbs: {
       styleOverrides: {
         separator: {
-          opacity: '30%',
+          opacity: "30%",
         },
       },
     },
@@ -95,26 +90,26 @@ const baseOptions: ThemeOptions = {
     MuiDialogTitle: {
       styleOverrides: {
         root: {
-          display: 'flex',
-          flexFlow: 'row nowrap',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '16px',
+          display: "flex",
+          flexFlow: "row nowrap",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "16px",
         },
       },
     },
     MuiDialogContent: {
       styleOverrides: {
-        root: { padding: '16px' },
+        root: { padding: "16px" },
       },
     },
     MuiDialogActions: {
       styleOverrides: {
         root: {
-          padding: '16px',
-          display: 'flex',
-          flexFlow: 'row nowrap',
-          justifyContent: 'flex-end',
+          padding: "16px",
+          display: "flex",
+          flexFlow: "row nowrap",
+          justifyContent: "flex-end",
         },
       },
     },
@@ -128,14 +123,14 @@ const getDesignTokens = (mode: string) => {
       overrides: {
         MuiTooltip: {
           tooltip: {
-            fontSize: '1em',
-            color: '#6F43E7',
-            backgroundColor: '#ECE5FF',
+            fontSize: "1em",
+            color: "#6F43E7",
+            backgroundColor: "#ECE5FF",
           },
         },
         MuiInputBase: {
           input: {
-            '&::placeholder': {
+            "&::placeholder": {
               opacity: 1,
               color: colors.blueGrey[600],
             },
@@ -143,17 +138,17 @@ const getDesignTokens = (mode: string) => {
         },
       },
       palette: {
-        mode: 'light',
+        mode: "light",
         action: {
-          active: '#39256C',
+          active: "#39256C",
         },
         background: {
-          default: '#FBFBFB',
-          dark: '#FBFBFB',
+          default: "#FBFBFB",
+          dark: "#FBFBFB",
           paper: colors.common.white,
         },
         primary: {
-          main: '#6F43E7',
+          main: "#6F43E7",
         },
         secondary: {
           main: colors.common.white,
@@ -167,33 +162,33 @@ const getDesignTokens = (mode: string) => {
     overrides: {
       MuiTooltip: {
         tooltip: {
-          fontSize: '1em',
-          color: '#ECE5FF',
-          backgroundColor: '#6F43E7',
+          fontSize: "1em",
+          color: "#ECE5FF",
+          backgroundColor: "#6F43E7",
         },
       },
     },
     palette: {
-      mode: 'dark',
+      mode: "dark",
       action: {
-        active: '#49AAA1',
+        active: "#49AAA1",
       },
       text: {
-        secondary: 'rgba(255,255,255,0.9)',
+        secondary: "rgba(255,255,255,0.9)",
       },
       background: {
-        default: '#1a1a1a',
-        paper: '#262626',
-        dark: '#1a1a1a',
+        default: "#1a1a1a",
+        paper: "#262626",
+        dark: "#1a1a1a",
       },
       primary: {
-        main: '#6F43E7',
-        light: '#ECE5FF',
-        dark: '#39256C',
+        main: "#6F43E7",
+        light: "#ECE5FF",
+        dark: "#39256C",
       },
 
       secondary: {
-        main: '#49AAA1',
+        main: "#49AAA1",
       },
     },
     shadows: strongShadows,

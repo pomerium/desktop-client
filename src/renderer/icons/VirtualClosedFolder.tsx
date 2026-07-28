@@ -1,9 +1,9 @@
-import { SvgIcon } from '@mui/material';
-import React, { ReactElement } from 'react';
+import { SvgIcon } from "@mui/material";
+import React, { ReactElement } from "react";
 
 function VirtualClosedFolder(): ReactElement {
   return (
-    <SvgIcon viewBox="0 0 20 20" sx={{ width: '20px', height: '20px' }}>
+    <SvgIcon viewBox="0 0 20 20" sx={{ width: "20px", height: "20px" }}>
       <path
         d="M3.33317 3.3335H8.33317L9.99984 5.00016H16.6665C17.5832 5.00016 18.3332 5.75016 18.3332 6.66683V8.89486C17.5755 8.5349 16.7278 8.3335 15.8332 8.3335C12.6115 8.3335 9.99984 10.9452 9.99984 14.1668C9.99984 15.0615 10.2012 15.9091 10.5612 16.6668H3.33317C2.4165 16.6668 1.6665 15.9168 1.6665 15.0002L1.67484 5.00016C1.67484 4.0835 2.4165 3.3335 3.33317 3.3335Z"
         fill="#6F43E7"
