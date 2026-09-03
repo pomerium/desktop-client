@@ -52,7 +52,11 @@ import Edit from "../icons/Edit";
 import Export from "../icons/Export";
 import ExportJSON from "../icons/ExportJSON";
 
+// Monotonic identifier for log entries, used as a stable React key.
+let nextLogID = 0;
+
 type SimplifiedLog = {
+  id: number;
   status: "info" | "error";
   message: string;
   date: string;
@@ -65,7 +69,6 @@ function ConnectionView(): ReactElement {
   const [errorFilter, setErrorFilter] = useState(false);
   const [infoFilter, setInfoFilter] = useState(false);
   const [connectionPort, setConnectionPort] = useState("");
-  const [filteredLogs, setFilteredLogs] = useState([] as SimplifiedLog[]);
   const [logs, setLogs] = useState([] as SimplifiedLog[]);
   const [menuAnchor, setMenuAnchor] = React.useState(null);
   const [showDetail, setShowDetail] = useState(false);
@@ -102,7 +105,7 @@ function ConnectionView(): ReactElement {
     link.click();
   };
 
-  const formatLog = (msg: ConnectionStatusUpdate): SimplifiedLog => {
+  const formatLog = (id: number, msg: ConnectionStatusUpdate): SimplifiedLog => {
     const date = msg.ts?.toLocaleTimeString() || "";
     const status = msg.lastError ? "error" : "info";
     let message = "";
@@ -134,7 +137,7 @@ function ConnectionView(): ReactElement {
       message += ": " + msg.lastError;
     }
 
-    return { message, status, date };
+    return { id, message, status, date };
   };
 
   useEffect(() => {
@@ -178,7 +181,7 @@ function ConnectionView(): ReactElement {
       }
     });
     ipcRenderer.on(LISTENER_LOG, (_, args) => {
-      setLogs((oldLogs) => [formatLog(args.msg), ...oldLogs]);
+      setLogs((oldLogs) => [formatLog(nextLogID++, args.msg), ...oldLogs]);
     });
     if (connectionID) {
       ipcRenderer.once(GET_RECORDS, (_, args) => {
@@ -209,15 +212,10 @@ function ConnectionView(): ReactElement {
     };
   }, [connectionID]);
 
-  useEffect(() => {
-    if ((errorFilter && infoFilter) || (!errorFilter && !infoFilter)) {
-      setFilteredLogs(logs);
-    } else if (errorFilter) {
-      setFilteredLogs(logs.filter((log) => log.status === "error"));
-    } else {
-      setFilteredLogs(logs.filter((log) => log.status === "info"));
-    }
-  }, [logs, errorFilter, infoFilter]);
+  const filteredLogs =
+    (errorFilter && infoFilter) || (!errorFilter && !infoFilter)
+      ? logs
+      : logs.filter((log) => log.status === (errorFilter ? "error" : "info"));
 
   const clientCertFiltersSummary = getClientCertFiltersSummary(connection?.clientCertFromStore);
 
@@ -545,7 +543,7 @@ function ConnectionView(): ReactElement {
                       item
                       container
                       alignItems="center"
-                      key={Math.random()}
+                      key={log.id}
                       sx={{
                         borderTop: "1px solid #E3E3E3",
                       }}

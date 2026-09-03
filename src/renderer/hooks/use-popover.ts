@@ -1,8 +1,8 @@
-import type { MutableRefObject } from "react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface PopoverController<T> {
-  anchorRef: MutableRefObject<T | null>;
+  anchorEl: T | null;
+  setAnchorEl: (element: T | null) => void;
   handleOpen: () => void;
   handleClose: () => void;
   handleToggle: () => void;
@@ -10,7 +10,7 @@ interface PopoverController<T> {
 }
 
 function usePopover<T = HTMLElement>(): PopoverController<T> {
-  const anchorRef = useRef<T | null>(null);
+  const [anchorEl, setAnchorEl] = useState<T | null>(null);
   const [open, setOpen] = useState<boolean>(false);
 
   const handleOpen = useCallback((): void => {
@@ -26,7 +26,8 @@ function usePopover<T = HTMLElement>(): PopoverController<T> {
   }, []);
 
   return {
-    anchorRef,
+    anchorEl,
+    setAnchorEl,
     handleClose,
     handleOpen,
     handleToggle,

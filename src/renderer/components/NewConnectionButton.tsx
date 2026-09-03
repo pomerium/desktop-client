@@ -10,25 +10,24 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { FC, useRef } from "react";
+import React, { FC } from "react";
 import { useNavigate } from "react-router-dom";
 
 import usePopover from "../hooks/use-popover";
 
 const NewConnectionButton: FC = () => {
-  const popover = usePopover<HTMLButtonElement>();
+  const { anchorEl, setAnchorEl, open, handleOpen, handleClose } = usePopover<HTMLButtonElement>();
   const navigate = useNavigate();
-  const anchorRef = useRef<HTMLDivElement>(null);
 
-  const handleClose = (event: Event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+  const handleClickAway = (event: Event) => {
+    if (anchorEl?.contains(event.target as HTMLElement)) {
       return;
     }
-    popover.handleClose();
+    handleClose();
   };
 
   const handleMenuItemClick = (key: string) => {
-    popover.handleClose();
+    handleClose();
     switch (key) {
       case "load":
         navigate(`/loadForm`, {
@@ -61,16 +60,16 @@ const NewConnectionButton: FC = () => {
       <Button
         variant="contained"
         color="primary"
-        ref={popover.anchorRef}
-        onClick={popover.handleOpen}
+        ref={setAnchorEl}
+        onClick={handleOpen}
         startIcon={<AddCircleOutlineIcon />}
       >
         <Typography variant="button">New Connection</Typography>
       </Button>
       <Popper
         sx={{ zIndex: 1 }}
-        open={popover.open}
-        anchorEl={popover.anchorRef.current}
+        open={open}
+        anchorEl={anchorEl}
         role={undefined}
         transition
         disablePortal
@@ -84,7 +83,7 @@ const NewConnectionButton: FC = () => {
             }}
           >
             <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
+              <ClickAwayListener onClickAway={handleClickAway}>
                 <MenuList id="split-button-menu" autoFocusItem disablePadding>
                   {options.map((option) => (
                     <MenuItem

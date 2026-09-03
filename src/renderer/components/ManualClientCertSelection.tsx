@@ -1,6 +1,6 @@
 import { Button, Chip, FormHelperText, Grid, IconButton, Typography } from "@mui/material";
 import { set } from "lodash";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import { Trash } from "react-feather";
 
 import { Connection } from "../../shared/pb/types";
@@ -15,22 +15,14 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
   connection,
   onChangeConnection,
 }) => {
-  const [showCertInput, setShowCertInput] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const showCertInput = !connection?.clientCert?.info;
   const certText = connection?.clientCert?.cert
     ? new TextDecoder().decode(connection.clientCert.cert)
     : "";
   const keyText = connection?.clientCert?.key
     ? new TextDecoder().decode(connection.clientCert.key)
     : "";
-
-  useEffect(() => {
-    if (connection?.clientCert?.info) {
-      setShowCertInput(false);
-    } else {
-      setShowCertInput(true);
-    }
-  }, [!!connection?.clientCert?.info]);
 
   const saveCertText = (value: string): void => {
     const c = { ...connection };
@@ -73,7 +65,6 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
   };
   const onDeleteCert = () => {
     onChangeConnection({ ...connection, clientCert: undefined });
-    setShowCertInput(true);
   };
 
   return (
