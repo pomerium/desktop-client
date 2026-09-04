@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>pomerium-desktop</id>
+    <version>0.33.0</version>
+    <title>Pomerium Desktop</title>
+    <authors>Pomerium Inc</authors>
+    <owners>Pomerium Inc</owners>
+    <projectUrl>https://github.com/pomerium/desktop-client</projectUrl>
+    <projectSourceUrl>https://github.com/pomerium/desktop-client</projectSourceUrl>
+    <packageSourceUrl>https://github.com/pomerium/desktop-client/blob/main/scripts/GenerateWindowsPackageMetadata.ts</packageSourceUrl>
+    <iconUrl>https://raw.githubusercontent.com/pomerium/desktop-client/v0.33.0/assets/icons/128x128.png</iconUrl>
+    <licenseUrl>https://github.com/pomerium/desktop-client/blob/v0.33.0/LICENSE</licenseUrl>
+    <bugTrackerUrl>https://github.com/pomerium/desktop-client/issues</bugTrackerUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Cross-platform desktop application for establishing TCP connections through Pomerium.</description>
+    <summary>Connect to services through Pomerium from the Windows desktop.</summary>
+    <releaseNotes>https://github.com/pomerium/desktop-client/releases/tag/v0.33.0</releaseNotes>
+    <copyright>Copyright Pomerium Inc</copyright>
+    <tags>pomerium zero-trust networking desktop windows</tags>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

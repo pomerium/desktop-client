@@ -1,0 +1,105 @@
+name: Windows package managers
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/windows-package-managers.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/GenerateWindowsPackageMetadata.ts"
+      - "scripts/GenerateWindowsPackageMetadata.test.ts"
+      - "scripts/fixtures/windows-package-metadata/**"
+      - "scripts/windows-package-managers/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate ${{ matrix.package-manager }}
+    runs-on: windows-2025
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package-manager: chocolatey
+            harness-package-manager: Chocolatey
+          - package-manager: winget
+            harness-package-manager: WinGet
+
+    env:
+      EVIDENCE_DIRECTORY: output/windows-package-managers/evidence/${{ matrix.package-manager }}
+      HARNESS_PACKAGE_MANAGER: ${{ matrix.harness-package-manager }}
+      PREVIOUS_METADATA_DIRECTORY: output/windows-package-managers/metadata/0.32.2
+      CURRENT_METADATA_DIRECTORY: output/windows-package-managers/metadata/0.33.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .tool-versions
+
+      - name: Install dependencies
+        run: npm ci --network-timeout 300000
+
+      - name: Generate v0.32.2 package metadata
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          npm run package-managers:generate --
+          --tag v0.32.2
+          --output $env:PREVIOUS_METADATA_DIRECTORY
+
+      - name: Generate v0.33.0 package metadata
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          npm run package-managers:generate --
+          --tag v0.33.0
+          --output $env:CURRENT_METADATA_DIRECTORY
+
+      - name: Bootstrap WinGet
+        if: ${{ matrix.package-manager == 'winget' }}
+        shell: pwsh
+        run: |
+          if (-not (Get-Command winget.exe -ErrorAction SilentlyContinue)) {
+            Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery -Scope CurrentUser | Out-Null
+            Repair-WinGetPackageManager -AllUsers
+          }
+
+          # Delivery Optimization is not reliably available on hosted runners, and winget reports
+          # its absence as 0x8A15006D while downloading the installer.
+          $settingsPath = Join-Path $env:LOCALAPPDATA "Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json"
+          New-Item -ItemType Directory -Force -Path (Split-Path $settingsPath) | Out-Null
+          @{ '$schema' = 'https://aka.ms/winget-settings.schema.json'; network = @{ downloader = 'wininet' } } |
+            ConvertTo-Json | Set-Content -Encoding utf8 $settingsPath
+
+          winget --info
+          winget settings export
+
+      - name: Test package lifecycle
+        shell: pwsh
+        run: >-
+          ./scripts/windows-package-managers/Test-WindowsPackageLifecycle.ps1
+          -PackageManager $env:HARNESS_PACKAGE_MANAGER
+          -OldMetadataRoot $env:PREVIOUS_METADATA_DIRECTORY
+          -NewMetadataRoot $env:CURRENT_METADATA_DIRECTORY
+          -EvidenceDirectory $env:EVIDENCE_DIRECTORY
+
+      - name: Upload package evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: windows-package-managers-${{ matrix.package-manager }}
+          path: output/windows-package-managers
+          if-no-files-found: warn
+          retention-days: 14
