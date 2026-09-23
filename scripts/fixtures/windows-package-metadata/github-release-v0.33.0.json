@@ -1,0 +1,15 @@
+{
+  "tag_name": "v0.33.0",
+  "draft": false,
+  "prerelease": false,
+  "published_at": "2026-07-16T22:37:23Z",
+  "assets": [
+    {
+      "name": "Pomerium-Desktop-Setup-0.33.0.exe",
+      "browser_download_url": "https://github.com/pomerium/desktop-client/releases/download/v0.33.0/Pomerium-Desktop-Setup-0.33.0.exe",
+      "digest": "sha256:6b889f360650019b910fda8cca04b3f17c51a6aab55df44215de8ef0fe68800e",
+      "state": "uploaded",
+      "size": 125556122
+    }
+  ]
+}
