@@ -12,7 +12,7 @@
   "bugs": {
     "url": "https://github.com/pomerium/desktop-client/issues"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Pomerium Inc",
     "email": "info@pomerium.com",
@@ -38,6 +38,7 @@
     "dev-setup": "git clone https://github.com/pomerium/cli && ln -s $(pwd)/cli/bin/pomerium-cli assets/bin/ && cd cli && make build && npm run metadata",
     "build-cli": "cd cli && git pull origin; make build",
     "metadata": "npx tsx scripts/WriteMetadata.ts",
+    "package-managers:generate": "tsx scripts/GenerateWindowsPackageMetadata.ts",
     "lint": "oxlint .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",

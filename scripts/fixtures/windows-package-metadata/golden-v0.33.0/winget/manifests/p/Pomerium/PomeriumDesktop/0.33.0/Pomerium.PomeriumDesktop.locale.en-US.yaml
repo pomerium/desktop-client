@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json
+
+PackageIdentifier: Pomerium.PomeriumDesktop
+PackageVersion: 0.33.0
+PackageLocale: en-US
+Publisher: Pomerium Inc
+PublisherUrl: https://www.pomerium.com/
+PublisherSupportUrl: https://github.com/pomerium/desktop-client/issues
+Author: Pomerium Inc
+PackageName: Pomerium Desktop
+PackageUrl: https://github.com/pomerium/desktop-client
+License: Apache-2.0
+LicenseUrl: https://github.com/pomerium/desktop-client/blob/v0.33.0/LICENSE
+Copyright: Copyright Pomerium Inc
+ShortDescription: Connect to services through Pomerium from the Windows desktop.
+Description: Cross-platform desktop application for establishing TCP connections through Pomerium.
+Moniker: pomerium-desktop
+Tags:
+  - access
+  - networking
+  - security
+  - zero-trust
+ReleaseNotesUrl: https://github.com/pomerium/desktop-client/releases/tag/v0.33.0
+ManifestType: defaultLocale
+ManifestVersion: 1.10.0

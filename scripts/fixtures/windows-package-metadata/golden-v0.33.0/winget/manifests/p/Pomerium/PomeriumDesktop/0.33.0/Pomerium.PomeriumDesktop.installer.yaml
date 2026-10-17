@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.10.0.schema.json
+
+PackageIdentifier: Pomerium.PomeriumDesktop
+PackageVersion: 0.33.0
+InstallerType: nullsoft
+Scope: user
+ElevationRequirement: elevationProhibited
+InstallModes:
+  - interactive
+  - silent
+  - silentWithProgress
+UpgradeBehavior: install
+ReleaseDate: 2026-07-16
+Installers:
+  - Architecture: x64
+    ProductCode: 1f7d9fda-695d-5026-9065-253047710988
+    InstallerUrl: https://github.com/pomerium/desktop-client/releases/download/v0.33.0/Pomerium-Desktop-Setup-0.33.0.exe
+    InstallerSha256: 6B889F360650019B910FDA8CCA04B3F17C51A6AAB55DF44215DE8EF0FE68800E
+    AppsAndFeaturesEntries:
+      - DisplayName: Pomerium Desktop 0.33.0
+        Publisher: Pomerium Inc
+        ProductCode: 1f7d9fda-695d-5026-9065-253047710988
+ManifestType: installer
+ManifestVersion: 1.10.0
