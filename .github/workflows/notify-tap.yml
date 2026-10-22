@@ -22,11 +22,22 @@ jobs:
           VERSION: "${{ github.event.release.tag_name }}"
           LATEST_VERSION: "${{ steps.get_latest.outputs.release }}"
 
+      - name: Create CI token
+        id: ci-token
+        if: steps.clean_versions.outputs.release == steps.clean_versions.outputs.latest_release
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510
+        with:
+          client-id: ${{ secrets.POMERIUM_CI_APP_CLIENT_ID }}
+          private-key: ${{ secrets.POMERIUM_CI_APP_PRIVATE_KEY }}
+          owner: pomerium
+          repositories: homebrew-tap
+          permission-contents: write
+
       - name: Update homebrew tap
         if: steps.clean_versions.outputs.release == steps.clean_versions.outputs.latest_release
         uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697
         with:
           repository: pomerium/homebrew-tap
-          token: ${{ secrets.APPARITOR_GITHUB_TOKEN }}
+          token: ${{ steps.ci-token.outputs.token }}
           event-type: desktop-client-release
           client-payload: '{ "version": "${{ steps.clean_versions.outputs.release }}" }'
