@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .tool-versions
 
@@ -33,7 +33,7 @@ jobs:
           npm ci
 
       - name: Import Apple CSC
-        uses: apple-actions/import-codesign-certs@5142e029c445c10ffc7149d172e540235a065466
+        uses: apple-actions/import-codesign-certs@5142e029c445c10ffc7149d172e540235a065466 # v7.0.0
         with:
           p12-file-base64: ${{ secrets.APPLE_APP_CSC }}
           p12-password: ${{ secrets.APPLE_APP_CSC_PASSWORD }}
