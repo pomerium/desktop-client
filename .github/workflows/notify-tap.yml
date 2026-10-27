@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - id: get_latest
-        uses: rez0n/actions-github-release@05fabbd6b2b3ce3383299555ea518faea69b736d
+        uses: rez0n/actions-github-release@05fabbd6b2b3ce3383299555ea518faea69b736d # v2.1
         with:
           repository: ${{ github.repository }}
           type: "stable"
@@ -25,7 +25,7 @@ jobs:
       - name: Create CI token
         id: ci-token
         if: steps.clean_versions.outputs.release == steps.clean_versions.outputs.latest_release
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
           client-id: ${{ secrets.POMERIUM_CI_APP_CLIENT_ID }}
           private-key: ${{ secrets.POMERIUM_CI_APP_PRIVATE_KEY }}
@@ -35,7 +35,7 @@ jobs:
 
       - name: Update homebrew tap
         if: steps.clean_versions.outputs.release == steps.clean_versions.outputs.latest_release
-        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
         with:
           repository: pomerium/homebrew-tap
           token: ${{ steps.ci-token.outputs.token }}
