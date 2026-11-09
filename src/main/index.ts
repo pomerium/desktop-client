@@ -347,7 +347,9 @@ async function init(): Promise<void> {
     // Auto-start connections marked with autostart flag
     configClient.list({ all: true, ids: [], tags: [] }, (err, res) => {
       if (!err && res) {
-        const autoStartIds = res.records.filter((r) => r.conn && r.conn.autostart).map((r) => r.id);
+        const autoStartIds = res.records.flatMap((r) =>
+          r.conn?.autostart && r.id !== undefined ? [r.id] : [],
+        );
         if (autoStartIds.length > 0) {
           listenerClient.update(
             { connectionIds: autoStartIds, connected: true },
