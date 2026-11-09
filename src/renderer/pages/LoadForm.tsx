@@ -43,7 +43,10 @@ function portalRouteToRecord(baseRecord: Record, portalRoute: PortalRoute): Reco
   );
 }
 
-async function reconcileConnections(baseRecord: Record, portalRoutes: PortalRoute[]) {
+async function reconcileConnections(
+  baseRecord: Record,
+  portalRoutes: PortalRoute[],
+): Promise<number> {
   const res = await getAllRecords();
 
   const currentRecords = new Map<string, Record>(
@@ -81,6 +84,8 @@ async function reconcileConnections(baseRecord: Record, portalRoutes: PortalRout
   }
 
   await getAllRecords();
+
+  return newRecords.size;
 }
 
 const LoadForm: FC = () => {
@@ -114,13 +119,25 @@ const LoadForm: FC = () => {
             clientCert: connection.clientCert,
             clientCertFromStore: connection.clientCertFromStore,
           });
-          await reconcileConnections(
+          const count = await reconcileConnections(
             {
               tags,
               conn: connection,
             },
             res?.routes || [],
           );
+          if (count === 0) {
+            enqueueSnackbar(
+              "No TCP or UDP routes found. Only tcp+https and udp+https routes can be imported; HTTP and native SSH routes are skipped.",
+              { variant: "info", autoHideDuration: TOAST_LENGTH },
+            );
+          } else {
+            enqueueSnackbar(`Imported ${count} ${count === 1 ? "route" : "routes"}`, {
+              variant: "success",
+              autoHideDuration: TOAST_LENGTH,
+            });
+            ipcRenderer.send(VIEW_CONNECTION_LIST);
+          }
         }
       } catch (e) {
         enqueueSnackbar(`${(e as any)?.message || e}`, {
