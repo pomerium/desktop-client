@@ -4,7 +4,7 @@ import { join } from "path";
 /* eslint global-require: off, no-console: off */
 import * as grpc from "@grpc/grpc-js";
 import * as Sentry from "@sentry/electron/main";
-import { app, BrowserWindow, dialog, ipcMain, MessageBoxOptions } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, MessageBoxOptions, shell } from "electron";
 import contextMenu from "electron-context-menu";
 import log from "electron-log";
 import { autoUpdater } from "electron-updater";
@@ -31,6 +31,7 @@ import {
   LISTENER_LOG,
   GET_ALL_RECORDS,
   FETCH_ROUTES,
+  OPEN_EXTERNAL,
 } from "../shared/constants";
 import { GetRecordsResponseArgs } from "../shared/constants-main";
 import {
@@ -201,6 +202,12 @@ async function init(): Promise<void> {
           menu.tray.setContextMenu(trayMenuHelper.createContextMenu());
         }
       });
+    });
+    ipcMain.on(OPEN_EXTERNAL, (_evt, url: string) => {
+      // only hand http(s) urls to the OS, never other schemes like file:
+      if (/^https?:\/\//i.test(url)) {
+        void shell.openExternal(url);
+      }
     });
     ipcMain.on(DELETE, (evt, id: string) => {
       configClient.delete({ ids: [id], tags: [], all: false }, (err) => {

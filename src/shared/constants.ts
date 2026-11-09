@@ -21,6 +21,7 @@ export const GET_UNIQUE_TAGS = "get_tags";
 export const IMPORT = "import";
 export const LISTENER_LOG = "listener_log";
 export const LISTENER_STATUS = "listener_status";
+export const OPEN_EXTERNAL = "open_external";
 export const SAVE_RECORD = "save_record";
 export const UPDATE_LISTENERS = "update_listeners";
 export const VIEW = "view";

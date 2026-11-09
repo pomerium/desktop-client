@@ -10,11 +10,11 @@ import {
   Typography,
 } from "@mui/material";
 import { defaultsDeep, isEqual } from "lodash";
-import { enqueueSnackbar } from "notistack";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 import React, { FC, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { DELETE, TOAST_LENGTH, VIEW_CONNECTION_LIST } from "../../shared/constants";
+import { DELETE, OPEN_EXTERNAL, TOAST_LENGTH, VIEW_CONNECTION_LIST } from "../../shared/constants";
 import { ipcRenderer } from "../../shared/electron";
 import { fetchRoutes, getAllRecords, saveRecord } from "../../shared/ipc";
 import { Connection, PortalRoute, Protocol, Record } from "../../shared/pb/types";
@@ -23,6 +23,14 @@ import ClientCertSelection from "../components/ClientCertSelection";
 import StyledCard from "../components/StyledCard";
 import TagSelector from "../components/TagSelector";
 import TextField from "../components/TextField";
+
+function getRoutesPortalUrl(serverUrl: string): string | undefined {
+  try {
+    return new URL("/.pomerium/routes", serverUrl).toString();
+  } catch {
+    return undefined;
+  }
+}
 
 function portalRouteToRecord(baseRecord: Record, portalRoute: PortalRoute): Record {
   const from = new URL(portalRoute.from.replace(/^(udp[+])|(tcp[+])(.*?)$/, "$3"));
@@ -43,7 +51,10 @@ function portalRouteToRecord(baseRecord: Record, portalRoute: PortalRoute): Reco
   );
 }
 
-async function reconcileConnections(baseRecord: Record, portalRoutes: PortalRoute[]) {
+async function reconcileConnections(
+  baseRecord: Record,
+  portalRoutes: PortalRoute[],
+): Promise<number> {
   const res = await getAllRecords();
 
   const currentRecords = new Map<string, Record>(
@@ -81,6 +92,8 @@ async function reconcileConnections(baseRecord: Record, portalRoutes: PortalRout
   }
 
   await getAllRecords();
+
+  return newRecords.size;
 }
 
 const LoadForm: FC = () => {
@@ -114,13 +127,46 @@ const LoadForm: FC = () => {
             clientCert: connection.clientCert,
             clientCertFromStore: connection.clientCertFromStore,
           });
-          await reconcileConnections(
+          const count = await reconcileConnections(
             {
               tags,
               conn: connection,
             },
             res?.routes || [],
           );
+          if (count === 0) {
+            const portalUrl = getRoutesPortalUrl(serverUrl);
+            enqueueSnackbar(
+              "No TCP or UDP routes found. Only tcp+https and udp+https routes can be imported. Other route types can be opened in the routes portal.",
+              {
+                variant: "warning",
+                // important and long, so keep it until the user dismisses it
+                persist: true,
+                action: (key) => (
+                  <>
+                    {portalUrl && (
+                      <Button
+                        color="inherit"
+                        size="small"
+                        onClick={() => ipcRenderer.send(OPEN_EXTERNAL, portalUrl)}
+                      >
+                        Open routes portal
+                      </Button>
+                    )}
+                    <Button color="inherit" size="small" onClick={() => closeSnackbar(key)}>
+                      Dismiss
+                    </Button>
+                  </>
+                ),
+              },
+            );
+          } else {
+            enqueueSnackbar(`Imported ${count} ${count === 1 ? "route" : "routes"}`, {
+              variant: "success",
+              autoHideDuration: TOAST_LENGTH,
+            });
+            ipcRenderer.send(VIEW_CONNECTION_LIST);
+          }
         }
       } catch (e) {
         enqueueSnackbar(`${(e as any)?.message || e}`, {
