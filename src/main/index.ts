@@ -140,6 +140,9 @@ async function init(): Promise<void> {
   const tray = trayMenuHelper.createTray();
   const menu = menubar({
     preloadWindow: true,
+    // menubar hides the dock icon by default. Keep it so the user can click it
+    // to bring the main window back after closing it (#97).
+    showDockIcon: true,
     browserWindow: { width: 0, height: 0 },
     index: process.env.ELECTRON_RENDERER_URL || `file://${rendererIndexPath}`,
     tray,
