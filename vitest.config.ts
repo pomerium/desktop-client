@@ -8,10 +8,10 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
-    resolve: {
-      alias: {
-        "@shared": resolve(__dirname, "src/shared"),
-      },
+  },
+  resolve: {
+    alias: {
+      "@shared": resolve(__dirname, "src/shared"),
     },
   },
 });

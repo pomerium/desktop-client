@@ -1,5 +1,5 @@
 import { FormControlLabel, FormHelperText, Grid, Switch, Typography } from "@mui/material";
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 
 import { platform } from "../../shared/electron";
 import { ClientCertFromStore, Connection } from "../../shared/pb/types";
@@ -83,7 +83,7 @@ const ClientCertSelection: FC<ClientCertSelectionProps> = ({ connection, onChang
         sx={{ mt: 2 }}
         disabled={!clientCertFromStoreEnabled}
         expanded={clientCertFiltersExpanded}
-        onChange={(evt, expanded) => setClientCertFiltersExpanded(expanded)}
+        onChange={(_evt, expanded) => setClientCertFiltersExpanded(expanded)}
       >
         <NestedAccordionSummary>
           <Typography>

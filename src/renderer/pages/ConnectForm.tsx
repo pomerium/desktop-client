@@ -7,6 +7,7 @@ import {
   Grid,
   InputLabel,
   MenuItem,
+  SelectChangeEvent,
   Select,
   Stack,
   Switch,

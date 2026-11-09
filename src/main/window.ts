@@ -25,10 +25,12 @@ const createWindow = (): BrowserWindow | null => {
     }
   });
 
-  appWindow.on("minimize", (event: Event) => {
+  // Electron's typings declare the "minimize" listener as `() => void`, but at
+  // runtime it is still invoked with an event argument.
+  appWindow.on("minimize", ((event: Event) => {
     event.preventDefault();
     appWindow?.hide();
-  });
+  }) as () => void);
 
   appWindow.on("close", (event) => {
     event.preventDefault();

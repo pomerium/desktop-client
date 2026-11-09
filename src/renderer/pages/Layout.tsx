@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import React, { FC } from "react";
+import { FC } from "react";
 import { Outlet } from "react-router-dom";
 
 import TopBar from "../components/TopBar";

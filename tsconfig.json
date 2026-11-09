@@ -6,6 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "noEmit": true,
+    "paths": { "@swc/core": ["./node_modules/@swc/types"] },
     "jsx": "react-jsx",
     "strict": true,
     "pretty": true,

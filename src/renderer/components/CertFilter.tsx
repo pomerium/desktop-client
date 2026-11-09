@@ -76,7 +76,7 @@ const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
             value={value}
             disabled={!attribute}
             onChange={(evt): void => setValue(evt.target.value)}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
           />
         )}
       </Grid>

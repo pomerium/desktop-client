@@ -1,10 +1,10 @@
 import { Grid, Typography, SvgIcon, Divider, Container, Tooltip, Box } from "@mui/material";
-import React, { FC, ReactElement, ReactFragment, ReactNode } from "react";
+import { FC, ReactElement, ReactNode } from "react";
 import { HelpCircle } from "react-feather";
 
 type FieldWrapperProps = {
   label: string;
-  description: ReactFragment;
+  description: ReactNode;
   children: ReactNode;
 };
 

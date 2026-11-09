@@ -1,6 +1,6 @@
 import { AppBar, Autocomplete, Grid, TextField, Toolbar } from "@mui/material";
 import { createFilterOptions } from "@mui/material/useAutocomplete";
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Search } from "react-feather";
 
 import { GET_ALL_RECORDS, VIEW } from "../../shared/constants";
