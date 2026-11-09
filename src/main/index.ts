@@ -67,7 +67,9 @@ class AppUpdater {
 }
 
 if (isDev || prodDebug) {
-  require("electron-debug")();
+  import("electron-debug")
+    .then(({ default: debug }) => debug())
+    .catch((err) => console.error("failed to load electron-debug", err));
 }
 
 const onUncaughtException = (() => {
