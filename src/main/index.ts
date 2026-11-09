@@ -202,13 +202,9 @@ async function init(): Promise<void> {
       });
     });
     ipcMain.on(OPEN_EXTERNAL, (_evt, url: string) => {
-      try {
-        const parsed = new URL(url);
-        if (parsed.protocol === "https:" || parsed.protocol === "http:") {
-          void shell.openExternal(parsed.toString());
-        }
-      } catch {
-        // ignore invalid urls
+      // only hand http(s) urls to the OS, never other schemes like file:
+      if (/^https?:\/\//i.test(url)) {
+        void shell.openExternal(url);
       }
     });
     ipcMain.on(DELETE, (evt, id: string) => {
