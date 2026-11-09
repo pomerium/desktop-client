@@ -25,7 +25,7 @@ function TopTabs(): ReactElement {
           <Grid item xs={4}>
             <Grid container>
               <Grid item xs={11}>
-                <Typography align="right" variant="subtitle2">
+                <Typography align="right" variant="subtitle2" sx={{ pt: 0.5 }}>
                   Version: {metadata.desktopVersion}-{metadata.gitHash}
                 </Typography>
                 <Typography align="right" variant="subtitle2">

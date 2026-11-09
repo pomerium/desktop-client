@@ -39,9 +39,9 @@ const TopBar: FC = () => {
 
   return (
     <AppBar position="sticky">
-      <Toolbar>
+      <Toolbar sx={{ py: 1 }}>
         <Grid container alignItems="center">
-          <Grid item xs={9}>
+          <Grid item xs={9} sx={{ display: "flex", alignItems: "center", pr: 2 }}>
             <Logo />
           </Grid>
           <Grid item xs={3}>
