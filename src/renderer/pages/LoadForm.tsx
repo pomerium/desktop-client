@@ -24,6 +24,9 @@ import StyledCard from "../components/StyledCard";
 import TagSelector from "../components/TagSelector";
 import TextField from "../components/TextField";
 
+// the "no routes found" message is long, so give it more time to be read
+const EMPTY_RESULT_TOAST_LENGTH = 8000;
+
 function portalRouteToRecord(baseRecord: Record, portalRoute: PortalRoute): Record {
   const from = new URL(portalRoute.from.replace(/^(udp[+])|(tcp[+])(.*?)$/, "$3"));
   const remoteAddr = from.pathname === "/" ? from.host : from.pathname.substring(1);
@@ -129,7 +132,7 @@ const LoadForm: FC = () => {
           if (count === 0) {
             enqueueSnackbar(
               "No TCP or UDP routes found. Only tcp+https and udp+https routes can be imported; HTTP and native SSH routes are skipped.",
-              { variant: "info", autoHideDuration: TOAST_LENGTH },
+              { variant: "info", autoHideDuration: EMPTY_RESULT_TOAST_LENGTH },
             );
           } else {
             enqueueSnackbar(`Imported ${count} ${count === 1 ? "route" : "routes"}`, {
