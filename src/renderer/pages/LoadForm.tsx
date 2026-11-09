@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { defaultsDeep, isEqual } from "lodash";
-import { enqueueSnackbar } from "notistack";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 import React, { FC, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -23,9 +23,6 @@ import ClientCertSelection from "../components/ClientCertSelection";
 import StyledCard from "../components/StyledCard";
 import TagSelector from "../components/TagSelector";
 import TextField from "../components/TextField";
-
-// the "no routes found" message is long, so give it more time to be read
-const EMPTY_RESULT_TOAST_LENGTH = 8000;
 
 function portalRouteToRecord(baseRecord: Record, portalRoute: PortalRoute): Record {
   const from = new URL(portalRoute.from.replace(/^(udp[+])|(tcp[+])(.*?)$/, "$3"));
@@ -132,7 +129,16 @@ const LoadForm: FC = () => {
           if (count === 0) {
             enqueueSnackbar(
               "No TCP or UDP routes found. Only tcp+https and udp+https routes can be imported; HTTP and native SSH routes are skipped.",
-              { variant: "info", autoHideDuration: EMPTY_RESULT_TOAST_LENGTH },
+              {
+                variant: "warning",
+                // important and long, so keep it until the user dismisses it
+                persist: true,
+                action: (key) => (
+                  <Button color="inherit" size="small" onClick={() => closeSnackbar(key)}>
+                    Dismiss
+                  </Button>
+                ),
+              },
             );
           } else {
             enqueueSnackbar(`Imported ${count} ${count === 1 ? "route" : "routes"}`, {
