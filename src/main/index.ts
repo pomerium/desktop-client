@@ -104,11 +104,17 @@ const onUncaughtException = (() => {
 
 process.on("uncaughtException", onUncaughtException);
 
-app.on("activate", async () => {
-  // On macOS, it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) mainWindow = createWindow();
-});
+// The window is hidden (not destroyed) when closed or minimized, so it must be
+// shown again rather than re-created.
+function showMainWindow(): void {
+  if (!mainWindow) return;
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+}
+
+// On macOS, clicking the dock icon after closing the window fires "activate".
+app.on("activate", showMainWindow);
 
 async function init(): Promise<void> {
   const [cli] = await Promise.all([
@@ -362,11 +368,6 @@ async function init(): Promise<void> {
 if (!singleInstanceLock) {
   app.quit();
 } else {
-  app.on("second-instance", () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
-  });
+  app.on("second-instance", showMainWindow);
   init();
 }
