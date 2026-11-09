@@ -14,7 +14,7 @@ import { closeSnackbar, enqueueSnackbar } from "notistack";
 import React, { FC, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { DELETE, TOAST_LENGTH, VIEW_CONNECTION_LIST } from "../../shared/constants";
+import { DELETE, OPEN_EXTERNAL, TOAST_LENGTH, VIEW_CONNECTION_LIST } from "../../shared/constants";
 import { ipcRenderer } from "../../shared/electron";
 import { fetchRoutes, getAllRecords, saveRecord } from "../../shared/ipc";
 import { Connection, PortalRoute, Protocol, Record } from "../../shared/pb/types";
@@ -23,6 +23,14 @@ import ClientCertSelection from "../components/ClientCertSelection";
 import StyledCard from "../components/StyledCard";
 import TagSelector from "../components/TagSelector";
 import TextField from "../components/TextField";
+
+function getRoutesPortalUrl(serverUrl: string): string | undefined {
+  try {
+    return new URL("/.pomerium/routes", serverUrl).toString();
+  } catch {
+    return undefined;
+  }
+}
 
 function portalRouteToRecord(baseRecord: Record, portalRoute: PortalRoute): Record {
   const from = new URL(portalRoute.from.replace(/^(udp[+])|(tcp[+])(.*?)$/, "$3"));
@@ -127,6 +135,7 @@ const LoadForm: FC = () => {
             res?.routes || [],
           );
           if (count === 0) {
+            const portalUrl = getRoutesPortalUrl(serverUrl);
             enqueueSnackbar(
               "No TCP or UDP routes found. Only tcp+https and udp+https routes can be imported; HTTP and native SSH routes are skipped.",
               {
@@ -134,9 +143,20 @@ const LoadForm: FC = () => {
                 // important and long, so keep it until the user dismisses it
                 persist: true,
                 action: (key) => (
-                  <Button color="inherit" size="small" onClick={() => closeSnackbar(key)}>
-                    Dismiss
-                  </Button>
+                  <>
+                    {portalUrl && (
+                      <Button
+                        color="inherit"
+                        size="small"
+                        onClick={() => ipcRenderer.send(OPEN_EXTERNAL, portalUrl)}
+                      >
+                        Open routes portal
+                      </Button>
+                    )}
+                    <Button color="inherit" size="small" onClick={() => closeSnackbar(key)}>
+                      Dismiss
+                    </Button>
+                  </>
                 ),
               },
             );
