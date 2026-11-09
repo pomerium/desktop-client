@@ -137,7 +137,7 @@ const LoadForm: FC = () => {
           if (count === 0) {
             const portalUrl = getRoutesPortalUrl(serverUrl);
             enqueueSnackbar(
-              "No TCP or UDP routes found. Only tcp+https and udp+https routes can be imported; HTTP and native SSH routes are skipped.",
+              "No TCP or UDP routes found. Only tcp+https and udp+https routes can be imported. Other route types can be opened in the routes portal.",
               {
                 variant: "warning",
                 // important and long, so keep it until the user dismisses it
