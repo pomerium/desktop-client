@@ -1,6 +1,5 @@
 import { IconButton } from "@mui/material";
 import { useSnackbar, SnackbarKey } from "notistack";
-import * as React from "react";
 import { XCircle } from "react-feather";
 
 type SnackbarCloseProps = {

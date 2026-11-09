@@ -80,6 +80,7 @@
   },
   "devDependencies": {
     "@electron/notarize": "^3.1.2",
+    "@swc/types": "^0.1.28",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/history": "5.0.0",

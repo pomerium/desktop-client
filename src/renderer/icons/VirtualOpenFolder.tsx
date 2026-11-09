@@ -1,5 +1,5 @@
 import { SvgIcon } from "@mui/material";
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 
 function VirtualOpenFolder(): ReactElement {
   return (

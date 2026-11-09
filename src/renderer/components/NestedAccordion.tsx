@@ -1,5 +1,4 @@
 import { Accordion, AccordionProps, styled } from "@mui/material";
-import React from "react";
 
 const NestedAccordion = styled((props: AccordionProps) => (
   <Accordion disableGutters elevation={0} {...props} />

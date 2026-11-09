@@ -1,5 +1,4 @@
 import { AccordionSummary, AccordionSummaryProps, styled } from "@mui/material";
-import React from "react";
 import { ChevronRight } from "react-feather";
 
 const NestedAccordionSummary = styled((props: AccordionSummaryProps) => (

@@ -3,7 +3,7 @@ import jssPreset from "@mui/styles/jssPreset";
 import StylesProvider from "@mui/styles/StylesProvider";
 import { create } from "jss";
 import { SnackbarProvider } from "notistack";
-import React, { FC, useEffect } from "react";
+import { FC, useEffect } from "react";
 import { HashRouter, Outlet, Route, Routes, useNavigate, Navigate } from "react-router-dom";
 
 import { THEMES } from "../shared/constants";

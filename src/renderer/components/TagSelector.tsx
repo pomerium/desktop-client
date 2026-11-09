@@ -1,5 +1,5 @@
 import { Autocomplete } from "@mui/material";
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { GET_UNIQUE_TAGS } from "../../shared/constants";
 import { ipcRenderer } from "../../shared/electron";
