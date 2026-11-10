@@ -91,7 +91,7 @@ const ConnectForm: FC<Props> = () => {
       ipcRenderer.removeAllListeners(GET_RECORDS);
       ipcRenderer.removeAllListeners(GET_UNIQUE_TAGS);
     };
-  }, []);
+  }, [connectionID, enqueueSnackbar]);
 
   const saveName = (value: string): void => {
     setConnection({
