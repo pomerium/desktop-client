@@ -196,9 +196,10 @@ const ConnectForm: FC<Props> = () => {
                     <InputLabel id="protocol-label">Protocol</InputLabel>
                     <Select
                       labelId="protocol-label"
-                      id="demo-simple-select"
+                      id="protocol-select"
+                      size="small"
                       value={connection?.protocol === Protocol.UDP ? "UDP" : "TCP"}
-                      label="Age"
+                      label="Protocol"
                       onChange={handleChangeProtocol}
                     >
                       <MenuItem value="TCP">TCP</MenuItem>
