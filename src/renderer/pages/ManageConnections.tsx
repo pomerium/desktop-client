@@ -54,7 +54,7 @@ function ManageConnections(): ReactElement {
     return () => {
       ipcRenderer.removeListener(EXPORT, listener);
     };
-  }, []);
+  }, [enqueueSnackbar]);
 
   useEffect(() => {
     ipcRenderer.on(GET_UNIQUE_TAGS, (_, args) => {
@@ -144,7 +144,7 @@ function ManageConnections(): ReactElement {
       ipcRenderer.removeAllListeners(IMPORT);
       ipcRenderer.removeAllListeners(SAVE_RECORD);
     };
-  }, []);
+  }, [enqueueSnackbar]);
 
   const untagged = connections?.filter((connection) => !connection?.tags?.length);
 

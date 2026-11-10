@@ -159,7 +159,7 @@ function ConnectionView(): ReactElement {
     return () => {
       ipcRenderer.removeListener(EXPORT, listener);
     };
-  }, []);
+  }, [enqueueSnackbar]);
 
   useEffect(() => {
     ipcRenderer.on(LISTENER_STATUS, (_, args) => {
@@ -210,7 +210,7 @@ function ConnectionView(): ReactElement {
       ipcRenderer.removeAllListeners(LISTENER_STATUS);
       ipcRenderer.removeAllListeners(LISTENER_LOG);
     };
-  }, [connectionID]);
+  }, [connectionID, enqueueSnackbar]);
 
   const filteredLogs =
     (errorFilter && infoFilter) || (!errorFilter && !infoFilter)

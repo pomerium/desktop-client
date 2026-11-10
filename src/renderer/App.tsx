@@ -26,7 +26,7 @@ const RouteListener: FC = () => {
     return function cleanup() {
       ipcRenderer.removeAllListeners("redirectTo");
     };
-  }, []);
+  }, [navigate]);
 
   return <Outlet />;
 };
