@@ -120,7 +120,7 @@
     "yaml": ">=2.8.3"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=26",
     "npm": ">=10",
     "yarn": "YARN NO LONGER USED - use npm instead."
   },
