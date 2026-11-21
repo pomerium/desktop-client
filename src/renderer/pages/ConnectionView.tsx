@@ -226,14 +226,14 @@ function ConnectionView(): ReactElement {
         <Container maxWidth={false} sx={{ pt: 4 }}>
           <Stack spacing={2}>
             <Grid>
-              <Grid container alignItems="flex-start">
-                <Grid item xs={5}>
+              <Grid container sx={{ alignItems: "flex-start" }}>
+                <Grid size={5}>
                   <Typography variant="h3" color="textPrimary">
                     {connection.name}
                   </Typography>
                 </Grid>
-                <Grid item xs={7} container justifyContent="flex-end">
-                  <Grid item>
+                <Grid size={7} container sx={{ justifyContent: "flex-end" }}>
+                  <Grid>
                     <Button
                       size="small"
                       type="button"
@@ -244,7 +244,7 @@ function ConnectionView(): ReactElement {
                       Edit
                     </Button>
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <Button
                       size="small"
                       type="button"
@@ -264,7 +264,7 @@ function ConnectionView(): ReactElement {
                       Export
                     </Button>
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <Button
                       size="small"
                       type="button"
@@ -275,7 +275,7 @@ function ConnectionView(): ReactElement {
                       Delete
                     </Button>
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     {connected && (
                       <Button
                         size="small"
@@ -306,35 +306,35 @@ function ConnectionView(): ReactElement {
             <StyledCard>
               <CardContent>
                 <Grid container spacing={2}>
-                  <Grid container item xs={12} alignItems="center">
-                    <Grid item xs={4}>
+                  <Grid container size={12} sx={{ alignItems: "center" }}>
+                    <Grid size={4}>
                       <Typography variant="h6">Destination URL</Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid size={8}>
                       <Typography variant="subtitle2">{connection.remoteAddr}</Typography>
                     </Grid>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <Divider />
                   </Grid>
-                  <Grid container item xs={12} alignItems="center">
-                    <Grid item xs={4}>
+                  <Grid container size={12} sx={{ alignItems: "center" }}>
+                    <Grid size={4}>
                       <Typography variant="h6">Listener Address</Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid size={8}>
                       <Typography variant="subtitle2">
                         {connectionPort || connection.listenAddr}
                       </Typography>
                     </Grid>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <Divider />
                   </Grid>
-                  <Grid container item xs={12} alignItems="center">
-                    <Grid item xs={4}>
+                  <Grid container size={12} sx={{ alignItems: "center" }}>
+                    <Grid size={4}>
                       <Typography variant="h6">Tags</Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid size={8}>
                       <Typography variant="subtitle2">{tags?.join(", ")}</Typography>
                     </Grid>
                   </Grid>
@@ -364,36 +364,36 @@ function ConnectionView(): ReactElement {
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid container item xs={12} alignItems="center">
-                    <Grid item xs={4}>
+                  <Grid container size={12} sx={{ alignItems: "center" }}>
+                    <Grid size={4}>
                       <Typography variant="h6">Disable TLS Verification</Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid size={8}>
                       <Typography variant="subtitle2">
                         {connection.disableTlsVerification ? "Yes" : "No"}
                       </Typography>
                     </Grid>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <Divider />
                   </Grid>
-                  <Grid container item xs={12} alignItems="center">
-                    <Grid item xs={4}>
+                  <Grid container size={12} sx={{ alignItems: "center" }}>
+                    <Grid size={4}>
                       <Typography variant="h6">Pomerium URL</Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid size={8}>
                       <Typography variant="subtitle2">{connection.pomeriumUrl}</Typography>
                     </Grid>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <Divider />
                   </Grid>
-                  <Grid container item xs={12} alignItems="center">
-                    <Grid item xs={4}>
+                  <Grid container size={12} sx={{ alignItems: "center" }}>
+                    <Grid size={4}>
                       <Typography variant="h6">Client Certificate</Typography>
                     </Grid>
-                    <Grid item xs={8}>
-                      <Stack alignItems="flex-start" spacing={1}>
+                    <Grid size={8}>
+                      <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
                         {connection?.clientCertFromStore !== undefined && (
                           <Typography variant="subtitle2">
                             Search OS certificate store
@@ -405,7 +405,7 @@ function ConnectionView(): ReactElement {
                           </Typography>
                         )}
                         {connection?.clientCert?.info && (
-                          <Stack direction="row" alignItems="baseline" spacing={1}>
+                          <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
                             <CertDetails
                               open={showDetail}
                               onClose={() => setShowDetail(false)}
@@ -443,12 +443,12 @@ function ConnectionView(): ReactElement {
                 aria-controls="log-content"
                 id="log-header"
               >
-                <Grid container item alignItems="center">
-                  <Grid item xs={9}>
+                <Grid container sx={{ alignItems: "center" }}>
+                  <Grid size={9}>
                     <Typography variant="h5">Logs</Typography>
                   </Grid>
                   {!!logs?.length && (
-                    <Grid item xs={3}>
+                    <Grid size={3}>
                       <Button
                         size="small"
                         type="button"
@@ -540,22 +540,18 @@ function ConnectionView(): ReactElement {
                 <Grid container spacing={2}>
                   {filteredLogs.map((log) => (
                     <Grid
-                      item
                       container
-                      alignItems="center"
                       key={log.id}
-                      sx={{
-                        borderTop: "1px solid #E3E3E3",
-                      }}
+                      sx={{ alignItems: "center", borderTop: "1px solid #E3E3E3" }}
                     >
-                      <Grid item xs={2}>
+                      <Grid size={2}>
                         {log.status === "info" && <Info style={{ color: "blue" }} />}
                         {log.status === "error" && <AlertTriangle style={{ color: "orange" }} />}
                       </Grid>
-                      <Grid item xs={4}>
+                      <Grid size={4}>
                         <Typography>{log.date}</Typography>
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid size={6}>
                         <Typography style={{ wordWrap: "break-word" }}>{log.message}</Typography>
                       </Grid>
                     </Grid>
@@ -563,7 +559,7 @@ function ConnectionView(): ReactElement {
                 </Grid>
               </AccordionDetails>
             </Accordion>
-            <Box minHeight="20px" />
+            <Box sx={{ minHeight: "20px" }} />
           </Stack>
         </Container>
       </>

@@ -104,9 +104,9 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
   return (
     <>
       <ExportDialog exportFile={exportFile} onClose={() => setExportFile(null)} />
-      <Grid container>
-        <Grid container item xs={12} alignItems="center">
-          <Grid container item xs={1} justifyContent="flex-end">
+      <Grid container sx={{ width: "100%" }}>
+        <Grid container size={12} sx={{ alignItems: "center" }}>
+          <Grid container size={1} sx={{ justifyContent: "flex-end" }}>
             <IconButton
               key={"menuButton" + folderName}
               aria-label={"toggle listeners for " + folderName + " " + connection?.id || ""}
@@ -117,13 +117,13 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
               {connected ? <Connected /> : <Disconnected />}
             </IconButton>
           </Grid>
-          <Grid item xs={3}>
+          <Grid size={3}>
             <Typography variant="h6">{connection?.conn?.name || ""}</Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={4}>
             <Link to={"/view_connection/" + connection?.id || ""} />
           </Grid>
-          <Grid container item xs={3} justifyContent="flex-end" alignItems="center">
+          <Grid container size={3} sx={{ justifyContent: "flex-end", alignItems: "center" }}>
             {connected && (
               <>
                 <Tooltip title="Copy to Clipboard">
@@ -159,7 +159,7 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             )}
             {!connected && <Typography variant="subtitle2">Inactive</Typography>}
           </Grid>
-          <Grid container item xs={1} justifyContent="center">
+          <Grid container size={1} sx={{ justifyContent: "center" }}>
             <IconButton
               aria-controls="connection-menu"
               aria-haspopup="true"
@@ -209,8 +209,8 @@ const ConnectionRow: React.FC<ConnectionRowProps> = ({
             </Menu>
           </Grid>
         </Grid>
-        <Grid container item xs={12}>
-          <Grid item xs={12}>
+        <Grid container size={12}>
+          <Grid size={12}>
             <Divider />
           </Grid>
         </Grid>

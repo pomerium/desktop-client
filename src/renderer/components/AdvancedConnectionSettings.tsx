@@ -28,7 +28,7 @@ const AdvancedConnectionSettings: FC<AdvancedConnectionSettingsProps> = ({
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <TextField
           fullWidth
           required
@@ -40,7 +40,7 @@ const AdvancedConnectionSettings: FC<AdvancedConnectionSettingsProps> = ({
           helperText="URL of a Bastion host to use for the initial TLS connection"
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -56,7 +56,7 @@ const AdvancedConnectionSettings: FC<AdvancedConnectionSettingsProps> = ({
           Skips TLS verification. No Cert Authority Needed.
         </FormHelperText>
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Typography sx={{ fontWeight: 500, pt: 1 }}>Client certificates</Typography>
       </Grid>
       <ClientCertSelection connection={connection} onChangeConnection={onChangeConnection} />

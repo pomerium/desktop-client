@@ -17,14 +17,13 @@ const FieldWrapper: FC<FieldWrapperProps> = ({
     <Container maxWidth={false} disableGutters sx={{ p: 2 }}>
       <Grid container sx={{ mb: 1 }}>
         <Grid
-          item
           sx={{
             width: "260px",
             paddingRight: 2,
             display: `flex`,
             flexFlow: `row wrap`,
           }}
-          xs={4}
+          size={4}
         >
           <Typography variant="body1">{label}</Typography>
           <Box
@@ -43,9 +42,7 @@ const FieldWrapper: FC<FieldWrapperProps> = ({
             </sub>
           </Box>
         </Grid>
-        <Grid item xs>
-          {children}
-        </Grid>
+        <Grid size="grow">{children}</Grid>
       </Grid>
       <Divider />
     </Container>

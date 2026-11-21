@@ -9,7 +9,7 @@ const Layout: FC = () => {
     <>
       <TopBar />
       <Outlet />
-      <Box mt={3} flexGrow={1} />
+      <Box sx={{ mt: 3, flexGrow: 1 }} />
     </>
   );
 };

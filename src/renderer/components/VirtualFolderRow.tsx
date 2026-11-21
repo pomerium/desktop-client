@@ -25,9 +25,9 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
   };
 
   return (
-    <Grid container>
-      <Grid container item xs={12} alignItems="center">
-        <Grid item xs={1}>
+    <Grid container sx={{ width: "100%" }}>
+      <Grid container size={12} sx={{ alignItems: "center" }}>
+        <Grid size={1}>
           <IconButton
             key={"menuButton" + folderName}
             aria-label={"toggle listeners for " + folderName}
@@ -38,21 +38,21 @@ const VirtualFolderRow: React.FC<VirtualFolderProps> = ({
             {open ? <VirtualOpenFolder /> : <VirtualClosedFolder />}
           </IconButton>
         </Grid>
-        <Grid item xs={3} onClick={toggleOpen}>
+        <Grid size={3} onClick={toggleOpen}>
           <Typography variant="h6">{folderName}</Typography>
         </Grid>
-        <Grid container item xs={5} onClick={toggleOpen}>
+        <Grid container size={5} onClick={toggleOpen}>
           &nbsp;
         </Grid>
-        <Grid container item xs={2} justifyContent="flex-end" onClick={toggleOpen}>
+        <Grid container size={2} onClick={toggleOpen} sx={{ justifyContent: "flex-end" }}>
           <Typography variant="subtitle2">
             {connectedListeners} of {totalListeners} listening
           </Typography>
         </Grid>
-        <Grid item xs={1} />
+        <Grid size={1} />
       </Grid>
-      <Grid container item xs={12}>
-        <Grid item xs={12}>
+      <Grid container size={12}>
+        <Grid size={12}>
           <Divider />
         </Grid>
       </Grid>

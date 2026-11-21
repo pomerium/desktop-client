@@ -63,7 +63,7 @@ const ClientCertSelection: FC<ClientCertSelectionProps> = ({ connection, onChang
 
   return (
     <>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <FormControlLabel
           control={
             <Switch

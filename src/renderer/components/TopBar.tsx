@@ -40,11 +40,11 @@ const TopBar: FC = () => {
   return (
     <AppBar position="sticky">
       <Toolbar sx={{ py: 1 }}>
-        <Grid container alignItems="center">
-          <Grid item xs={9} sx={{ display: "flex", alignItems: "center", pr: 2 }}>
+        <Grid container sx={{ width: "100%", alignItems: "center" }}>
+          <Grid size={9} sx={{ display: "flex", alignItems: "center", pr: 2 }}>
             <Logo />
           </Grid>
-          <Grid item xs={3}>
+          <Grid size={3}>
             <Autocomplete
               id="search"
               sx={{

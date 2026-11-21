@@ -26,15 +26,13 @@ interface DataPointProps {
 
 function DataPoint({ children, title }: React.PropsWithChildren<DataPointProps>) {
   return (
-    <Grid container alignItems="stretch" spacing={1}>
-      <Grid item xs={4}>
+    <Grid container spacing={1} sx={{ alignItems: "stretch" }}>
+      <Grid size={4}>
         <Typography sx={{ fontWeight: "bold" }} variant="h6">
           {title}
         </Typography>
       </Grid>
-      <Grid item xs={8}>
-        {children}
-      </Grid>
+      <Grid size={8}>{children}</Grid>
     </Grid>
   );
 }

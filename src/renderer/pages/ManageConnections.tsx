@@ -154,14 +154,14 @@ function ManageConnections(): ReactElement {
       <Container maxWidth={false} sx={{ pt: 4 }}>
         <Stack spacing={2}>
           <Grid>
-            <Grid container alignItems="flex-start">
-              <Grid item xs={6}>
+            <Grid container sx={{ alignItems: "flex-start" }}>
+              <Grid size={6}>
                 <Typography variant="h3" color="textPrimary">
                   Manage Connections
                 </Typography>
               </Grid>
-              <Grid item xs={6} container justifyContent="flex-end">
-                <Grid item>
+              <Grid size={6} container sx={{ justifyContent: "flex-end" }}>
+                <Grid>
                   <Button
                     type="button"
                     color="primary"
@@ -171,9 +171,9 @@ function ManageConnections(): ReactElement {
                     Import
                   </Button>
                 </Grid>
-                <Grid item xs={1} />
+                <Grid size={1} />
                 {connections?.length > 0 && (
-                  <Grid item>
+                  <Grid>
                     <Button
                       type="button"
                       color="primary"
@@ -193,8 +193,8 @@ function ManageConnections(): ReactElement {
                     </Button>
                   </Grid>
                 )}
-                {connections?.length > 0 && <Grid item xs={1} />}
-                <Grid item>
+                {connections?.length > 0 && <Grid size={1} />}
+                <Grid>
                   <NewConnectionButton />
                 </Grid>
               </Grid>
