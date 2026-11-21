@@ -16,15 +16,15 @@ function TopTabs(): ReactElement {
       }}
     >
       <Toolbar disableGutters>
-        <Grid container alignItems="center">
-          <Grid item xs={8}>
+        <Grid container sx={{ width: "100%", alignItems: "center" }}>
+          <Grid size={8}>
             <Tabs value="/manage" indicatorColor="primary" textColor="primary">
               <Tab label="MANAGE CONNECTIONS" to="/manage" value="/manage" component={Link} />
             </Tabs>
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={4}>
             <Grid container>
-              <Grid item xs={11}>
+              <Grid size={11}>
                 <Typography align="right" variant="subtitle2" sx={{ pt: 0.5 }}>
                   Version: {metadata.desktopVersion}-{metadata.gitHash}
                 </Typography>
@@ -32,7 +32,7 @@ function TopTabs(): ReactElement {
                   CLI Version: {metadata.cliVersion}
                 </Typography>
               </Grid>
-              <Grid item xs={11} />
+              <Grid size={11} />
             </Grid>
           </Grid>
         </Grid>

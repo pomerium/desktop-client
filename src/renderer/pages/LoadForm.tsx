@@ -237,7 +237,7 @@ const LoadForm: FC = () => {
                 </FormControl>
               </Stack>
             </AdvancedSettingsAccordion>
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Stack direction="row" spacing={2} sx={{ justifyContent: "flex-end" }}>
               <Button type="button" variant="contained" color="secondary" onClick={onClickBack}>
                 Back
               </Button>

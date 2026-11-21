@@ -70,7 +70,7 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
   return (
     <>
       {showCertInput && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <label htmlFor="cert-file">
             <input
               style={{ display: "none" }}
@@ -85,7 +85,7 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
         </Grid>
       )}
       {showCertInput && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Typography variant="body2">Client Certificate Text</Typography>
           <TextArea
             fullWidth
@@ -105,7 +105,7 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
         </Grid>
       )}
       {showCertInput && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <label htmlFor="key-file">
             <input
               style={{ display: "none" }}
@@ -120,7 +120,7 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
         </Grid>
       )}
       {showCertInput && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Typography variant="body2">Client Certificate Key Text</Typography>
           <TextArea
             fullWidth
@@ -140,7 +140,7 @@ const ManualClientCertSelection: FC<ManualClientCertSelectionProps> = ({
       )}
 
       {!showCertInput && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <CertDetails
             open={showDetail}
             onClose={() => setShowDetail(false)}

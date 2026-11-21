@@ -92,7 +92,7 @@ const NewConnectionButton: FC = () => {
                       sx={{ borderRadius: 1 }}
                       divider
                     >
-                      <Stack direction="row" spacing={1} justifyContent="center">
+                      <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
                         <Typography variant="button">{option.title}</Typography>
                       </Stack>
                     </MenuItem>

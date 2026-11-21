@@ -38,10 +38,10 @@ const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
 
   return (
     <Grid container columnSpacing={1}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Typography sx={{ py: 1 }}>{label}</Typography>
       </Grid>
-      <Grid item xs={4}>
+      <Grid size={4}>
         <FormControl size="small" fullWidth disabled={disabled}>
           <InputLabel shrink id={selectLabelId}>
             Attribute
@@ -67,7 +67,7 @@ const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={8}>
+      <Grid size={8}>
         {attribute && (
           <TextField
             inputRef={valueInputRef}
@@ -80,7 +80,7 @@ const CertFilter: React.FC<Props> = ({ label, data, onChange, disabled }) => {
           />
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <FormHelperText>
           Further limits the search to certificates where the {label} has a particular attribute
           value (exact match).
