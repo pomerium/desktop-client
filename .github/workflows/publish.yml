@@ -15,6 +15,12 @@ jobs:
       pull-requests: read
     runs-on: ${{ matrix.os }}
 
+    # Serialize publish runs so overlapping pushes can't each find no
+    # release and create separate drafts for the same version (#622).
+    concurrency:
+      group: publish
+      cancel-in-progress: false
+
     strategy:
       matrix:
         os: [macos-latest]
