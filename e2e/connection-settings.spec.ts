@@ -1,7 +1,6 @@
-import path from "node:path";
-
 import type { ElectronApplication, Page } from "@playwright/test";
 
+import { certPaths } from "./certs";
 import { test, expect, launchApp, openMainWindow, quitApp, runFixme } from "./fixtures";
 import {
   createConnection,
@@ -18,9 +17,8 @@ import {
 // settings, client certificates, autostart and the unsaved changes prompt.
 // Each one is saved through the real CLI and read back in the edit form.
 
-const certDir = path.join(__dirname, "data");
-const certFile = path.join(certDir, "client.pem");
-const keyFile = path.join(certDir, "client-key.pem");
+const certFile = certPaths().clientCert;
+const keyFile = certPaths().clientKey;
 
 // Linux has no OS certificate store integration, so the form shows the manual
 // client certificate fields directly instead of in an accordion.

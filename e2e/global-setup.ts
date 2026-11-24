@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { generateCerts } from "./certs";
+
 const repoRoot = path.resolve(__dirname, "..");
 
 // In an unpackaged build the app runs the CLI from assets/bin
@@ -24,6 +26,7 @@ const ensureCli = () => {
 };
 
 export default function globalSetup() {
+  generateCerts();
   // A packaged app (E2E_APP_EXECUTABLE) bundles its own CLI and build.
   if (process.env.E2E_APP_EXECUTABLE) return;
   if (!fs.existsSync(path.join(repoRoot, "out", "main", "index.js"))) {

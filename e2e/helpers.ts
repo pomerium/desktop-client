@@ -1,6 +1,11 @@
+import fs from "node:fs";
+import https from "node:https";
 import net from "node:net";
+import type tls from "node:tls";
 
 import { expect, type ElectronApplication, type Page } from "@playwright/test";
+
+import { certPaths } from "./certs";
 
 export const findFreePort = async (): Promise<number> =>
   new Promise((resolve, reject) => {
@@ -80,6 +85,134 @@ export const expectListenerAcceptsConnection = async (port: number, payload: str
       else finish(new Error(`listener ${port} closed before accepting a client`));
     });
   });
+};
+
+/** Sends `payload` through a local listener and checks it comes back. */
+export const expectEcho = async (port: number, payload: string) => {
+  const received = await sendAndCollect(port, payload, 8000, payload.length);
+  expect(received, `echo through listener on ${port}`).toBe(payload);
+};
+
+/** Sends `payload` through a local listener and checks nothing comes back. */
+export const expectNoEcho = async (port: number, payload: string) => {
+  const received = await sendAndCollect(port, payload, 3000, payload.length);
+  expect(received, `no echo through listener on ${port}`).not.toBe(payload);
+};
+
+const sendAndCollect = (port: number, payload: string, timeoutMs: number, want: number) =>
+  new Promise<string>((resolve) => {
+    let data = "";
+    const socket = net.connect({ host: "127.0.0.1", port });
+    const done = () => {
+      clearTimeout(timer);
+      socket.destroy();
+      resolve(data);
+    };
+    const timer = setTimeout(done, timeoutMs);
+    socket.on("connect", () => socket.write(payload));
+    socket.on("data", (chunk) => {
+      data += chunk.toString();
+      if (data.length >= want) done();
+    });
+    socket.on("error", done);
+    socket.on("close", done);
+  });
+
+const readFile = (file: string) => fs.readFileSync(file, "utf8");
+
+export type ProxiedTunnel = {
+  /** The CONNECT target, host:port. */
+  target: string;
+  /** Subject of the client certificate the CLI presented, if any. */
+  clientSubject?: { CN?: string | string[]; O?: string | string[] };
+};
+
+export type FakePomerium = {
+  /** Use as the connection's Pomerium URL. */
+  url: string;
+  port: number;
+  /** Tunnels the proxy opened, in order. */
+  tunnels: ProxiedTunnel[];
+  /** TLS handshake errors, for example a missing client certificate. */
+  tlsErrors: string[];
+  close: () => Promise<void>;
+};
+
+/**
+ * A stand-in for a Pomerium proxy, enough for pomerium-cli's TCP tunnels:
+ * HTTPS with the throwaway certificate from certs.ts (not trusted by the OS),
+ * answering the CLI's probe request and its `CONNECT host:port` with 200,
+ * then piping the connection to that address. It never asks for sign-in.
+ * Only 127.0.0.1 targets are allowed. With `requireClientCert`, the TLS
+ * handshake requires a client certificate signed by the test CA.
+ */
+export const startFakePomerium = async (
+  options: { requireClientCert?: boolean } = {},
+): Promise<FakePomerium> => {
+  const tunnels: ProxiedTunnel[] = [];
+  const tlsErrors: string[] = [];
+  const sockets = new Set<net.Socket>();
+  const server = https.createServer(
+    {
+      key: readFile(certPaths().serverKey),
+      cert: readFile(certPaths().serverCert),
+      ...(options.requireClientCert
+        ? { requestCert: true, rejectUnauthorized: true, ca: [readFile(certPaths().ca)] }
+        : {}),
+    },
+    (_req, res) => {
+      // The CLI's probe request. No Alt-Svc header, so it sticks to HTTP/1.1.
+      res.writeHead(404);
+      res.end();
+    },
+  );
+  server.on("connection", (socket: net.Socket) => {
+    sockets.add(socket);
+    socket.on("close", () => sockets.delete(socket));
+  });
+  server.on("tlsClientError", (error) => tlsErrors.push(error.message));
+  server.on("connect", (req, clientSocket: net.Socket, head: Buffer) => {
+    const target = req.url ?? "";
+    const [host, port] = [target.slice(0, target.lastIndexOf(":")), target.split(":").pop()];
+    const peer = (clientSocket as tls.TLSSocket).getPeerCertificate?.();
+    tunnels.push({
+      target,
+      clientSubject: peer && peer.subject ? { CN: peer.subject.CN, O: peer.subject.O } : undefined,
+    });
+    if (host !== "127.0.0.1" || !port) {
+      clientSocket.end("HTTP/1.1 403 Forbidden\r\n\r\n");
+      return;
+    }
+    const upstream = net.connect({ host, port: Number(port) }, () => {
+      clientSocket.write("HTTP/1.1 200 OK\r\n\r\n");
+      if (head.length) upstream.write(head);
+      upstream.pipe(clientSocket);
+      clientSocket.pipe(upstream);
+    });
+    sockets.add(upstream);
+    upstream.on("close", () => sockets.delete(upstream));
+    upstream.on("error", () => clientSocket.destroy());
+    clientSocket.on("error", () => upstream.destroy());
+  });
+  await new Promise<void>((resolve, reject) => {
+    server.on("error", reject);
+    server.listen(0, "127.0.0.1", () => resolve());
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") {
+    throw new Error("failed to start the fake Pomerium proxy");
+  }
+  return {
+    url: `https://127.0.0.1:${address.port}`,
+    port: address.port,
+    tunnels,
+    tlsErrors,
+    close: () =>
+      new Promise((resolve) => {
+        sockets.forEach((s) => s.destroy());
+        server.close(() => resolve());
+      }),
+  };
 };
 
 export const expectPortClosed = async (port: number) => {

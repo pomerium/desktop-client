@@ -148,10 +148,14 @@ export const launchApp = async (home: string): Promise<ElectronApplication> => {
   if (process.platform === "linux") {
     args.push("--no-sandbox");
   }
-  const electronApp = await electron.launch({
+  const options: Parameters<typeof electron.launch>[0] = {
     executablePath: appExecutable ?? (electronBinary as unknown as string),
     args,
     cwd: repoRoot,
+    // Rarely (seen once on a macOS runner) Electron never finishes starting
+    // and the launch hangs. Give up after 30s and try once more instead of
+    // using up the whole test timeout.
+    timeout: 30_000,
     env: {
       ...process.env,
       HOME: home,
@@ -163,6 +167,10 @@ export const launchApp = async (home: string): Promise<ElectronApplication> => {
       NODE_ENV: "production",
       POMERIUM_DESKTOP_DISABLE_SENTRY: "1",
     },
+  };
+  const electronApp = await electron.launch(options).catch((error: Error) => {
+    console.warn(`[e2e] launching the app failed (${error.message.split("\n")[0]}); retrying`);
+    return electron.launch(options);
   });
   // Keep the main process output (uncaught exceptions are logged there) so a
   // failing test can attach it.
