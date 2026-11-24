@@ -1,0 +1,24 @@
+# Categories for GitHub's generated release notes, used by the
+# "Create draft release" step in .github/workflows/publish.yml.
+# Mirrors the sections scripts/changelog.sh produces.
+changelog:
+  exclude:
+    labels:
+      - ci
+      - docs
+      - github_actions
+  categories:
+    - title: Breaking
+      labels: [breaking]
+    - title: New
+      labels: [enhancement, feature, improvement]
+    - title: Fixed
+      labels: [bug]
+    - title: Security
+      labels: [security]
+    - title: Dependency
+      labels: [dependencies]
+    - title: Deployment
+      labels: [deployment]
+    - title: Changed
+      labels: ["*"]
