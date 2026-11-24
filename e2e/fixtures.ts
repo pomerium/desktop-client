@@ -16,6 +16,17 @@ import { GET_ALL_RECORDS } from "../src/shared/constants";
 
 const repoRoot = path.resolve(__dirname, "..");
 
+/**
+ * Set to a packaged app's executable (for example a mounted release DMG's
+ * `Pomerium Desktop.app/Contents/MacOS/Pomerium Desktop`) to test that build
+ * instead of the unpackaged `out/` build. Used by the release comparison.
+ */
+export const appExecutable = process.env.E2E_APP_EXECUTABLE;
+
+// Older releases may log errors this build has fixed. The comparison run only
+// takes screenshots, so it can opt out of failing on them.
+const allowConsoleErrors = process.env.E2E_ALLOW_CONSOLE_ERRORS === "1";
+
 // Renderer console messages that are known and unrelated to the change under
 // test. Keep this list short: every entry hides a real problem.
 const IGNORED_CONSOLE_ERRORS: RegExp[] = [
@@ -120,12 +131,15 @@ export const test = base.extend<AppFixtures>({
   },
 
   electronApp: async ({ tempHome }, use) => {
-    const args = [".", `--user-data-dir=${path.join(tempHome, "userData")}`];
+    const args = [`--user-data-dir=${path.join(tempHome, "userData")}`];
+    if (!appExecutable) {
+      args.unshift(".");
+    }
     if (process.platform === "linux") {
       args.push("--no-sandbox");
     }
     const electronApp = await electron.launch({
-      executablePath: electronBinary as unknown as string,
+      executablePath: appExecutable ?? (electronBinary as unknown as string),
       args,
       cwd: repoRoot,
       env: {
@@ -192,6 +206,7 @@ export const test = base.extend<AppFixtures>({
         .catch(() => {});
     }
     // Fail the test on any renderer error, even if every assertion passed.
+    if (allowConsoleErrors) return;
     expect(consoleErrors, "renderer console errors").toEqual([]);
   },
 });

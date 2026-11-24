@@ -24,6 +24,8 @@ const ensureCli = () => {
 };
 
 export default function globalSetup() {
+  // A packaged app (E2E_APP_EXECUTABLE) bundles its own CLI and build.
+  if (process.env.E2E_APP_EXECUTABLE) return;
   if (!fs.existsSync(path.join(repoRoot, "out", "main", "index.js"))) {
     throw new Error("No build output in out/. Run `npm run build` first.");
   }

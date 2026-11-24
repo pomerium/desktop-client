@@ -57,3 +57,4 @@ yarn.lock
 # Playwright e2e output
 /test-results
 /playwright-report
+/comparison
