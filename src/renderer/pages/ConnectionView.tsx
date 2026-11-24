@@ -443,7 +443,7 @@ function ConnectionView(): ReactElement {
                 aria-controls="log-content"
                 id="log-header"
               >
-                <Grid container sx={{ alignItems: "center" }}>
+                <Grid container sx={{ width: "100%", alignItems: "center" }}>
                   <Grid size={9}>
                     <Typography variant="h5">Logs</Typography>
                   </Grid>
@@ -542,6 +542,7 @@ function ConnectionView(): ReactElement {
                     <Grid
                       container
                       key={log.id}
+                      size={12}
                       sx={{ alignItems: "center", borderTop: "1px solid #E3E3E3" }}
                     >
                       <Grid size={2}>
