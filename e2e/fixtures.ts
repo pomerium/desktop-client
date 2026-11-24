@@ -16,12 +16,24 @@ import { GET_ALL_RECORDS } from "../src/shared/constants";
 
 const repoRoot = path.resolve(__dirname, "..");
 
+const mainProcessOutput = new WeakMap<ElectronApplication, string[]>();
+
+/** Everything the app's main process has written to stdout and stderr. */
+export const mainProcessLog = (electronApp: ElectronApplication) =>
+  (mainProcessOutput.get(electronApp) ?? []).join("");
+
 /**
  * Set to a packaged app's executable (for example a mounted release DMG's
  * `Pomerium Desktop.app/Contents/MacOS/Pomerium Desktop`) to test that build
  * instead of the unpackaged `out/` build. Used by the release comparison.
  */
 export const appExecutable = process.env.E2E_APP_EXECUTABLE;
+
+/**
+ * Tests for known, filed bugs are marked fixme so the suite stays green. Set
+ * E2E_RUN_FIXME=1 to run them anyway, for example to check a fix.
+ */
+export const runFixme = process.env.E2E_RUN_FIXME === "1";
 
 // Older releases may log errors this build has fixed. The comparison run only
 // takes screenshots, so it can opt out of failing on them.
@@ -77,7 +89,13 @@ const killTree = (pid: number) => {
 };
 
 const quitApp = async (electronApp: ElectronApplication) => {
-  const pid = electronApp.process().pid;
+  let pid: number | undefined;
+  try {
+    pid = electronApp.process().pid;
+  } catch {
+    // Already closed, for example by a test that relaunches the app.
+    return;
+  }
   // The main window hides instead of closing. Drop that handler on every
   // window, then quit; before-quit stops the CLI.
   await electronApp
@@ -121,6 +139,98 @@ const findMainWindow = async (electronApp: ElectronApplication): Promise<Page> =
   throw new Error("failed to find the main application window");
 };
 
+/** Launches the app with its CLI config and Electron profile in `home`. */
+export const launchApp = async (home: string): Promise<ElectronApplication> => {
+  const args = [`--user-data-dir=${path.join(home, "userData")}`];
+  if (!appExecutable) {
+    args.unshift(".");
+  }
+  if (process.platform === "linux") {
+    args.push("--no-sandbox");
+  }
+  const electronApp = await electron.launch({
+    executablePath: appExecutable ?? (electronBinary as unknown as string),
+    args,
+    cwd: repoRoot,
+    env: {
+      ...process.env,
+      HOME: home,
+      USERPROFILE: home,
+      XDG_CONFIG_HOME: path.join(home, ".config"),
+      APPDATA: path.join(home, "AppData", "Roaming"),
+      LOCALAPPDATA: path.join(home, "AppData", "Local"),
+      TMPDIR: path.join(home, "tmp"),
+      NODE_ENV: "production",
+      POMERIUM_DESKTOP_DISABLE_SENTRY: "1",
+    },
+  });
+  // Keep the main process output (uncaught exceptions are logged there) so a
+  // failing test can attach it.
+  const output: string[] = [];
+  mainProcessOutput.set(electronApp, output);
+  electronApp.process().stdout?.on("data", (chunk) => output.push(String(chunk)));
+  electronApp.process().stderr?.on("data", (chunk) => output.push(String(chunk)));
+  // The main process registers its IPC handlers and its before-quit handler
+  // (which lets the window close and stops the CLI) only once the tray is
+  // ready. Quitting earlier just hides the window and leaves the app running,
+  // holding the single-instance lock, so wait for that first (#638).
+  await expect
+    .poll(
+      () =>
+        electronApp.evaluate(
+          ({ ipcMain }, channel) => ipcMain.listenerCount(channel),
+          GET_ALL_RECORDS,
+        ),
+      {
+        message: "main process IPC handlers registered",
+        timeout: 30_000,
+      },
+    )
+    .toBeGreaterThan(0);
+  // A message box (the main process shows one on an uncaught exception) would
+  // block the app until someone clicks it. Record them and answer at once, so
+  // the test fails with the message instead of hanging.
+  await electronApp.evaluate(({ dialog }) => {
+    const scope = globalThis as typeof globalThis & { e2eDialogs?: string[] };
+    scope.e2eDialogs = [];
+    const record = (kind: string, options: unknown) => {
+      const o = (options ?? {}) as { title?: string; message?: string };
+      scope.e2eDialogs?.push(`${kind}: ${o.title ?? ""}: ${o.message ?? ""}`);
+    };
+    const d = dialog as unknown as Record<string, unknown>;
+    d.showMessageBox = async (...args: unknown[]) => {
+      record("showMessageBox", args.at(-1));
+      return { response: 0, checkboxChecked: false };
+    };
+    d.showMessageBoxSync = (...args: unknown[]) => {
+      record("showMessageBoxSync", args.at(-1));
+      return 0;
+    };
+    d.showErrorBox = (title: string, content: string) => {
+      record("showErrorBox", { title, message: content });
+    };
+  });
+  return electronApp;
+};
+
+/** Message boxes the main process tried to show, if it's still running. */
+export const shownDialogs = (electronApp: ElectronApplication): Promise<string[]> =>
+  electronApp
+    .evaluate(() => (globalThis as typeof globalThis & { e2eDialogs?: string[] }).e2eDialogs ?? [])
+    .catch(() => []);
+
+/** Finds the main window and waits for the connection list to render. */
+export const openMainWindow = async (electronApp: ElectronApplication): Promise<Page> => {
+  const page = await findMainWindow(electronApp);
+  await page.waitForLoadState("domcontentloaded");
+  await expect(page.getByText("Manage Connections", { exact: true })).toBeVisible({
+    timeout: 30_000,
+  });
+  return page;
+};
+
+export { quitApp };
+
 export const test = base.extend<AppFixtures>({
   // oxlint-disable-next-line no-empty-pattern
   tempHome: async ({}, use) => {
@@ -130,48 +240,18 @@ export const test = base.extend<AppFixtures>({
     await fs.rm(home, { recursive: true, force: true, maxRetries: 5 }).catch(() => {});
   },
 
-  electronApp: async ({ tempHome }, use) => {
-    const args = [`--user-data-dir=${path.join(tempHome, "userData")}`];
-    if (!appExecutable) {
-      args.unshift(".");
-    }
-    if (process.platform === "linux") {
-      args.push("--no-sandbox");
-    }
-    const electronApp = await electron.launch({
-      executablePath: appExecutable ?? (electronBinary as unknown as string),
-      args,
-      cwd: repoRoot,
-      env: {
-        ...process.env,
-        HOME: tempHome,
-        USERPROFILE: tempHome,
-        XDG_CONFIG_HOME: path.join(tempHome, ".config"),
-        APPDATA: path.join(tempHome, "AppData", "Roaming"),
-        LOCALAPPDATA: path.join(tempHome, "AppData", "Local"),
-        TMPDIR: path.join(tempHome, "tmp"),
-        NODE_ENV: "production",
-      },
-    });
-    // The main process registers its IPC handlers and its before-quit handler
-    // (which lets the window close and stops the CLI) only once the tray is
-    // ready. Quitting earlier just hides the window and leaves the app running,
-    // holding the single-instance lock, so wait for that first.
-    await expect
-      .poll(
-        () =>
-          electronApp.evaluate(
-            ({ ipcMain }, channel) => ipcMain.listenerCount(channel),
-            GET_ALL_RECORDS,
-          ),
-        {
-          message: "main process IPC handlers registered",
-          timeout: 30_000,
-        },
-      )
-      .toBeGreaterThan(0);
+  electronApp: async ({ tempHome }, use, testInfo) => {
+    const electronApp = await launchApp(tempHome);
     await use(electronApp);
+    const dialogs = await shownDialogs(electronApp);
     await quitApp(electronApp);
+    const log = mainProcessLog(electronApp);
+    if (log && (testInfo.status !== testInfo.expectedStatus || dialogs.length)) {
+      await testInfo.attach("main-process.log", { body: log, contentType: "text/plain" });
+    }
+    // An error dialog means the main process hit an uncaught exception.
+    if (allowConsoleErrors) return;
+    expect(dialogs, "main process error dialogs").toEqual([]);
   },
 
   consoleErrors: [

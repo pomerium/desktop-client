@@ -112,7 +112,71 @@ export const gotoRoute = async (page: Page, hash: string) => {
   await expect.poll(() => routeOf(page)).toBe(hash);
 };
 
-export type ConnectionInput = { name: string; destination: string; localAddress?: string };
+// Exports go through a blob URL and an <a download> click. Capture them in the
+// renderer instead of letting Electron open a save dialog.
+export type CapturedDownload = { filename: string; text: string };
+
+export const installDownloadCapture = async (page: Page) => {
+  await page.evaluate(() => {
+    const scope = window as typeof window & {
+      e2eDownloads?: CapturedDownload[];
+      e2eBlobs?: Map<string, Blob>;
+    };
+    if (scope.e2eDownloads) return;
+    scope.e2eDownloads = [];
+    scope.e2eBlobs = new Map();
+    const createObjectURL = URL.createObjectURL.bind(URL);
+    const click = HTMLAnchorElement.prototype.click;
+    URL.createObjectURL = (blob: Blob) => {
+      const url = createObjectURL(blob);
+      scope.e2eBlobs?.set(url, blob);
+      return url;
+    };
+    HTMLAnchorElement.prototype.click = function clickAnchor(this: HTMLAnchorElement) {
+      const blob = scope.e2eBlobs?.get(this.href);
+      if (this.download && blob) {
+        const filename = this.download;
+        void blob.text().then((text) => scope.e2eDownloads?.push({ filename, text }));
+        return;
+      }
+      click.call(this);
+    };
+  });
+};
+
+export const lastDownload = async (page: Page) => {
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as typeof window & { e2eDownloads?: unknown[] }).e2eDownloads?.length ?? 0,
+      ),
+    )
+    .toBeGreaterThan(0);
+  return page.evaluate(() =>
+    (window as typeof window & { e2eDownloads?: CapturedDownload[] }).e2eDownloads!.at(-1)!,
+  );
+};
+
+/** How many downloads the renderer has captured so far. */
+export const downloadCount = (page: Page) =>
+  page.evaluate(
+    () => (window as typeof window & { e2eDownloads?: unknown[] }).e2eDownloads?.length ?? 0,
+  );
+
+/** Runs `action` and returns the download it causes. */
+export const captureDownload = async (page: Page, action: () => Promise<void>) => {
+  const before = await downloadCount(page);
+  await action();
+  await expect.poll(() => downloadCount(page)).toBeGreaterThan(before);
+  return lastDownload(page);
+};
+
+export type ConnectionInput = {
+  name: string;
+  destination: string;
+  localAddress?: string;
+  tags?: string[];
+};
 
 /** Creates a connection through the UI and returns its id. */
 export const createConnection = async (page: Page, input: ConnectionInput): Promise<string> => {
@@ -126,11 +190,42 @@ export const createConnection = async (page: Page, input: ConnectionInput): Prom
   if (input.localAddress) {
     await page.getByLabel("Local Address").fill(input.localAddress);
   }
+  for (const tag of input.tags ?? []) {
+    await addTag(page, tag);
+  }
   await page.getByRole("button", { name: "Save" }).click();
   await page.waitForFunction(() => /^#\/view_connection\/.+/.test(window.location.hash));
   await expect(page.getByText(input.name, { exact: true })).toBeVisible();
   const hash = await routeOf(page);
   return hash.replace("#/view_connection/", "");
+};
+
+/**
+ * An item in the open menu. Every row and folder keeps its menu mounted, so
+ * match only the visible one.
+ */
+export const menuItem = (page: Page, name: string) =>
+  page.getByRole("menuitem", { name, exact: true }).filter({ visible: true });
+
+/** Adds a tag in the tag selector by typing it and pressing Enter. */
+export const addTag = async (page: Page, tag: string) => {
+  const input = page.getByRole("combobox", { name: "Tags..." });
+  await input.fill(tag);
+  await input.press("Enter");
+  await expect(page.getByRole("button", { name: tag, exact: true })).toBeVisible();
+};
+
+/** Opens the edit form for a connection. */
+export const gotoEditForm = async (page: Page, id: string) => {
+  await gotoRoute(page, `#/edit_connect/${id}`);
+  await expect(page.getByText("Edit Connection", { exact: true })).toBeVisible();
+  // The form fills in once the record arrives from the CLI.
+  await expect(page.getByLabel("Name")).not.toHaveValue("");
+};
+
+export const expandAdvancedSettings = async (page: Page) => {
+  await page.getByText("Advanced Settings", { exact: true }).click();
+  await expect(page.getByText("Disable TLS Verification", { exact: true })).toBeVisible();
 };
 
 /** Sets the renderer viewport width, keeping the window's height. */

@@ -6,6 +6,8 @@ import {
   expectListenerAcceptsConnection,
   expectPortClosed,
   findFreePort,
+  installDownloadCapture,
+  lastDownload,
   startEchoServer,
   type EchoServer,
 } from "./helpers";
@@ -13,51 +15,6 @@ import {
 // Ported from scripts/acceptance/electron-smoke.ts (#498). A local TCP echo
 // server stands in for the remote end, so no Pomerium server or sign-in is
 // needed.
-
-type CapturedDownload = { filename: string; text: string };
-
-// Exports go through a blob URL and an <a download> click. Capture them in the
-// renderer instead of letting Electron open a save dialog.
-const installDownloadCapture = async (page: import("@playwright/test").Page) => {
-  await page.evaluate(() => {
-    const scope = window as typeof window & {
-      e2eDownloads?: CapturedDownload[];
-      e2eBlobs?: Map<string, Blob>;
-    };
-    if (scope.e2eDownloads) return;
-    scope.e2eDownloads = [];
-    scope.e2eBlobs = new Map();
-    const createObjectURL = URL.createObjectURL.bind(URL);
-    const click = HTMLAnchorElement.prototype.click;
-    URL.createObjectURL = (blob: Blob) => {
-      const url = createObjectURL(blob);
-      scope.e2eBlobs?.set(url, blob);
-      return url;
-    };
-    HTMLAnchorElement.prototype.click = function clickAnchor(this: HTMLAnchorElement) {
-      const blob = scope.e2eBlobs?.get(this.href);
-      if (this.download && blob) {
-        const filename = this.download;
-        void blob.text().then((text) => scope.e2eDownloads?.push({ filename, text }));
-        return;
-      }
-      click.call(this);
-    };
-  });
-};
-
-const lastDownload = async (page: import("@playwright/test").Page) => {
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () => (window as typeof window & { e2eDownloads?: unknown[] }).e2eDownloads?.length ?? 0,
-      ),
-    )
-    .toBeGreaterThan(0);
-  return page.evaluate(() =>
-    (window as typeof window & { e2eDownloads?: CapturedDownload[] }).e2eDownloads!.at(-1)!,
-  );
-};
 
 const connectionToggle = (page: import("@playwright/test").Page, name: string) =>
   page
