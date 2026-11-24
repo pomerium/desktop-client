@@ -46,6 +46,7 @@
     "release": "npm run build && electron-builder build --publish always",
     "postinstall": "electron-builder install-app-deps",
     "test": "vitest run --passWithNoTests",
+    "test:e2e": "npm run build && playwright test",
     "protoc": "scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && oxfmt --write ./src/shared/pb"
   },
   "dependencies": {
@@ -81,11 +82,13 @@
   },
   "devDependencies": {
     "@electron/notarize": "^3.1.2",
+    "@playwright/test": "1.65.0",
     "@swc/types": "^0.1.28",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/history": "5.0.0",
     "@types/node": "26.6.6",
+    "@types/node-forge": "1.3.14",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/react-router": "5.1.20",
@@ -97,6 +100,7 @@
     "electron-vite": "^6.0.0",
     "gunzip-stream": "^1.0.1",
     "jsdom": "^31.0.1",
+    "node-forge": "1.4.4",
     "oxfmt": "^0.78.0",
     "oxlint": "^1.93.0",
     "tar-stream": "^3.2.2",

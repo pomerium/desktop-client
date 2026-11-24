@@ -50,10 +50,13 @@ import { start } from "./cli";
 import createWindow from "./window";
 
 const SentryDSN = "https://56e47edf5a3c437186196bb49bb03c4c@o845499.ingest.sentry.io/6146413";
-Sentry.init({
-  dsn: SentryDSN,
-  debug: process.env.NODE_ENV !== "production",
-});
+// Automated test runs set this so their errors aren't reported.
+if (process.env.POMERIUM_DESKTOP_DISABLE_SENTRY !== "1") {
+  Sentry.init({
+    dsn: SentryDSN,
+    debug: process.env.NODE_ENV !== "production",
+  });
+}
 
 let mainWindow: BrowserWindow | null;
 const singleInstanceLock = app.requestSingleInstanceLock();

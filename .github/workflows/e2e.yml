@@ -1,0 +1,172 @@
+name: E2E
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  e2e:
+    name: e2e (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .tool-versions
+
+      - name: npm ci
+        run: npm ci --network-timeout 300000
+
+      # Builds the renderer and main process and downloads pomerium-cli for
+      # every OS into system_files/. The e2e global setup copies the one for
+      # this runner into assets/bin.
+      - name: Build
+        run: npm run build
+
+      - name: Run e2e tests (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npx playwright test
+
+      - name: Run e2e tests
+        if: runner.os != 'Linux'
+        run: npx playwright test
+
+      - name: Upload screenshots, traces and report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-${{ matrix.os }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # Screenshots of the latest release next to this PR's build, posted as a
+  # single PR comment that's updated on every push (like the QA table on
+  # #628). GitHub has no API for comment image uploads, so the images are
+  # committed to the e2e-screenshots branch and linked from there. Skipped for
+  # PRs from forks, whose token can't push or comment.
+  compare:
+    name: release comparison
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: macos-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .tool-versions
+
+      - name: npm ci
+        run: npm ci --network-timeout 300000
+
+      - name: Build
+        run: npm run build
+
+      - name: Screenshot this PR
+        env:
+          E2E_SCREENSHOT_DIR: comparison/pr
+        run: npx playwright test screenshots
+
+      - name: Download and mount the latest release
+        run: |
+          tag=$(gh release view --json tagName -q .tagName)
+          echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
+          gh release download "$tag" --pattern '*arm64*.dmg' --dir "$RUNNER_TEMP/release-dmg"
+          hdiutil attach -nobrowse -readonly -mountpoint "$RUNNER_TEMP/release" "$RUNNER_TEMP"/release-dmg/*.dmg
+          app=$(find "$RUNNER_TEMP/release" -maxdepth 1 -name '*.app' | head -1)
+          echo "RELEASE_APP=$app/Contents/MacOS/$(basename "$app" .app)" >> "$GITHUB_ENV"
+
+      - name: Screenshot the latest release
+        env:
+          E2E_SCREENSHOT_DIR: comparison/release
+          E2E_ALLOW_CONSOLE_ERRORS: "1"
+        run: E2E_APP_EXECUTABLE="$RELEASE_APP" npx playwright test screenshots
+
+      - name: Unmount the release
+        if: always()
+        run: hdiutil detach "$RUNNER_TEMP/release" || true
+
+      - name: Publish screenshots to the e2e-screenshots branch
+        run: |
+          dest="pr-${PR_NUMBER}/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "IMAGE_BASE_URL=https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/e2e-screenshots/${dest}" >> "$GITHUB_ENV"
+          work="$RUNNER_TEMP/e2e-screenshots"
+          git init -q "$work"
+          cd "$work"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          # Other PRs may push at the same time, so retry on top of the new tip.
+          for attempt in 1 2 3; do
+            if git fetch -q --depth 1 origin e2e-screenshots; then
+              git checkout -q -B e2e-screenshots FETCH_HEAD
+            else
+              git checkout -q --orphan e2e-screenshots
+            fi
+            mkdir -p "$dest"
+            cp -R "$GITHUB_WORKSPACE/comparison/release" "$GITHUB_WORKSPACE/comparison/pr" "$dest/"
+            git add "$dest"
+            git commit -q -m "e2e screenshots for #${PR_NUMBER} (run ${GITHUB_RUN_ID})"
+            git push -q origin HEAD:e2e-screenshots && exit 0
+            echo "push attempt ${attempt} failed, retrying"
+          done
+          exit 1
+
+      - name: Post or update the PR comment
+        env:
+          PR_LABEL: "#${{ github.event.pull_request.number }}"
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          npx tsx e2e/comparison-comment.ts comparison "$IMAGE_BASE_URL" > "$RUNNER_TEMP/comment.md"
+          marker='<!-- e2e-release-comparison -->'
+          id=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+            --jq ".[] | select(.body | startswith(\"${marker}\")) | .id" | head -1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${id}" -F "body=@$RUNNER_TEMP/comment.md" > /dev/null
+          else
+            gh pr comment "$PR_NUMBER" --body-file "$RUNNER_TEMP/comment.md"
+          fi
+
+      - name: Upload comparison screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-comparison
+          path: comparison/
+          retention-days: 14
+          if-no-files-found: ignore
