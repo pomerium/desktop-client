@@ -22,6 +22,6 @@
     "allowJs": true,
     "noImplicitAny": false
   },
-  "include": ["src/**/*", "*.config.ts"],
+  "include": ["src/**/*", "e2e/**/*", "*.config.ts"],
   "exclude": ["node_modules", "out", "release"]
 }

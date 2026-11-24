@@ -46,6 +46,7 @@
     "release": "npm run build && electron-builder build --publish always",
     "postinstall": "electron-builder install-app-deps",
     "test": "vitest run --passWithNoTests",
+    "test:e2e": "npm run build && playwright test",
     "protoc": "scripts/protoc --ts_proto_out=./src/shared/pb/ --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true --proto_path=. api.proto && oxfmt --write ./src/shared/pb"
   },
   "dependencies": {
@@ -81,6 +82,7 @@
   },
   "devDependencies": {
     "@electron/notarize": "^3.1.2",
+    "@playwright/test": "1.65.0",
     "@swc/types": "^0.1.28",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

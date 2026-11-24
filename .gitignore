@@ -53,3 +53,7 @@ src/meta.json
 changelog.md
 
 yarn.lock
+
+# Playwright e2e output
+/test-results
+/playwright-report
